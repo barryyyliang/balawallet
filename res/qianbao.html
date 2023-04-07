@@ -42,6 +42,10 @@
         var namevalue = document.getElementById(name).value
         window.changeWalletName(addressvalue,namevalue)
     }
+    function management(address,name){
+        window.weblog("enter management")
+
+    }
     function addAccountElement(acc,table){
         window.weblog("enter addelement")
         for (i=0; i<acc.length; i++){
@@ -81,7 +85,13 @@
             bt.setAttribute("type","button")
             bt.setAttribute("value","修改别名")
             bt.setAttribute("onclick","changeName("+"'address"+i +"'" +",'name"+i+"')")
-            td4.append(bt)            
+            td4.append(bt)    
+            var bt2 = document.createElement("input")
+            bt2.setAttribute("style","font-size: 14px;height:25px;")
+            bt2.setAttribute("type","button")
+            bt2.setAttribute("value","管理")
+            bt2.setAttribute("onclick","management("+"'address"+i +"'" +",'name"+i+"')")
+            td4.append(bt2)          
             tr.append(td4)
 
             table.append(tr)

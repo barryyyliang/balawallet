@@ -18,12 +18,16 @@ import (
 
 var win webview.WebView
 var dir string
+var datadir string
+var accountdir string
+var resdir string
+var exportdir string
 var ks *keystore.KeyStore
 
 //页面切换
 func changePage(page string, param string) {
-	fmt.Println(dir + "/res/" + page)
-	content, err := os.ReadFile(dir + "/res/" + page)
+	fmt.Println(resdir + page)
+	content, err := os.ReadFile(resdir + page)
 	if err != nil {
 		fmt.Println("can not read html")
 	}
@@ -46,7 +50,7 @@ func newaccount(pass string, walletName string) {
 	fmt.Println("password:" + pass)
 	scryptN := keystore.StandardScryptN
 	scryptP := keystore.StandardScryptP
-	account, err := keystore.StoreKey(dir+"/account/", pass, scryptN, scryptP)
+	account, err := keystore.StoreKey(accountdir, pass, scryptN, scryptP)
 	if err != nil {
 		fmt.Println("failed to generate new account")
 	}
@@ -56,7 +60,7 @@ func newaccount(pass string, walletName string) {
 	fmt.Println(account.URL.Scheme)
 
 	//账户信息存库
-	db, err := leveldb.OpenFile(dir+"/data/db", nil)
+	db, err := leveldb.OpenFile(datadir+"db", nil)
 	defer db.Close()
 
 	if isAddressExist(db, account.Address.String(), walletName) == false {
@@ -79,7 +83,7 @@ func weblog(para string) {
 func getAccounts() string {
 	//账户信息
 	addressCache := make(map[string]string)
-	db, err := leveldb.OpenFile(dir+"/data/db", nil)
+	db, err := leveldb.OpenFile(datadir+"db", nil)
 	defer db.Close()
 	if err == nil {
 		it := db.NewIterator(nil, nil)
@@ -112,7 +116,7 @@ func getAccounts() string {
 
 func changeWalletName(address string, name string) {
 	//账户信息存库
-	db, err := leveldb.OpenFile(dir+"/data/db", nil)
+	db, err := leveldb.OpenFile(datadir+"db", nil)
 	defer db.Close()
 
 	if isAddressExist(db, address, name) == false {
@@ -169,7 +173,7 @@ func exportAccount(add string, pa string) {
 			return
 		}
 
-		file, err := os.OpenFile(dir+"/export/"+add, os.O_RDWR|os.O_CREATE, 0666)
+		file, err := os.OpenFile(exportdir+add, os.O_RDWR|os.O_CREATE, 0666)
 		if err != nil {
 			fmt.Println("can not open file in export")
 			return
@@ -186,7 +190,7 @@ func exportAccount(add string, pa string) {
 func main() {
 	win = webview.New(true)
 	defer win.Destroy()
-	win.SetTitle("Basic Example")
+	win.SetTitle("我的钱包")
 	win.SetSize(600, 480, webview.HintNone)
 
 	//注册全局函数
@@ -200,6 +204,10 @@ func main() {
 
 	path, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	dir = strings.Replace(path, "\\", "/", -1)
+	datadir = dir + "/data/"
+	resdir = dir + "/res/"
+	accountdir = dir + "/account/"
+	exportdir = dir + "/export/"
 
 	//打开钱包
 	scryptN := keystore.StandardScryptN
