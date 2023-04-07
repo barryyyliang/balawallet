@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head> 
+<meta charset="utf-8"> 
+<title>数字货币钱包</title> 
+<style>
+    table, th, td {
+      frame: void;
+    }
+    ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #333;
+    }
+
+    li {
+        float: left;
+    }
+
+    li a {
+        display: block;
+        color: white;
+        text-align: center;
+        padding: 14px 16px;
+        text-decoration: none;
+    }
+
+    li a:hover {
+        background-color: #111;
+    } 
+    li a:active {
+        background-color: #111;
+    }
+</style>
+<script>
+    function changeName(address,name){
+        window.weblog("enter changeName")
+        window.weblog(address)
+        var addressvalue = document.getElementById(address).value
+        var namevalue = document.getElementById(name).value
+        window.changeWalletName(addressvalue,namevalue)
+    }
+    function addAccountElement(acc,table){
+        window.weblog("enter addelement")
+        for (i=0; i<acc.length; i++){
+            var par = acc[i].split('-')
+
+            var tr = document.createElement("tr")
+            tr.setAttribute("style","height:50px;")
+            var td1 = document.createElement("td")
+            td1.append("Eth: ")
+            tr.append(td1)
+
+            var ipt = document.createElement("input")
+            ipt.setAttribute("id","address"+i)
+            ipt.setAttribute("style","font-size: 14px;height:25px;")
+            ipt.setAttribute("type","text")
+            ipt.setAttribute("value",par[0])
+            ipt.setAttribute("size","45")   
+            ipt.setAttribute("disabled","")         
+            var td2 = document.createElement("td")
+            td2.append(ipt)
+            tr.append(td2)
+
+
+            var td3 = document.createElement("td")
+            var ipt2 = document.createElement("input")
+            ipt2.setAttribute("id","name"+i)
+            ipt2.setAttribute("style","font-size: 14px;height:25px;")
+            ipt2.setAttribute("type","text")
+            ipt2.setAttribute("value",par[1])
+            ipt2.setAttribute("size","20")  
+            td3.append(ipt2)
+            tr.append(td3)
+
+            var td4 = document.createElement("td")               
+            var bt = document.createElement("input")
+            bt.setAttribute("style","font-size: 14px;height:25px;")
+            bt.setAttribute("type","button")
+            bt.setAttribute("value","修改别名")
+            bt.setAttribute("onclick","changeName("+"'address"+i +"'" +",'name"+i+"')")
+            td4.append(bt)            
+            tr.append(td4)
+
+            table.append(tr)
+        }
+
+
+    }
+    window.onload=function() {
+        window.weblog("qianbao page")
+        window.getAccounts().then( (result) => {
+            window.weblog("get result" + result)
+            var arr = result.split(',')
+            window.weblog("go to addelement")
+            addAccountElement(arr,document.getElementById("table1"))
+        }
+        )
+    }
+</script>
+</head> 
+<body>
+    <ul>
+        <li><a class="active" onclick="window.changePage('qianbao.html','')">钱包</a></li>
+        <li><a class="active" onclick="window.changePage('contractasset.html','')">合约资产</a></li>
+        <li><a class="active" onclick="window.changePage('market.html','')">市场</a></li>
+        <li><a class="active" onclick="window.changePage('system.html','')">系统</a></li>
+    </ul>
+
+    <div style="margin: 0 auto;background-color: aquamarine;text-align: center;">
+        <div style="margin: 0 auto;background-color: rgb(236, 255, 127);text-align: center;">
+            <table id="table1" style="margin: 0 auto;font-size: 16px;text-align: center;">
+                <tr>
+                    <th>类型</th>
+                    <th>地址</th>
+                    <th>别名</th>
+                </tr> 
+            </table>
+        </div>
+    </div>
+
+ 
+</body>
+</html>

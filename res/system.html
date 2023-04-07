@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head> 
+<meta charset="utf-8"> 
+<title>数字货币钱包</title> 
+<style>
+    table, th, td {
+      frame: void;
+    }
+    ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #333;
+    }
+
+    li {
+        float: left;
+    }
+
+    li a {
+        display: block;
+        color: white;
+        text-align: center;
+        padding: 14px 16px;
+        text-decoration: none;
+        font-size: 16px;
+    }
+
+    li a:hover {
+        background-color: #111;
+    } 
+    li a:active {
+        background-color: #111;
+    }
+
+
+    .button1 {
+        background-color: #656865d8; /* Green */
+        border: none;
+        color: white;
+        padding: 15px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+        -webkit-transition-duration: 0.4s; /* Safari */
+        transition-duration: 0.4s;
+        width: 200px;
+    }
+    .button1:hover {
+        box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+    }
+
+    </style>
+</head> 
+<body>
+    <ul>
+        <li><a class="active" onclick="window.changePage('qianbao.html','')">钱包</a></li>
+        <li><a onclick="window.changePage('contractasset.html','')">合约资产</a></li>
+        <li><a onclick="window.changePage('market.html','')">市场</a></li>
+        <li><a onclick="window.changePage('system.html','')">系统</a></li>
+    </ul>
+
+    <div style="margin: 0 auto;background-color: aquamarine;text-align: center;">
+        <div style="margin: 0 auto;background-color: rgb(236, 255, 127);text-align: center;">
+            <button class="button1" onclick="window.changePage('newaccount.html','')">新增账户</button>
+        </div>
+        <div style="margin: 0 auto;background-color: rgb(236, 255, 127);text-align: center;">
+            <button class="button1" onclick="window.changePage('import.html','')">导入账号</button>
+        </div>
+        <div style="margin: 0 auto;background-color: rgb(236, 255, 127);text-align: center;">
+            <button class="button1" onclick="window.changePage('export.html','')">导出账号</button>
+        </div>
+        <div style="margin: 0 auto;background-color: rgb(236, 255, 127);text-align: center;">
+            <button class="button1">显示账号助记符</button>
+        </div>
+    </div>
+ 
+</body>
+</html>
