@@ -17,6 +17,7 @@ var accountdir string
 var resdir string
 var exportdir string
 var ks *keystore.KeyStore
+var nodeaddress string = "http://localhost:8545"
 
 func main() {
 	win = webview.New(true)
@@ -34,6 +35,7 @@ func main() {
 	win.Bind("exportAccount", exportAccount)
 	win.Bind("getAccountName", getAccountName)
 	win.Bind("transfer", transfer)
+	win.Bind("doGetBalance", doGetBalance)
 
 	path, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	dir = strings.Replace(path, "\\", "/", -1)

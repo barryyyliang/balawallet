@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"crypto/ecdsa"
 	"encoding/hex"
 	"fmt"
@@ -12,6 +13,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/syndtr/goleveldb/leveldb"
 )
 
@@ -198,19 +200,25 @@ func exportAccount(add string, pa string) {
 }
 
 func transfer(from string, to string, value int64, pass string) {
+	connect, err := ethclient.Dial(nodeaddress)
+	if err != nil {
+		fmt.Println("can not connect to node:")
+		return
+	}
+	ctx := context.Background()
+	defer connect.Close()
 	acc := ks.Accounts()
 	for i := 0; i < len(acc); i++ {
 		fmt.Printf("get account: %s : \r\n", acc[i].Address.String())
 		if from == acc[i].Address.String() {
-			common.BytesToAddress([]byte(to))
 			bigvalue := big.NewInt(value)
 			var nounce uint64 = 1
 			var gasLimit uint64 = 21000
-			gasPrice := big.NewInt(20000000000)
-			chainId := big.NewInt(11583)
+			gasPrice, err := connect.SuggestGasPrice(ctx) ///big.NewInt(20000000000)
+			chainId, err := connect.ChainID(ctx)
 
 			tx := types.NewTransaction(nounce, common.HexToAddress(to), bigvalue, gasLimit, gasPrice, []byte(""))
-			tx, err := ks.SignTxWithPassphrase(acc[i], pass, tx, chainId)
+			tx, err = ks.SignTxWithPassphrase(acc[i], pass, tx, chainId)
 			if err == nil {
 				json, err2 := tx.MarshalJSON()
 				if err2 == nil {
@@ -224,5 +232,22 @@ func transfer(from string, to string, value int64, pass string) {
 
 			return
 		}
+	}
+}
+
+//获取账户余额
+func doGetBalance(add string) string {
+	connect, err := ethclient.Dial(nodeaddress)
+	if err != nil {
+		fmt.Println("can not connect to node:" + err.Error())
+		return ""
+	}
+
+	balance, err := connect.BalanceAt(context.Background(), common.HexToAddress(add), nil)
+	if err == nil {
+		return balance.String()
+	} else {
+		fmt.Println("get balance error:" + err.Error())
+		return ""
 	}
 }
