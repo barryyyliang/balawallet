@@ -40,7 +40,7 @@
         window.weblog(address)
         var addressvalue = document.getElementById(address).value
         var namevalue = document.getElementById(name).value
-        window.changeWalletName(addressvalue,namevalue)
+        window.changeAccountName(addressvalue,namevalue)
     }
     function management(address,name){
         window.weblog("enter management")
@@ -114,6 +114,7 @@
 <body>
     <ul>
         <li><a class="active" onclick="window.changePage('qianbao.html','')">钱包</a></li>
+        <li><a onclick="window.changePage('transfer.html','')">转账</a></li>
         <li><a class="active" onclick="window.changePage('contractasset.html','')">合约资产</a></li>
         <li><a class="active" onclick="window.changePage('market.html','')">市场</a></li>
         <li><a class="active" onclick="window.changePage('system.html','')">系统</a></li>
