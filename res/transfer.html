@@ -75,7 +75,7 @@
             window.weblog("toAddress value:" + toAddress)  
             var amount = document.getElementById("amount").value
             window.weblog("amount value:" + amount) 
-            window.transfer(add, toAddress,parseInt(amount),pa)
+            window.transfer(add, toAddress,amount,pa)
         }
 
         function change(){
@@ -110,6 +110,12 @@
                     se.add(option)
                 }
                 se.value = ""            
+            }
+            )
+
+            window.doGetFee().then ( (result) => {
+                var se = document.getElementById("fee")
+                se.value = result
             }
             )
         } 
@@ -155,6 +161,10 @@
                 <tr>
                     <td>金额:</td>
                     <td><input type="text" id="amount" name="amount" style="width:300px"></td>
+                </tr> 
+                <tr>
+                    <td>预估费用:</td>
+                    <td><input type="text" id="fee" name="fee" style="width:300px" disabled></td>
                 </tr> 
                 <tr>
                     <td>密码:</td>

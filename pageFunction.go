@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"math/big"
 	"os"
+	"strings"
 
 	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/ethereum/go-ethereum/common"
@@ -199,7 +200,7 @@ func exportAccount(add string, pa string) {
 	}
 }
 
-func transfer(from string, to string, value int64, pass string) {
+func transfer(from string, to string, value string, pass string) {
 	connect, err := ethclient.Dial(nodeaddress)
 	if err != nil {
 		fmt.Println("can not connect to node:")
@@ -211,15 +212,22 @@ func transfer(from string, to string, value int64, pass string) {
 	for i := 0; i < len(acc); i++ {
 		fmt.Printf("get account: %s : \r\n", acc[i].Address.String())
 		if from == acc[i].Address.String() {
-			bigvalue := big.NewInt(value)
-			var nounce uint64 = 1
+			bigvalue, _ := etherTowei(value)
+			nounce, err := connect.NonceAt(ctx, common.HexToAddress(from), nil)
 			var gasLimit uint64 = 21000
 			gasPrice, err := connect.SuggestGasPrice(ctx) ///big.NewInt(20000000000)
 			chainId, err := connect.ChainID(ctx)
-
-			tx := types.NewTransaction(nounce, common.HexToAddress(to), bigvalue, gasLimit, gasPrice, []byte(""))
+			//后续可以改为可设置消费的交易
+			tx := types.NewTransaction(nounce, common.HexToAddress(to), &bigvalue, gasLimit, gasPrice, []byte(""))
 			tx, err = ks.SignTxWithPassphrase(acc[i], pass, tx, chainId)
 			if err == nil {
+				err := connect.SendTransaction(ctx, tx)
+				if err != nil {
+					fmt.Println("transfer err:" + err.Error())
+				} else {
+					fmt.Println("transfer success")
+				}
+
 				json, err2 := tx.MarshalJSON()
 				if err2 == nil {
 					fmt.Println(string(json))
@@ -238,16 +246,109 @@ func transfer(from string, to string, value int64, pass string) {
 //获取账户余额
 func doGetBalance(add string) string {
 	connect, err := ethclient.Dial(nodeaddress)
+	defer connect.Close()
 	if err != nil {
 		fmt.Println("can not connect to node:" + err.Error())
 		return ""
 	}
 
 	balance, err := connect.BalanceAt(context.Background(), common.HexToAddress(add), nil)
+
 	if err == nil {
-		return balance.String()
+		return weiToether(balance.String())
 	} else {
 		fmt.Println("get balance error:" + err.Error())
 		return ""
 	}
+}
+
+func weiTox(unittag int, wei string) string {
+	ballength := len(wei)
+	var balance string
+	fmt.Println("wei:" + wei)
+	if ballength > unittag {
+		var first []byte = make([]byte, ballength-unittag)
+		copy(first, []byte(wei)[0:ballength-unittag])
+		fmt.Println("first:" + string(first))
+		var second []byte = make([]byte, unittag)
+		copy(second, []byte(wei)[ballength-unittag:])
+		fmt.Println("second:" + string(second))
+		secondStr := strings.TrimRight(string(second), "0")
+		if secondStr != "" {
+			balance = string(first) + "." + secondStr
+		} else {
+			balance = string(first)
+		}
+	} else {
+		wei = strings.TrimRight(wei, "0")
+		if wei != "" {
+			gap := unittag - ballength
+			balance = "0."
+
+			for i := 0; i < gap; i++ {
+				balance = balance + "0"
+			}
+			balance = balance + wei
+		} else {
+			balance = "0"
+		}
+	}
+	return balance
+}
+
+func weiToether(wei string) string {
+	return weiTox(18, wei)
+}
+
+func weiTogwei(wei string) string {
+	return weiTox(9, wei)
+}
+
+func etherTowei(ether string) (big.Int, bool) {
+	// 要调用isnumber判断是否为正确数字格式
+	if isNumber(ether) {
+		strs := strings.Split(ether, ".")
+		lens := len(strs[1])
+		var balstr string
+		for i := 0; i < 18-lens; i++ {
+			strs[1] = strs[1] + "0"
+		}
+
+		if "0" == strs[0] {
+			balstr = strings.TrimLeft(strs[1], "0")
+		} else {
+			balstr = strs[0] + strs[1]
+		}
+		var wei big.Int = *big.NewInt(0)
+		_, ret := wei.SetString(balstr, 10)
+		return wei, ret
+	}
+	return *big.NewInt(0), false
+
+}
+
+//判断字符串是否为10进制数字，，每个字符必须为数字【1--9】，最多有一个小数点”.“
+func isNumber(value string) bool {
+	//todo
+
+	return true
+}
+
+func doGetFee() string {
+	connect, err := ethclient.Dial(nodeaddress)
+	if err != nil {
+		fmt.Println("can not connect to node:")
+		return ""
+	}
+	ctx := context.Background()
+	defer connect.Close()
+
+	price, err := connect.SuggestGasPrice(ctx)
+	tips, err := connect.SuggestGasTipCap(ctx)
+	gas := big.NewInt(21000)
+	fee := big.NewInt(0)
+	fee = fee.Add(price, tips)
+	fee = fee.Mul(fee, gas)
+	str := weiToether(fee.String())
+	return str
 }

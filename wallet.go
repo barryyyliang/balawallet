@@ -36,6 +36,7 @@ func main() {
 	win.Bind("getAccountName", getAccountName)
 	win.Bind("transfer", transfer)
 	win.Bind("doGetBalance", doGetBalance)
+	win.Bind("doGetFee", doGetFee)
 
 	path, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	dir = strings.Replace(path, "\\", "/", -1)
