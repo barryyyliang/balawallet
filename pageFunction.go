@@ -84,9 +84,9 @@ func getAccounts() string {
 		defer it.Release()
 		for it.Next() {
 			//fmt.Println("get address:" + string(it.Key()) + ":" + string(it.Value()))
-			fmt.Printf("get address: %s :\r\n", string(it.Key()))
+			//fmt.Printf("get address: %s :\r\n", string(it.Key()))
 			addressCache[string(it.Key())] = string(it.Value())
-			fmt.Println("map:" + string(it.Key()) + ":" + addressCache[string(it.Key())])
+			//fmt.Println("map:" + string(it.Key()) + ":" + addressCache[string(it.Key())])
 		}
 	}
 
@@ -95,12 +95,12 @@ func getAccounts() string {
 	for i := 0; i < len(acc); i++ {
 		if 0 == i {
 			//fmt.Println("get name:" + acc[i].Address.String())
-			fmt.Printf("get name: %s : \r\n", acc[i].Address.String())
+			//fmt.Printf("get name: %s : \r\n", acc[i].Address.String())
 			add := acc[i].Address.String()
 			acclist = add + "-" + addressCache[add]
 		} else {
 			//fmt.Println("get name:" + acc[i].Address.String())
-			fmt.Printf("get name: %s : \r\n", acc[i].Address.String())
+			//fmt.Printf("get name: %s : \r\n", acc[i].Address.String())
 			add := acc[i].Address.String()
 			acclist = acclist + "," + add + "-" + addressCache[add]
 		}
@@ -161,7 +161,7 @@ func importAccount(pa string, name string, kk string) {
 
 //导出私钥
 func exportAccount(add string, pa string) {
-	fmt.Println("exportAccount")
+	//fmt.Println("exportAccount")
 	selectAccountFile := ""
 	acc := ks.Accounts()
 	for i := 0; i < len(acc); i++ {
@@ -200,6 +200,18 @@ func exportAccount(add string, pa string) {
 	}
 }
 
+func newDynamicTx(nonce uint64, to common.Address, amount *big.Int, gasLimit uint64, gasPrice *big.Int, tipsPrice *big.Int, chain *big.Int) *types.Transaction {
+	return types.NewTx(&types.DynamicFeeTx{
+		Nonce:     nonce,
+		To:        &to,
+		Value:     amount,
+		Gas:       gasLimit,
+		GasFeeCap: gasPrice,
+		GasTipCap: tipsPrice,
+		ChainID:   chain,
+	})
+}
+
 func transfer(from string, to string, value string, pass string) {
 	connect, err := ethclient.Dial(nodeaddress)
 	if err != nil {
@@ -216,9 +228,11 @@ func transfer(from string, to string, value string, pass string) {
 			nounce, err := connect.NonceAt(ctx, common.HexToAddress(from), nil)
 			var gasLimit uint64 = 21000
 			gasPrice, err := connect.SuggestGasPrice(ctx) ///big.NewInt(20000000000)
+			tipsPrice, err := connect.SuggestGasTipCap(ctx)
 			chainId, err := connect.ChainID(ctx)
 			//后续可以改为可设置消费的交易
-			tx := types.NewTransaction(nounce, common.HexToAddress(to), &bigvalue, gasLimit, gasPrice, []byte(""))
+			//tx := types.NewTransaction(nounce, common.HexToAddress(to), &bigvalue, gasLimit, gasPrice, make([]byte, 0))
+			tx := newDynamicTx(nounce, common.HexToAddress(to), &bigvalue, gasLimit, gasPrice, tipsPrice, chainId)
 			tx, err = ks.SignTxWithPassphrase(acc[i], pass, tx, chainId)
 			if err == nil {
 				err := connect.SendTransaction(ctx, tx)
@@ -269,10 +283,10 @@ func weiTox(unittag int, wei string) string {
 	if ballength > unittag {
 		var first []byte = make([]byte, ballength-unittag)
 		copy(first, []byte(wei)[0:ballength-unittag])
-		fmt.Println("first:" + string(first))
+		//fmt.Println("first:" + string(first))
 		var second []byte = make([]byte, unittag)
 		copy(second, []byte(wei)[ballength-unittag:])
-		fmt.Println("second:" + string(second))
+		//fmt.Println("second:" + string(second))
 		secondStr := strings.TrimRight(string(second), "0")
 		if secondStr != "" {
 			balance = string(first) + "." + secondStr
@@ -344,7 +358,17 @@ func doGetFee() string {
 	defer connect.Close()
 
 	price, err := connect.SuggestGasPrice(ctx)
+	if err != nil {
+		fmt.Println("get price error:" + err.Error())
+		return ""
+	}
+	fmt.Println("price:" + weiToether(price.String()))
 	tips, err := connect.SuggestGasTipCap(ctx)
+	if err != nil {
+		fmt.Println("get tips error:" + err.Error())
+		return ""
+	}
+	fmt.Println("tips:" + weiToether(tips.String()))
 	gas := big.NewInt(21000)
 	fee := big.NewInt(0)
 	fee = fee.Add(price, tips)
