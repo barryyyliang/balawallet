@@ -11,12 +11,12 @@ import (
 )
 
 var win webview.WebView
+var ks *keystore.KeyStore
 var dir string
 var datadir string
 var accountdir string
 var resdir string
 var exportdir string
-var ks *keystore.KeyStore
 var nodeaddress string = "http://localhost:8545"
 
 func main() {
