@@ -20,7 +20,7 @@ var exportdir string
 var nodeaddress string = "http://localhost:8545"
 
 func main() {
-	win = webview.New(true)
+	win = webview.New(false)
 	defer win.Destroy()
 	win.SetTitle("我的钱包")
 	win.SetSize(600, 480, webview.HintNone)

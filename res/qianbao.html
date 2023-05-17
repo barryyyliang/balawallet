@@ -72,16 +72,53 @@
         overflow: auto;
     }
 
+    #menu{
+    width: 0; /*设置为0 隐藏自定义菜单*/
+    height: 125px;
+    overflow: hidden; /*隐藏溢出的元素*/
+    box-shadow: 0 1px 1px #888,1px 0 1px #ccc;
+    position: absolute; /*自定义菜单相对与body元素进行定位*/
+    }
+    .menu{
+        width: 130px;
+        height: 25px;
+        line-height: 25px;
+        padding: 0 10px;
+        background: rgb(126, 126, 121);
+    }
+    .menu:hover {
+        background-color: rgb(245, 245, 245);
+    }
 
 </style>
 <script>
+    var activeArea 
+    window.oncontextmenu=function(e){
+        //取消默认的浏览器自带右键 很重要！！
+        activeArea = document.activeElement
+        e.preventDefault();
+        //获取我们自定义的右键菜单
+        var menu=document.querySelector("#menu");
+        //根据事件对象中鼠标点击的位置，进行定位
+        menu.style.left=e.clientX+'px';
+        menu.style.top=e.clientY+'px';
+        //改变自定义菜单的宽，让它显示出来
+        menu.style.width='100px';
+        menu.style.height='auto';
+    }
+    //鼠标左键任意位置单击, 关闭右键菜单
+    window.onclick=function(e){
+        //用户触发click事件就可以关闭了，因为绑定在window上，按事件冒泡处理，不会影响菜单的功能
+        document.querySelector('#menu').style.height=0;
+    }
+
     function ShowDiv(show_div, bg_div){
         document.getElementById(show_div).style.display='block';
         document.getElementById(bg_div).style.display='block';
         var bgdiv = document.getElementById(bg_div);
         bgdiv.style.width = document.body.scrollWidth;
-        // bgdiv.style.height = $(document) .height();
-        $("#"+bg_div).height($(document).height());
+        bgdiv.style.height = document.body.scrollHeight;
+        //$("#"+bg_div).height($(document).height());
     }
     //关闭弹出层
     function CloseDiv(show_div,bg_div){
@@ -153,7 +190,7 @@
 
             table.append(tr)
         }
-        ShowDiv("MyDiv","fade")
+        //ShowDiv("MyDiv","fade")
 
     }
     window.onload=function() {
@@ -166,38 +203,80 @@
         }
         )
     }
+
+    function copy(){
+        var userSelection= window.getSelection().toString()
+        window.weblog(activeArea)
+        if(activeArea != undefined){
+            if (activeArea.selectionStart != undefined) {
+                 userSelection = activeArea.value.substring(
+                    activeArea.selectionStart, activeArea.selectionEnd
+                )
+            }
+        }
+
+        if (navigator.clipboard) {
+            // clipboard api 复制
+            navigator.clipboard.writeText(userSelection);
+        } else {
+            var textarea = document.getElementById('copyarea');
+            // 赋值
+            textarea.value = userSelection;
+            // 选中
+            textarea.select();
+            // 复制
+            document.execCommand('copy', true);
+        }
+
+
+    }
 </script>
 </head> 
-<body>
-    <ul>
-        <li><a class="active" onclick="window.changePage('qianbao.html','')">钱包</a></li>
-        <li><a onclick="window.changePage('transfer.html','')">转账</a></li>
-        <li><a class="active" onclick="window.changePage('contractasset.html','')">合约资产</a></li>
-        <li><a class="active" onclick="window.changePage('market.html','')">市场</a></li>
-        <li><a class="active" onclick="window.changePage('system.html','')">系统</a></li>
-    </ul>
+<body oncontextmenu="return false" onselectstart="return false">
+    <div style="width: 100%;height: 100%;background: rgb(251, 251, 251);position: absolute;"> 
+        <ul>
+            <li><a class="active" onclick="window.changePage('qianbao.html','')">钱包</a></li>
+            <li><a onclick="window.changePage('transfer.html','')">转账</a></li>
+            <li><a class="active" onclick="window.changePage('contractasset.html','')">合约资产</a></li>
+            <li><a class="active" onclick="window.changePage('market.html','')">市场</a></li>
+            <li><a class="active" onclick="window.changePage('system.html','')">系统</a></li>
+        </ul>
 
-    <div style="margin: 0 auto;background-color: aquamarine;text-align: center;">
-        <div style="margin: 0 auto;background-color: rgb(236, 255, 127);text-align: center;">
-            <table id="table1" style="margin: 0 auto;font-size: 16px;text-align: center;">
-                <tr>
-                    <th>类型</th>
-                    <th>地址</th>
-                    <th>别名</th>
-                </tr> 
-            </table>
+        <div style="margin: 0 auto;background-color: aquamarine;text-align: center;">
+            <div style="margin: 0 auto;background-color: rgb(236, 255, 127);text-align: center;">
+                <table id="table1" style="margin: 0 auto;font-size: 16px;text-align: center;">
+                    <tr>
+                        <th>类型</th>
+                        <th>地址</th>
+                        <th>别名</th>
+                    </tr> 
+                </table>
+            </div>
         </div>
-    </div>
 
-    <!--弹出层时背景层DIV-->
-    <div id="fade" class= "black_overlay"></div>
-    <div id="MyDiv" class="white_content_small">
-        <div style="text-align: right; cursor: default; height: 40px;">
-            <span style="font-size: 16px;" onclick="CloseDiv('MyDiv','fade')">关闭</span>
+        <!--弹出层时背景层DIV-->
+        <div id="fade" class= "black_overlay"></div>
+        <div id="MyDiv" class="white_content_small">
+            <div style="text-align: right; cursor: default; height: 40px;">
+                <span style="font-size: 16px;" onclick="CloseDiv('MyDiv','fade')">关闭</span>
+            </div>
+            <div id="dialogcontent">
+                一个模态对话框
+            </div>
         </div>
-        <div id="dialogcontenct">
-            一个模态对话框
+        
+
+        <!-- menu-->
+        
+        <div id="menu">
+            <div class="menu" onclick="copy()">拷贝</div>
+            <div class="menu">粘贴</div>
+            <div class="menu">剪切</div>
+            <div class="menu">清除</div>
+            <textarea id="copyarea" style="position: fixed;clip: rect(0 0 0 0);"></textarea>
         </div>
+        
+
     </div>
  
 </body>
