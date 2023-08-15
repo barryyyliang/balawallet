@@ -5,6 +5,7 @@ import (
 	"context"
 	"crypto/ecdsa"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"math/big"
 	"os"
@@ -375,4 +376,64 @@ func doGetFee() string {
 	fee = fee.Mul(fee, gas)
 	str := weiToether(fee.String())
 	return str
+}
+
+func doGetComponent(com string) string {
+	fmt.Println("enter doGetMenu")
+
+	if com == "menu" {
+		type menujson struct {
+			Menumcss string `json:"css"`
+			Menuhtml string `json:"html"`
+		}
+		menucss, err1 := os.ReadFile(dir + "/res/common/menucss.html")
+		if err1 != nil {
+			fmt.Println("doGetComponent get menucss.html error")
+			return ""
+		}
+		menu, err2 := os.ReadFile(dir + "/res/common/menu.html")
+		if err2 != nil {
+			fmt.Println("doGetComponent get menu.html error")
+			return ""
+		}
+		result := menujson{string(menucss), string(menu)}
+		re, err := json.Marshal(result)
+		if err != nil {
+			fmt.Println("doGetComponent json error")
+			return ""
+		}
+		return string(re)
+	} else if com == "rightmenu" {
+		type menujson struct {
+			Menumcss string `json:"css"`
+			Menuhtml string `json:"html"`
+			Menujs   string `json:"js"`
+		}
+		menucss, err1 := os.ReadFile(dir + "/res/common/rightmenucss.html")
+		if err1 != nil {
+			fmt.Println("doGetComponent get rightmenucss.html error")
+			return ""
+		}
+		menu, err2 := os.ReadFile(dir + "/res/common/rightmenu.html")
+		if err2 != nil {
+			fmt.Println("doGetComponent get rightmenu.html error")
+			return ""
+		}
+
+		menujs, err3 := os.ReadFile(dir + "/res/common/rightmenujs.html")
+		if err3 != nil {
+			fmt.Println("doGetComponent get rightmenujs.html error")
+			return ""
+		}
+		result := menujson{string(menucss), string(menu), string(menujs)}
+		re, err := json.Marshal(result)
+		if err != nil {
+			fmt.Println("doGetComponent json error")
+			return ""
+		}
+		return string(re)
+	}
+
+	return ""
+
 }

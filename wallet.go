@@ -17,10 +17,10 @@ var datadir string
 var accountdir string
 var resdir string
 var exportdir string
-var nodeaddress string = "http://localhost:8545"
+var nodeaddress string = "https://mainnet.infura.io/v3/ba034438be464cc29276811659dddea6" //"http://localhost:8545"
 
 func main() {
-	win = webview.New(false)
+	win = webview.New(true)
 	defer win.Destroy()
 	win.SetTitle("我的钱包")
 	win.SetSize(600, 480, webview.HintNone)
@@ -37,6 +37,7 @@ func main() {
 	win.Bind("transfer", transfer)
 	win.Bind("doGetBalance", doGetBalance)
 	win.Bind("doGetFee", doGetFee)
+	win.Bind("doGetComponent", doGetComponent)
 
 	path, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	dir = strings.Replace(path, "\\", "/", -1)
