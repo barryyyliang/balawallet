@@ -93,88 +93,24 @@
     .menu:hover {
         background-color: rgb(245, 245, 245);
     }
-    /*弹出菜单 end*/
 
 </style>
 <style id="stylerightmenu"></style>
 <script id="menuscript"></script>
 <script>
-    var activeArea 
-    window.oncontextmenu=function(e){
-        //取消默认的浏览器自带右键 很重要！！
-        activeArea = document.activeElement
-        e.preventDefault();
-        //获取我们自定义的右键菜单
-        var menu=document.querySelector("#menu");
-        //根据事件对象中鼠标点击的位置，进行定位
-        menu.style.left=e.clientX+'px';
-        menu.style.top=e.clientY+'px';
-        //改变自定义菜单的宽，让它显示出来
-        menu.style.width='100px';
-        menu.style.height='auto';
-    }
-    //鼠标左键任意位置单击, 关闭右键菜单
-    window.onclick=function(e){
-        //用户触发click事件就可以关闭了，因为绑定在window上，按事件冒泡处理，不会影响菜单的功能
-        document.querySelector('#menu').style.height=0;
-    }
-
-    function ShowDiv(show_div, bg_div){
-        document.getElementById(show_div).style.display='block';
-        document.getElementById(bg_div).style.display='block';
-        var bgdiv = document.getElementById(bg_div);
-        bgdiv.style.width = document.body.scrollWidth;
-        bgdiv.style.height = document.body.scrollHeight;
-        //$("#"+bg_div).height($(document).height());
-    }
-    //关闭弹出层
-    function CloseDiv(show_div,bg_div){
-        document.getElementById(show_div).style.display='none';
-        document.getElementById(bg_div).style.display='none';
-    }
-
-    function copy(){
-        var userSelection= window.getSelection().toString()
-        window.weblog(activeArea)
-        if(activeArea != undefined){
-            if (activeArea.selectionStart != undefined) {
-                 userSelection = activeArea.value.substring(
-                    activeArea.selectionStart, activeArea.selectionEnd
-                )
-            }
-        }
-
-        if (navigator.clipboard) {
-            // clipboard api 复制
-            navigator.clipboard.writeText(userSelection);
-        } else {
-            var textarea = document.getElementById('copyarea');
-            // 赋值
-            textarea.value = userSelection;
-            // 选中
-            textarea.select();
-            // 复制
-            document.execCommand('copy', true);
-        }
-    }
-</script>
-<script>
     function changeName(address,name){
-        window.weblog("enter changeName")
-        window.weblog(address)
+        window.doWebLog("enter changeName")
+        window.doWebLog(address)
         var addressvalue = document.getElementById(address).value
         var namevalue = document.getElementById(name).value
-        window.changeAccountName(addressvalue,namevalue)
+        window.doChangeAccountName(addressvalue,namevalue)
     }
     function management(address,name){
-        window.weblog("enter management")
+        window.doWebLog("enter management")
 
     }
     function addAccountElement(acc,table){
-        window.weblog("enter addelement")
-        alert("alert")
-        confirm("confirm")
-        prompt("prompt")
+        window.doWebLog("enter addelement")
         for (i=0; i<acc.length; i++){
             var par = acc[i].split('-')
 
@@ -229,11 +165,11 @@
 
 
     window.onload=function() {
-        window.weblog("qianbao page")
-        window.getAccounts().then( (result) => {
-            window.weblog("get result" + result)
+        window.doWebLog("qianbao page")
+        window.doGetAccounts().then( (result) => {
+            window.doWebLog("get result" + result)
             var arr = result.split(',')
-            window.weblog("go to addelement")
+            window.doWebLog("go to addelement")
             addAccountElement(arr,document.getElementById("table1"))
         }
         )
@@ -252,11 +188,11 @@
     <div style="width: 98%;height: 98%;background: rgb(251, 251, 251);position: absolute;"> 
         <div id = "menudiv">
             <ul>
-                <li><a class="active" onclick="window.changePage('qianbao.html','')">钱包</a></li>
-                <li><a onclick="window.changePage('transfer.html','')">转账</a></li>
-                <li><a onclick="window.changePage('contractasset.html','')">合约资产</a></li>
-                <li><a onclick="window.changePage('market.html','')">市场</a></li>
-                <li><a onclick="window.changePage('system.html','')">系统</a></li>
+                <li><a class="active" onclick="window.doChangePage('qianbao.html','')">钱包</a></li>
+                <li><a onclick="window.doChangePage('transfer.html','')">转账</a></li>
+                <li><a onclick="window.doChangePage('contractasset.html','')">合约资产</a></li>
+                <li><a onclick="window.doChangePage('market.html','')">市场</a></li>
+                <li><a onclick="window.doChangePage('system.html','')">系统</a></li>
             </ul>
         </div>    
 

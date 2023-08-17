@@ -3,7 +3,7 @@
             <div id="fade" class= "black_overlay"></div>
             <div id="MyDiv" class="white_content_small">
                 <div style="text-align: right; cursor: default; height: 40px;">
-                    <span style="font-size: 16px;" onclick="CloseDiv('MyDiv','fade')">关闭</span>
+                    <span style="font-size: 16px;" onclick="MYDIALOG.CloseDiv('MyDiv','fade')">关闭</span>
                 </div>
                 <div id="dialogcontent">
                     一个模态对话框
@@ -12,8 +12,8 @@
     
             <!-- menu-->            
             <div id="menu">
-                <div class="menu" onclick="copy()">拷贝</div>
-                <div class="menu">粘贴</div>
+                <div class="menu" onclick="MYMENU.copy()">拷贝</div>
+                <div class="menu" onclick="MYMENU.paste()">粘贴</div>
                 <div class="menu">剪切</div>
                 <div class="menu">清除</div>
                 <textarea id="copyarea" style="position: fixed;clip: rect(0 0 0 0);"></textarea>

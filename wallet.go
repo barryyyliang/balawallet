@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -17,7 +18,9 @@ var datadir string
 var accountdir string
 var resdir string
 var exportdir string
-var nodeaddress string = "https://mainnet.infura.io/v3/ba034438be464cc29276811659dddea6" //"http://localhost:8545"
+
+//var nodeaddress string = "http://localhost:8545"
+var G_Config = make(map[string]string)
 
 func main() {
 	win = webview.New(true)
@@ -26,18 +29,20 @@ func main() {
 	win.SetSize(600, 480, webview.HintNone)
 
 	//注册全局函数
-	win.Bind("changePage", changePage)
-	win.Bind("newaccount", newaccount)
-	win.Bind("weblog", weblog)
-	win.Bind("getAccounts", getAccounts)
-	win.Bind("changeAccountName", changeAccountName)
-	win.Bind("importAccount", importAccount)
-	win.Bind("exportAccount", exportAccount)
-	win.Bind("getAccountName", getAccountName)
-	win.Bind("transfer", transfer)
+	win.Bind("doChangePage", doChangePage)
+	win.Bind("doNewAccount", doNewAccount)
+	win.Bind("doWebLog", doWebLog)
+	win.Bind("doGetAccounts", doGetAccounts)
+	win.Bind("doChangeAccountName", doChangeAccountName)
+	win.Bind("doImportAccount", doImportAccount)
+	win.Bind("doExportAccount", doExportAccount)
+	win.Bind("doGetAccountName", doGetAccountName)
+	win.Bind("doTransfer", doTransfer)
 	win.Bind("doGetBalance", doGetBalance)
 	win.Bind("doGetFee", doGetFee)
 	win.Bind("doGetComponent", doGetComponent)
+	win.Bind("doConfig", doConfig)
+	win.Bind("doGetConfig", doGetConfig)
 
 	path, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	dir = strings.Replace(path, "\\", "/", -1)
@@ -50,6 +55,11 @@ func main() {
 	scryptN := keystore.StandardScryptN
 	scryptP := keystore.StandardScryptP
 	ks = keystore.NewKeyStore(dir+"/account/", scryptN, scryptP)
+	//初始化配置
+	var conf = [1]string{"nodeAddress"}
+	par, err := json.Marshal(conf)
+
+	doGetConfig(string(par))
 
 	content, err := os.ReadFile(dir + "/res/qianbao.html")
 	if err != nil {

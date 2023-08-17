@@ -20,7 +20,7 @@ import (
 )
 
 //页面切换
-func changePage(page string, param string) {
+func doChangePage(page string, param string) {
 	fmt.Println(resdir + page)
 	content, err := os.ReadFile(resdir + page)
 	if err != nil {
@@ -41,7 +41,7 @@ func isAddressExist(db *leveldb.DB, adress string, name string) bool {
 }
 
 //新创建一个账号
-func newaccount(pass string, walletName string) {
+func doNewAccount(pass string, walletName string) {
 	fmt.Println("password:" + pass)
 	scryptN := keystore.StandardScryptN
 	scryptP := keystore.StandardScryptP
@@ -70,12 +70,12 @@ func newaccount(pass string, walletName string) {
 }
 
 //日志接口
-func weblog(para string) {
+func doWebLog(para string) {
 	fmt.Println(para)
 }
 
 //获取账号列表
-func getAccounts() string {
+func doGetAccounts() string {
 	//账户信息
 	addressCache := make(map[string]string)
 	db, err := leveldb.OpenFile(datadir+"db", nil)
@@ -109,7 +109,7 @@ func getAccounts() string {
 	return acclist
 }
 
-func changeAccountName(address string, name string) {
+func doChangeAccountName(address string, name string) {
 	//账户信息存库
 	db, err := leveldb.OpenFile(datadir+"db", nil)
 	defer db.Close()
@@ -126,7 +126,7 @@ func changeAccountName(address string, name string) {
 	}
 }
 
-func getAccountName(address string) string {
+func doGetAccountName(address string) string {
 	db, err := leveldb.OpenFile(datadir+"db", nil)
 	defer db.Close()
 	if err == nil {
@@ -146,7 +146,7 @@ func getAccountName(address string) string {
 }
 
 //通过私钥导入账号
-func importAccount(pa string, name string, kk string) {
+func doImportAccount(pa string, name string, kk string) {
 	fmt.Println("importAccount")
 	key := new(ecdsa.PrivateKey)
 	key.PublicKey.Curve = crypto.S256()
@@ -161,7 +161,7 @@ func importAccount(pa string, name string, kk string) {
 }
 
 //导出私钥
-func exportAccount(add string, pa string) {
+func doExportAccount(add string, pa string) {
 	//fmt.Println("exportAccount")
 	selectAccountFile := ""
 	acc := ks.Accounts()
@@ -213,8 +213,8 @@ func newDynamicTx(nonce uint64, to common.Address, amount *big.Int, gasLimit uin
 	})
 }
 
-func transfer(from string, to string, value string, pass string) {
-	connect, err := ethclient.Dial(nodeaddress)
+func doTransfer(from string, to string, value string, pass string) {
+	connect, err := ethclient.Dial(G_Config["nodeAddress"])
 	if err != nil {
 		fmt.Println("can not connect to node:")
 		return
@@ -260,7 +260,7 @@ func transfer(from string, to string, value string, pass string) {
 
 //获取账户余额
 func doGetBalance(add string) string {
-	connect, err := ethclient.Dial(nodeaddress)
+	connect, err := ethclient.Dial(G_Config["nodeAddress"])
 	defer connect.Close()
 	if err != nil {
 		fmt.Println("can not connect to node:" + err.Error())
@@ -350,7 +350,7 @@ func isNumber(value string) bool {
 }
 
 func doGetFee() string {
-	connect, err := ethclient.Dial(nodeaddress)
+	connect, err := ethclient.Dial(G_Config["nodeAddress"])
 	if err != nil {
 		fmt.Println("can not connect to node:")
 		return ""
@@ -420,7 +420,7 @@ func doGetComponent(com string) string {
 			return ""
 		}
 
-		menujs, err3 := os.ReadFile(dir + "/res/common/rightmenujs.html")
+		menujs, err3 := os.ReadFile(dir + "/res/common/rightmenu.js")
 		if err3 != nil {
 			fmt.Println("doGetComponent get rightmenujs.html error")
 			return ""
@@ -436,4 +436,43 @@ func doGetComponent(com string) string {
 
 	return ""
 
+}
+
+func doConfig(configs string) {
+	fmt.Println("enter doConfig")
+
+	json.Unmarshal([]byte(configs), &G_Config)
+
+	fmt.Println(G_Config)
+
+	db, err := leveldb.OpenFile(datadir+"db", nil)
+	defer db.Close()
+
+	for key, value := range G_Config {
+		err = db.Put([]byte(key), []byte(value), nil)
+		if err != nil {
+			fmt.Println("put configi err")
+		} else {
+			fmt.Println("put config:" + key + ":" + value)
+		}
+	}
+}
+
+func doGetConfig(configs string) string {
+	fmt.Println(configs)
+	db, _ := leveldb.OpenFile(datadir+"db", nil)
+	defer db.Close()
+
+	var configName []string
+	json.Unmarshal([]byte(configs), &configName)
+	for _, key := range configName {
+		data, err := db.Get([]byte(key), nil)
+		if err == nil {
+			G_Config[key] = string(data)
+		} else {
+			fmt.Println("get erro:" + err.Error())
+		}
+	}
+	re, _ := json.Marshal(G_Config)
+	return string(re)
 }

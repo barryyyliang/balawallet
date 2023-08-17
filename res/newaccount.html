@@ -65,29 +65,29 @@
 </style>
 <script>
     function newacnt() {
-        window.weblog("进入函数")
+        window.doWebLog("进入函数")
         var pa = document.getElementById("pass").value
-        window.weblog("密码：")
-        window.weblog(pa)
+        window.doWebLog("密码：")
+        window.doWebLog(pa)
         var repa = document.getElementById("repass").value
-        window.weblog("重输密码：")
-        window.weblog(repa)
+        window.doWebLog("重输密码：")
+        window.doWebLog(repa)
         if (pa != repa){
-            window.weblog("dont match")
+            window.doWebLog("dont match")
             return
         }
         var name = document.getElementById("name").value
-        window.newaccount(pa,name)
+        window.doNewAccount(pa,name)
     }
 </script>
 </head> 
 <body>
     <ul>
-        <li><a class="active" onclick="window.changePage('qianbao.html','')">钱包</a></li>
-        <li><a onclick="window.changePage('transfer.html','')">转账</a></li>
-        <li><a onclick="window.changePage('contractasset.html','')">合约资产</a></li>
-        <li><a onclick="window.changePage('market.html','')">市场</a></li>
-        <li><a onclick="window.changePage('system.html','')">系统</a></li>
+        <li><a class="active" onclick="window.doChangePage('qianbao.html','')">钱包</a></li>
+        <li><a onclick="window.doChangePage('transfer.html','')">转账</a></li>
+        <li><a onclick="window.doChangePage('contractasset.html','')">合约资产</a></li>
+        <li><a onclick="window.doChangePage('market.html','')">市场</a></li>
+        <li><a onclick="window.doChangePage('system.html','')">系统</a></li>
     </ul>
 
     <div style="margin: 0 auto;background-color: aquamarine;text-align: center;">
