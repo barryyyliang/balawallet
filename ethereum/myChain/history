@@ -1,9 +1,0 @@
-web3
-eth.chainId
-eth.chainId()
-eth.blockNumber
-miner.start()
-miner.setEtherbase("0x2e8a86efe74c83b3bf0d18f114bbba0278f611a3")
-miner.start()
-eth.blockNumber
-miner.stop()
