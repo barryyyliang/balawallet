@@ -1,0 +1,1 @@
+geth --datadir myChain --networkid 11583 --http  console 2>log.txt
