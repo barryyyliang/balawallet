@@ -18,27 +18,6 @@
         //用户触发click事件就可以关闭了，因为绑定在window上，按事件冒泡处理，不会影响菜单的功能
         document.querySelector('#menu').style.height=0;
     }
-
-    var MYDIALOG = {
-        //模态对话框
-        ShowDiv:function (show_div, bg_div, dialog_content){
-            var showdiv = document.getElementById(show_div);
-            showdiv.style.display='block';
-            var bgdiv = document.getElementById(bg_div);
-            bgdiv.style.display='block';
-            bgdiv.style.width = document.body.scrollWidth;
-            bgdiv.style.height = document.body.scrollHeight;
-            var contentdiv = document.getElementById("dialogcontent");
-            contentdiv.innerHTML = dialog_content
-            //$("#"+bg_div).height($(document).height());
-        },
-
-        //关闭模态对话框
-        CloseDiv:function (show_div,bg_div){
-            document.getElementById(show_div).style.display='none';
-            document.getElementById(bg_div).style.display='none';
-        }
-    }
  
     var MYMENU = {
         copy:function (){
@@ -105,6 +84,27 @@
 
                 window.doWebLog(document.getElementById('copyarea').value)
             }
+        }
+    }
+
+    var MYDIALOG = {
+        //模态对话框
+        ShowDiv:function (show_div, bg_div, dialog_content){
+            var showdiv = document.getElementById(show_div);
+            showdiv.style.display='block';
+            var bgdiv = document.getElementById(bg_div);
+            bgdiv.style.display='block';
+            bgdiv.style.width = document.body.scrollWidth;
+            bgdiv.style.height = document.body.scrollHeight;
+            var contentdiv = document.getElementById("dialogcontent");
+            contentdiv.innerHTML = dialog_content
+            //$("#"+bg_div).height($(document).height());
+        },
+
+        //关闭模态对话框
+        CloseDiv:function (show_div,bg_div){
+            document.getElementById(show_div).style.display='none';
+            document.getElementById(bg_div).style.display='none';
         }
     }
 

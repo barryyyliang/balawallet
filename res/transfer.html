@@ -78,7 +78,14 @@
             window.doWebLog("toAddress value:" + toAddress)  
             var amount = document.getElementById("amount").value
             window.doWebLog("amount value:" + amount) 
-            window.doTransfer(add, toAddress,amount,pa)
+            window.doTransfer(add, toAddress,amount,pa).then((result) => {
+                var obj = JSON.parse(result)
+                if (obj.Code === 0) {
+                    MYDIALOG.ShowDiv("MyDiv","fade", "转账成功");
+                } else {
+                    MYDIALOG.ShowDiv("MyDiv","fade", obj.Err);
+                }
+            })
         }
 
         function change(){

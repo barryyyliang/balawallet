@@ -44,7 +44,7 @@ func main() {
 	win.Bind("doConfig", doConfig)
 	win.Bind("doGetConfig", doGetConfig)
 
-	path, err := filepath.Abs(filepath.Dir(os.Args[0]))
+	path, _ := filepath.Abs(filepath.Dir(os.Args[0]))
 	dir = strings.Replace(path, "\\", "/", -1)
 	datadir = dir + "/data/"
 	resdir = dir + "/res/"
@@ -57,7 +57,7 @@ func main() {
 	ks = keystore.NewKeyStore(dir+"/account/", scryptN, scryptP)
 	//初始化配置
 	var conf = [1]string{"nodeAddress"}
-	par, err := json.Marshal(conf)
+	par, _ := json.Marshal(conf)
 
 	doGetConfig(string(par))
 
@@ -66,6 +66,8 @@ func main() {
 		fmt.Println("can not read html")
 	}
 	win.SetHtml(string(content))
+	//same website can not be opened by this way
+	//win.Navigate("https://github.com/webview/webview")
 
 	win.Run()
 }

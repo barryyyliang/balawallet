@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"math/big"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/ethereum/go-ethereum/accounts/keystore"
@@ -18,6 +19,11 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/syndtr/goleveldb/leveldb"
 )
+
+type ErrorResult struct {
+	Code int
+	Err  string
+}
 
 //页面切换
 func doChangePage(page string, param string) {
@@ -213,11 +219,13 @@ func newDynamicTx(nonce uint64, to common.Address, amount *big.Int, gasLimit uin
 	})
 }
 
-func doTransfer(from string, to string, value string, pass string) {
+func doTransfer(from string, to string, value string, pass string) string {
 	connect, err := ethclient.Dial(G_Config["nodeAddress"])
+	var re []byte
 	if err != nil {
 		fmt.Println("can not connect to node:")
-		return
+		re, _ = json.Marshal(ErrorResult{1, "can not connet to node"})
+		return string(re)
 	}
 	ctx := context.Background()
 	defer connect.Close()
@@ -225,12 +233,33 @@ func doTransfer(from string, to string, value string, pass string) {
 	for i := 0; i < len(acc); i++ {
 		fmt.Printf("get account: %s : \r\n", acc[i].Address.String())
 		if from == acc[i].Address.String() {
-			bigvalue, _ := etherTowei(value)
+			bigvalue, err := etherTowei(value)
+			if err != nil {
+				re, _ = json.Marshal(ErrorResult{1, err.Error()})
+				break
+
+			}
 			nounce, err := connect.NonceAt(ctx, common.HexToAddress(from), nil)
+			if err != nil {
+				re, _ = json.Marshal(ErrorResult{1, err.Error()})
+				break
+			}
 			var gasLimit uint64 = 21000
 			gasPrice, err := connect.SuggestGasPrice(ctx) ///big.NewInt(20000000000)
+			if err != nil {
+				re, _ = json.Marshal(ErrorResult{1, err.Error()})
+				break
+			}
 			tipsPrice, err := connect.SuggestGasTipCap(ctx)
+			if err != nil {
+				re, _ = json.Marshal(ErrorResult{1, err.Error()})
+				break
+			}
 			chainId, err := connect.ChainID(ctx)
+			if err != nil {
+				re, _ = json.Marshal(ErrorResult{1, err.Error()})
+				break
+			}
 			//后续可以改为可设置消费的交易
 			//tx := types.NewTransaction(nounce, common.HexToAddress(to), &bigvalue, gasLimit, gasPrice, make([]byte, 0))
 			tx := newDynamicTx(nounce, common.HexToAddress(to), &bigvalue, gasLimit, gasPrice, tipsPrice, chainId)
@@ -239,8 +268,10 @@ func doTransfer(from string, to string, value string, pass string) {
 				err := connect.SendTransaction(ctx, tx)
 				if err != nil {
 					fmt.Println("transfer err:" + err.Error())
+					re, _ = json.Marshal(ErrorResult{1, err.Error()})
 				} else {
 					fmt.Println("transfer success")
+					re, _ = json.Marshal(ErrorResult{0, ""})
 				}
 
 				json, err2 := tx.MarshalJSON()
@@ -251,11 +282,13 @@ func doTransfer(from string, to string, value string, pass string) {
 				}
 			} else {
 				fmt.Println("sign tx err")
+				re, _ = json.Marshal(ErrorResult{1, err.Error()})
 			}
-
-			return
+			break
 		}
 	}
+	fmt.Println(string(re))
+	return string(re)
 }
 
 //获取账户余额
@@ -319,33 +352,45 @@ func weiTogwei(wei string) string {
 	return weiTox(9, wei)
 }
 
-func etherTowei(ether string) (big.Int, bool) {
+func etherTowei(ether string) (big.Int, error) {
 	// 要调用isnumber判断是否为正确数字格式
 	if isNumber(ether) {
 		strs := strings.Split(ether, ".")
-		lens := len(strs[1])
 		var balstr string
-		for i := 0; i < 18-lens; i++ {
-			strs[1] = strs[1] + "0"
+		if len(strs) == 1 {
+			balstr = strs[0] + "000000000000000000"
+
+		} else {
+			lens := len(strs[1])
+
+			for i := 0; i < 18-lens; i++ {
+				strs[1] = strs[1] + "0"
+			}
+
+			if "0" == strs[0] {
+				balstr = strings.TrimLeft(strs[1], "0")
+			} else {
+				balstr = strs[0] + strs[1]
+			}
 		}
 
-		if "0" == strs[0] {
-			balstr = strings.TrimLeft(strs[1], "0")
-		} else {
-			balstr = strs[0] + strs[1]
-		}
 		var wei big.Int = *big.NewInt(0)
-		_, ret := wei.SetString(balstr, 10)
-		return wei, ret
+		wei.SetString(balstr, 10)
+		return wei, nil
 	}
-	return *big.NewInt(0), false
+	return *big.NewInt(0), fmt.Errorf("bad number")
 
 }
 
 //判断字符串是否为10进制数字，，每个字符必须为数字【1--9】，最多有一个小数点”.“
 func isNumber(value string) bool {
 	//todo
-
+	result, err := strconv.ParseFloat(value, 64)
+	fmt.Println(result)
+	if err != nil && err.(*strconv.NumError).Err == strconv.ErrSyntax {
+		fmt.Println("bad number:" + err.Error())
+		return false
+	}
 	return true
 }
 
@@ -386,9 +431,9 @@ func doGetComponent(com string) string {
 			Menumcss string `json:"css"`
 			Menuhtml string `json:"html"`
 		}
-		menucss, err1 := os.ReadFile(dir + "/res/common/menucss.html")
+		menucss, err1 := os.ReadFile(dir + "/res/common/menu.css")
 		if err1 != nil {
-			fmt.Println("doGetComponent get menucss.html error")
+			fmt.Println("doGetComponent get menu.css error")
 			return ""
 		}
 		menu, err2 := os.ReadFile(dir + "/res/common/menu.html")
@@ -409,9 +454,9 @@ func doGetComponent(com string) string {
 			Menuhtml string `json:"html"`
 			Menujs   string `json:"js"`
 		}
-		menucss, err1 := os.ReadFile(dir + "/res/common/rightmenucss.html")
+		menucss, err1 := os.ReadFile(dir + "/res/common/rightmenu.css")
 		if err1 != nil {
-			fmt.Println("doGetComponent get rightmenucss.html error")
+			fmt.Println("doGetComponent get rightmenu.css error")
 			return ""
 		}
 		menu, err2 := os.ReadFile(dir + "/res/common/rightmenu.html")
@@ -422,7 +467,7 @@ func doGetComponent(com string) string {
 
 		menujs, err3 := os.ReadFile(dir + "/res/common/rightmenu.js")
 		if err3 != nil {
-			fmt.Println("doGetComponent get rightmenujs.html error")
+			fmt.Println("doGetComponent get rightmenu.js error")
 			return ""
 		}
 		result := menujson{string(menucss), string(menu), string(menujs)}
