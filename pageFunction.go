@@ -12,6 +12,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
@@ -219,6 +220,18 @@ func newDynamicTx(nonce uint64, to common.Address, amount *big.Int, gasLimit uin
 	})
 }
 
+func newDeployTx(nonce uint64, amount *big.Int, gasLimit uint64, gasPrice *big.Int, tipsPrice *big.Int, chain *big.Int, data []byte) *types.Transaction {
+	return types.NewTx(&types.DynamicFeeTx{
+		Nonce:     nonce,
+		Value:     amount,
+		Gas:       gasLimit,
+		GasFeeCap: gasPrice,
+		GasTipCap: tipsPrice,
+		ChainID:   chain,
+		Data:      data,
+	})
+}
+
 func doTransfer(from string, to string, value string, pass string) string {
 	connect, err := ethclient.Dial(G_Config["nodeAddress"])
 	var re []byte
@@ -239,23 +252,8 @@ func doTransfer(from string, to string, value string, pass string) string {
 				break
 
 			}
-			nounce, err := connect.NonceAt(ctx, common.HexToAddress(from), nil)
-			if err != nil {
-				re, _ = json.Marshal(ErrorResult{1, err.Error()})
-				break
-			}
 			var gasLimit uint64 = 21000
-			gasPrice, err := connect.SuggestGasPrice(ctx) ///big.NewInt(20000000000)
-			if err != nil {
-				re, _ = json.Marshal(ErrorResult{1, err.Error()})
-				break
-			}
-			tipsPrice, err := connect.SuggestGasTipCap(ctx)
-			if err != nil {
-				re, _ = json.Marshal(ErrorResult{1, err.Error()})
-				break
-			}
-			chainId, err := connect.ChainID(ctx)
+			nounce, gasPrice, tipsPrice, chainId, err := getChainInfo(connect, from)
 			if err != nil {
 				re, _ = json.Marshal(ErrorResult{1, err.Error()})
 				break
@@ -358,8 +356,9 @@ func etherTowei(ether string) (big.Int, error) {
 		strs := strings.Split(ether, ".")
 		var balstr string
 		if len(strs) == 1 {
-			balstr = strs[0] + "000000000000000000"
-
+			if balstr != "0" {
+				balstr = strs[0] + "000000000000000000"
+			}
 		} else {
 			lens := len(strs[1])
 
@@ -519,5 +518,106 @@ func doGetConfig(configs string) string {
 		}
 	}
 	re, _ := json.Marshal(G_Config)
+	return string(re)
+}
+
+func getChainInfo(connect *ethclient.Client, from string) (uint64, *big.Int, *big.Int, *big.Int, error) {
+	ctx := context.Background()
+	nounce, err := connect.NonceAt(ctx, common.HexToAddress(from), nil)
+	if err != nil {
+		return nounce, nil, nil, nil, err
+	}
+	gasPrice, err := connect.SuggestGasPrice(ctx) ///big.NewInt(20000000000)
+	if err != nil {
+		return nounce, nil, nil, nil, err
+	}
+	tipsPrice, err := connect.SuggestGasTipCap(ctx)
+	if err != nil {
+		return nounce, nil, nil, nil, err
+	}
+	chainId, err := connect.ChainID(ctx)
+	if err != nil {
+		return nounce, nil, nil, nil, err
+	}
+	return nounce, gasPrice, tipsPrice, chainId, nil
+
+}
+
+func doDeployContract(from string, filepath string, pass string) string {
+
+	connect, err := ethclient.Dial(G_Config["nodeAddress"])
+	var re []byte
+	if err != nil {
+		fmt.Println("can not connect to node:")
+		re, _ = json.Marshal(ErrorResult{1, "can not connet to node"})
+		return string(re)
+	}
+	ctx := context.Background()
+	defer connect.Close()
+	acc := ks.Accounts()
+	for i := 0; i < len(acc); i++ {
+		fmt.Printf("get account: %s : \r\n", acc[i].Address.String())
+		if from == acc[i].Address.String() {
+			bigvalue, err := etherTowei("0")
+			if err != nil {
+				re, _ = json.Marshal(ErrorResult{1, err.Error()})
+				break
+
+			}
+
+			nounce, gasPrice, tipsPrice, chainId, err := getChainInfo(connect, from)
+			if err != nil {
+				re, _ = json.Marshal(ErrorResult{1, err.Error()})
+				break
+			}
+			bin, err := os.ReadFile(filepath)
+			if err != nil {
+				re, _ = json.Marshal(ErrorResult{1, "can not read bin file"})
+				break
+			}
+			msg := ethereum.CallMsg{
+				From:      acc[i].Address, // the sender of the 'transaction'
+				To:        nil,            // the destination contract (nil for contract creation)
+				Gas:       0,              // if 0, the call executes with near-infinite gas
+				GasPrice:  gasPrice,       // wei <-> gas exchange ratio
+				GasFeeCap: tipsPrice,      // EIP-1559 fee cap per gas.
+				GasTipCap: tipsPrice,      // EIP-1559 tip per gas.
+				Value:     big.NewInt(0),  // amount of wei sent along with the call
+				Data:      bin,            // input data, usually an ABI-encoded contract method invocation
+			}
+
+			gasLimit, err := connect.EstimateGas(ctx, msg)
+			if err != nil {
+				re, _ = json.Marshal(ErrorResult{1, err.Error()})
+				break
+			}
+
+			//后续可以改为可设置消费的交易
+			//tx := types.NewTransaction(nounce, common.HexToAddress(to), &bigvalue, gasLimit, gasPrice, make([]byte, 0))
+			tx := newDeployTx(nounce, &bigvalue, gasLimit, gasPrice, tipsPrice, chainId, bin)
+			tx, err = ks.SignTxWithPassphrase(acc[i], pass, tx, chainId)
+			if err == nil {
+				err := connect.SendTransaction(ctx, tx)
+				if err != nil {
+					re, _ = json.Marshal(ErrorResult{1, err.Error()})
+				} else {
+					fmt.Println("deploy success")
+					re, _ = json.Marshal(ErrorResult{0, ""})
+				}
+
+				json, err2 := tx.MarshalJSON()
+				if err2 == nil {
+					fmt.Println(string(json))
+				} else {
+					fmt.Println("marshaljson tx err")
+				}
+			} else {
+				fmt.Println("sign tx err")
+				re, _ = json.Marshal(ErrorResult{1, err.Error()})
+			}
+			break
+		}
+	}
+	fmt.Println(string(re))
 	return string(re)
 }

@@ -32,8 +32,8 @@
     li a:hover {
         background-color: #111;
     } 
-    li a:active {
-        background-color: #111;
+    li a.active {
+        background-color: rgb(100, 145, 100);
     }
     /*主菜单 end*/
 
@@ -94,6 +94,25 @@
         background-color: rgb(245, 245, 245);
     }
 
+
+    .button1 {
+        background-color: #656865d8; /* Green */
+        border: none;
+        color: white;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+        -webkit-transition-duration: 0.4s; /* Safari */
+        transition-duration: 0.4s;
+        width: 100px;
+        height: 30px;
+    }
+    .button1:hover {
+        box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+    }
 </style>
 <style id="stylerightmenu"></style>
 <script id="menuscript"></script>
@@ -144,18 +163,21 @@
 
             var td4 = document.createElement("td")               
             var bt = document.createElement("input")
-            bt.setAttribute("style","font-size: 14px;height:25px;")
+            bt.setAttribute("class","button1")
             bt.setAttribute("type","button")
             bt.setAttribute("value","修改别名")
             bt.setAttribute("onclick","changeName("+"'address"+i +"'" +",'name"+i+"')")
-            td4.append(bt)    
+            td4.append(bt) 
+            tr.append(td4)
+
+            var td5 = document.createElement("td") 
             var bt2 = document.createElement("input")
-            bt2.setAttribute("style","font-size: 14px;height:25px;")
+            bt2.setAttribute("class","button1")
             bt2.setAttribute("type","button")
             bt2.setAttribute("value","管理")
             bt2.setAttribute("onclick","management("+"'address"+i +"'" +",'name"+i+"')")
-            td4.append(bt2)          
-            tr.append(td4)
+            td5.append(bt2)          
+            tr.append(td5)
 
             table.append(tr)
         }
@@ -191,7 +213,7 @@
                 <li><a class="active" onclick="window.doChangePage('qianbao.html','')">钱包</a></li>
                 <li><a onclick="window.doChangePage('transfer.html','')">转账</a></li>
                 <li><a onclick="window.doChangePage('contractasset.html','')">合约资产</a></li>
-                <li><a onclick="window.doChangePage('market.html','')">市场</a></li>
+                <li><a onclick="window.doChangePage('tools.html','')">工具</a></li>
                 <li><a onclick="window.doChangePage('system.html','')">系统</a></li>
             </ul>
         </div>    

@@ -3,15 +3,37 @@
 <head> 
 <meta charset="utf-8"> 
 <title>数字货币钱包</title> 
+<style >
+    .button1 {
+        background-color: #656865d8; /* Green */
+        border: none;
+        color: white;
+        padding: 15px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+        -webkit-transition-duration: 0.4s; /* Safari */
+        transition-duration: 0.4s;
+        width: 200px;
+    }
+    .button1:hover {
+        box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+    }
+</style>
 <style id="stylemenu"></style>
 <style id="stylerightmenu"></style>
 <script id="menuscript"></script>
+
 <script>
     window.onload=function() {
         window.doGetComponent("menu").then( (result) => {
             var obj = JSON.parse(result)
             document.getElementById('stylemenu').innerHTML = obj.css                   
             document.getElementById('menudiv').innerHTML = obj.html
+            document.getElementById("contractasset").setAttribute("class","active")
         }
         )   
         window.doGetComponent("rightmenu").then( (result) => {
@@ -22,6 +44,108 @@
         }
         )         
     } 
+
+    function addAccountElement(acc,table){
+        window.doWebLog("enter addelement")
+        for (i=0; i<acc.length; i++){
+            var par = acc[i].split('-')
+
+            var tr = document.createElement("tr")
+            tr.setAttribute("style","height:50px;")
+            var td1 = document.createElement("td")
+            td1.append("Eth: ")
+            tr.append(td1)
+
+            var ipt = document.createElement("input")
+            ipt.setAttribute("id","address"+i)
+            ipt.setAttribute("style","font-size: 14px;height:25px;")
+            ipt.setAttribute("type","text")
+            ipt.setAttribute("value",par[0])
+            ipt.setAttribute("size","45")   
+            ipt.setAttribute("disabled","")         
+            var td2 = document.createElement("td")
+            td2.append(ipt)
+            tr.append(td2)
+
+
+            var td3 = document.createElement("td")
+            var ipt2 = document.createElement("input")
+            ipt2.setAttribute("id","name"+i)
+            ipt2.setAttribute("style","font-size: 14px;height:25px;")
+            ipt2.setAttribute("type","text")
+            ipt2.setAttribute("value",par[1])
+            ipt2.setAttribute("size","20")  
+            td3.append(ipt2)
+            tr.append(td3)
+
+            var td4 = document.createElement("td")               
+            var bt = document.createElement("input")
+            bt.setAttribute("style","font-size: 14px;height:25px;")
+            bt.setAttribute("type","button")
+            bt.setAttribute("value","修改别名")
+            bt.setAttribute("onclick","changeName("+"'address"+i +"'" +",'name"+i+"')")
+            td4.append(bt)    
+            var bt2 = document.createElement("input")
+            bt2.setAttribute("style","font-size: 14px;height:25px;")
+            bt2.setAttribute("type","button")
+            bt2.setAttribute("value","管理")
+            bt2.setAttribute("onclick","management("+"'address"+i +"'" +",'name"+i+"')")
+            td4.append(bt2)          
+            tr.append(td4)
+
+            table.append(tr)
+        }
+    }
+    function addNew(){
+        window.doWebLog("addnew")
+        var table = document.getElementById("table1")
+        window.doWebLog("get table")
+        var tr = newTr()
+        window.doWebLog("get new tr")
+        table.append(tr)
+    }
+
+    function newTr(){
+        var tr = document.createElement("tr")
+        tr.setAttribute("style","height:50px;")
+
+        var ipt0 = document.createElement("input")
+        ipt0.setAttribute("style","font-size: 14px;height:25px;")
+        ipt0.setAttribute("type","text")
+        ipt0.setAttribute("size","10")   
+        var td1 = document.createElement("td")
+        td1.append(ipt0)
+        tr.append(td1)
+
+        var ipt = document.createElement("input")
+        ipt.setAttribute("id","address")
+        ipt.setAttribute("style","font-size: 14px;height:25px;")
+        ipt.setAttribute("type","text")
+        ipt.setAttribute("size","45") 
+        var td2 = document.createElement("td")
+        td2.append(ipt)
+        tr.append(td2)
+        
+        var ipt2 = document.createElement("input")
+        ipt2.setAttribute("id","name")
+        ipt2.setAttribute("style","font-size: 14px;height:25px;")
+        ipt2.setAttribute("type","text")
+        ipt2.setAttribute("size","20")  
+        var td3 = document.createElement("td")
+        td3.append(ipt2)
+        tr.append(td3)
+
+        var td4 = document.createElement("td")               
+        var bt = document.createElement("input")
+        bt.setAttribute("style","font-size: 14px;height:25px;")
+        bt.setAttribute("type","button")
+        bt.setAttribute("value","管理")
+        //bt.setAttribute("onclick","changeName("+"'address"+i +"'" +",'name"+i+"')")
+        td4.append(bt) 
+        tr.append(td4)
+
+        return tr
+    }
 </script>
 
 </head> 
@@ -44,6 +168,9 @@
                         <td><input style="font-size: 14px;height: 25px;" type="text" size="20" value="USDT" disabled></td>
                     </tr>
                 </table>
+            </div>
+            <div style="margin: 0 auto;background-color: rgb(236, 255, 127);text-align: center;">
+                <button class="button1" onclick="addNew()">添加</button>
             </div>
         </div>   
         <div id = 'rightmenudiv'> </div>

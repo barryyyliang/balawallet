@@ -18,6 +18,7 @@ var datadir string
 var accountdir string
 var resdir string
 var exportdir string
+var currentAccount string
 
 //var nodeaddress string = "http://localhost:8545"
 var G_Config = make(map[string]string)
