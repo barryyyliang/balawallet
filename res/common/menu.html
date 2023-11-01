@@ -1,8 +1,13 @@
 
-    <ul>
-        <li><a id="qianbao" onclick="window.doChangePage('qianbao.html','')">钱包</a></li>
-        <li><a id="transfer" onclick="window.doChangePage('transfer.html','')">转账</a></li>
-        <li><a id="contractasset" onclick="window.doChangePage('contractasset.html','')">合约资产</a></li>
-        <li><a id="tools" onclick="window.doChangePage('tools.html','')">工具</a></li>
-        <li><a id="system" onclick="window.doChangePage('system.html','')">系统</a></li>
-    </ul>
+    <div style="width: 80%;">
+        <ul>
+            <li><a id="qianbao" onclick="window.doChangePage('qianbao.html','')">钱包</a></li>
+            <li><a id="transfer" onclick="window.doChangePage('transfer.html','')">转账</a></li>
+            <li><a id="contractasset" onclick="window.doChangePage('contractasset.html','')">合约资产</a></li>
+            <li><a id="tools" onclick="window.doChangePage('tools.html','')">工具</a></li>
+            <li><a id="system" onclick="window.doChangePage('system.html','')">系统</a></li>
+        </ul>   
+    </div>  
+    <div style="width: 50%;display: flex;align-items: center;background-color: #333;">
+        <select id="add" name="add" onchange="change()" style="font-size: 14px;height: 25px;width: 300px;border-radius: 0px;"></select>
+    </div>   

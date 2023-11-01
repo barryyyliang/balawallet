@@ -127,6 +127,23 @@
 
     }
 
+    function initMenu(acc) {
+        var se = document.getElementById("add")
+        var option = document.createElement("option")
+        option.text = ""
+        option.value = ""
+        se.add(option)
+        for (i=0; i<acc.length; i++){
+            window.doWebLog(acc[i])
+            var par = acc[i].split('-')
+            var option = document.createElement("option")
+            option.text = par[0]
+            option.value = par[0]
+            se.add(option)
+        }
+        se.value = ""   
+
+    }
 
     window.onload=function() {
         window.doWebLog("qianbao page")
@@ -135,8 +152,10 @@
             var arr = result.split(',')
             window.doWebLog("go to addelement")
             addAccountElement(arr,document.getElementById("table1"))
+            initMenu(arr)
         }
         )
+
 
         // window.doGetComponent("rightmenu").then( (result) => {
         //         var obj = JSON.parse(result)
@@ -152,7 +171,7 @@
 <body >
     <div style="width: 98%;height: 98%;background: rgb(251, 251, 251);position: absolute;"> 
         <div id = "menudiv" style="display: flex;">
-            <div style="width: 90%;">
+            <div style="width: 80%;">
                 <ul>
                     <li><a class="active" onclick="window.doChangePage('qianbao.html','')">钱包</a></li>
                     <li><a onclick="window.doChangePage('transfer.html','')">转账</a></li>
@@ -161,7 +180,9 @@
                     <li><a onclick="window.doChangePage('system.html','')">系统</a></li>
                 </ul>   
             </div>  
-            <div style="width: 50%;display: flex;align-items: center;background-color: #333;"><input type="text" id="name" name="name" style="width:300px;height: 25px;" ></div>      
+            <div style="width: 50%;display: flex;align-items: center;background-color: #333;">
+                <select id="add" name="add" onchange="change()" style="font-size: 14px;height: 25px;width: 300px;border-radius: 0px;"></select>
+            </div>      
         </div>    
 
         <div style="margin: 0 auto;background-color: aquamarine;text-align: center;">

@@ -60,7 +60,7 @@
                 window.doWebLog("get result" + result)
                 var acc = result.split(',')
                 window.doWebLog("go to addelement")
-                var se = document.getElementById("add")
+                var se = document.getElementById("acc")
                 window.doWebLog("get select addelement")
                 for (i=0; i<acc.length; i++){
                     window.doWebLog(acc[i])
@@ -87,7 +87,7 @@
 </head> 
 <body>
     <div style="width: 98%;height: 98%;background: rgb(251, 251, 251);position: absolute;"> 
-        <div id="menudiv"></div>
+        <div id="menudiv"  style="display: flex;"></div>
 
         <div style="margin: 0 auto;background-color: aquamarine;text-align: center;">
 
@@ -98,7 +98,7 @@
                         
                         <td>账户</td>
                         <td>
-                            <select id="add" name="add" style="font-size: 14px;height: 25px;width: 200px;border-radius: 0px;">
+                            <select id="acc" name="acc" style="font-size: 14px;height: 25px;width: 200px;border-radius: 0px;">
 
                             </select>
                         </td>

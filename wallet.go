@@ -27,7 +27,7 @@ func main() {
 	win = webview.New(true)
 	defer win.Destroy()
 	win.SetTitle("我的钱包")
-	win.SetSize(600, 480, webview.HintNone)
+	win.SetSize(800, 480, webview.HintNone)
 
 	//注册全局函数
 	win.Bind("doChangePage", doChangePage)
