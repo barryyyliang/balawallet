@@ -423,7 +423,7 @@ func doGetFee() string {
 }
 
 func doGetComponent(com string) string {
-	fmt.Println("enter doGetMenu")
+	fmt.Println("enter get" + com)
 
 	if com == "menu" {
 		type menujson struct {
@@ -476,10 +476,36 @@ func doGetComponent(com string) string {
 			return ""
 		}
 		return string(re)
+	} else {
+		type pagejson struct {
+			Pagecss  string `json:"css"`
+			Pagehtml string `json:"html"`
+			Pagejs   string `json:"js"`
+		}
+		Pagecss, err1 := os.ReadFile(dir + "/res/" + com + ".css")
+		if err1 != nil {
+			fmt.Println("doGetComponent get " + com + ".css error")
+			return ""
+		}
+		Pagehtml, err2 := os.ReadFile(dir + "/res/" + com + ".html")
+		if err2 != nil {
+			fmt.Println("doGetComponent get " + com + ".html error")
+			return ""
+		}
+
+		Pagejs, err3 := os.ReadFile(dir + "/res/" + com + ".js")
+		if err3 != nil {
+			fmt.Println("doGetComponent get " + com + ".js error")
+			return ""
+		}
+		result := pagejson{string(Pagecss), string(Pagehtml), string(Pagejs)}
+		re, err := json.Marshal(result)
+		if err != nil {
+			fmt.Println("doGetComponent json error")
+			return ""
+		}
+		return string(re)
 	}
-
-	return ""
-
 }
 
 func doConfig(configs string) {

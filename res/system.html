@@ -1,78 +1,16 @@
-<!DOCTYPE html>
-<html>
-<head> 
-<meta charset="utf-8"> 
-<title>数字货币钱包</title> 
-<style>
-    table, th, td {
-      frame: void;
-    }
-    .button1 {
-        background-color: #656865d8; /* Green */
-        border: none;
-        color: white;
-        padding: 15px 32px;
-        text-align: center;
-        text-decoration: none;
-        display: inline-block;
-        font-size: 16px;
-        margin: 4px 2px;
-        cursor: pointer;
-        -webkit-transition-duration: 0.4s; /* Safari */
-        transition-duration: 0.4s;
-        width: 200px;
-    }
-    .button1:hover {
-        box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
-    }
 
-    </style>
-    <style id="stylemenu"></style>
-    <style id="stylerightmenu"></style>
-    <script id="menuscript"></script>
-    <script>
-        window.onload=function() {
-            window.doGetComponent("menu").then( (result) => {
-                var obj = JSON.parse(result)
-                document.getElementById('stylemenu').innerHTML = obj.css                   
-                document.getElementById('menudiv').innerHTML = obj.html
-                document.getElementById("system").setAttribute("class","active")
-            }
-            )  
-
-            window.doGetComponent("rightmenu").then( (result) => {
-                var obj = JSON.parse(result)
-                document.getElementById('stylerightmenu').innerHTML = obj.css   
-                document.getElementById('rightmenudiv').innerHTML = obj.html
-                document.getElementById('menuscript').innerHTML = obj.js            
-            }
-            )         
-        } 
-    </script>
-</head> 
-<body>
-    <div style="width: 98%;height: 98%;background: rgb(251, 251, 251);position: absolute;"> 
-        <div id="menudiv"  style="display: flex;"></div>
-
-        <div style="margin: 0 auto;background-color: aquamarine;text-align: center;">
-            <div style="margin: 0 auto;background-color: rgb(236, 255, 127);text-align: center;">
-                <button class="button1" onclick="window.doChangePage('newaccount.html','')">新增账户</button>
-            </div>
-            <div style="margin: 0 auto;background-color: rgb(236, 255, 127);text-align: center;">
-                <button class="button1" onclick="window.doChangePage('import.html','')">导入账号</button>
-            </div>
-            <div style="margin: 0 auto;background-color: rgb(236, 255, 127);text-align: center;">
-                <button class="button1" onclick="window.doChangePage('export.html','')">导出账号</button>
-            </div>
-            <div style="margin: 0 auto;background-color: rgb(236, 255, 127);text-align: center;">
-                <button class="button1" onclick="window.doChangePage('config.html','')">系统设置</button>
-            </div>
-            <div style="margin: 0 auto;background-color: rgb(236, 255, 127);text-align: center;">
-                <button class="button1">关于</button>
-            </div>
-        </div>
-        <div id = 'rightmenudiv'> </div>
-    </div>
- 
-</body>
-</html>
+<div style="margin: 0 auto;background-color: rgb(236, 255, 127);text-align: center;">
+    <button class="button1" onclick="changePage('system','newaccount')">新增账户</button>
+</div>
+<div style="margin: 0 auto;background-color: rgb(236, 255, 127);text-align: center;">
+    <button class="button1" onclick="changePage('system','import')">导入账号</button>
+</div>
+<div style="margin: 0 auto;background-color: rgb(236, 255, 127);text-align: center;">
+    <button class="button1" onclick="changePage('system','export')">导出账号</button>
+</div>
+<div style="margin: 0 auto;background-color: rgb(236, 255, 127);text-align: center;">
+    <button class="button1" onclick="changePage('system','config')">系统设置</button>
+</div>
+<div style="margin: 0 auto;background-color: rgb(236, 255, 127);text-align: center;">
+    <button class="button1">关于</button>
+</div>

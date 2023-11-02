@@ -62,7 +62,7 @@ func main() {
 
 	doGetConfig(string(par))
 
-	content, err := os.ReadFile(dir + "/res/qianbao.html")
+	content, err := os.ReadFile(dir + "/res/main.html")
 	if err != nil {
 		fmt.Println("can not read html")
 	}

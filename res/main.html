@@ -4,6 +4,8 @@
 <meta charset="utf-8"> 
 <title>数字货币钱包</title> 
 <style>
+
+    /*主菜单*/
     table, th, td {
       frame: void;
     }
@@ -30,19 +32,130 @@
     li a:hover {
         background-color: #111;
     } 
-    li a:active {
-        background-color: #111;
+    li a.active {
+        background-color: rgb(100, 145, 100);
     }
-    </style>
+    /*主菜单 end*/
+
+    .button1 {
+        background-color: #656865d8; /* Green */
+        border: none;
+        color: white;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+        -webkit-transition-duration: 0.4s; /* Safari */
+        transition-duration: 0.4s;
+        width: 100px;
+        height: 30px;
+    }
+    .button1:hover {
+        box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+    }
+</style>
+<style id="stylerightmenu"></style>
+<style id="pageStyle"></style>
+<script id="menuscript"></script>
+<script id="pageScript"></script>
+<script>
+    window.onload=function() {
+        window.doWebLog("qianbao page")
+        // window.doGetComponent("rightmenu").then( (result) => {
+        //         var obj = JSON.parse(result)
+        //         document.getElementById('stylerightmenu').innerHTML = obj.css   
+        //         document.getElementById('rightmenudiv').innerHTML = obj.html
+        //         document.getElementById('menuscript').innerHTML = obj.js            
+        //     }
+        // )
+
+        window.doGetAccounts().then( (result) => {
+            window.doWebLog("get result" + result)
+            var arr = result.split(',')
+            window.doWebLog("go to addelement")
+            initMenu(arr)
+        })
+
+        changePage("qianbao","qianbao")
+          
+    }
+
+    function initMenu(acc) {
+        var se = document.getElementById("add")
+        var option = document.createElement("option")
+        option.text = ""
+        option.value = ""
+        se.add(option)
+        for (i=0; i<acc.length; i++){
+            window.doWebLog(acc[i])
+            var par = acc[i].split('-')
+            var option = document.createElement("option")
+            option.text = par[0]
+            option.value = par[0]
+            se.add(option)
+        }
+        se.value = ""  
+    }
+
+    function changePage(menuname,pagename){
+        window.doWebLog("change page to " + pagename)
+        window.doWebLog("change menu to " + menuname)
+        document.getElementById('pageStyle').remove() 
+        document.getElementById('pageContent').innerHTML = ""
+        document.getElementById('pageScript')
+
+        var li = document.getElementsByClassName("active")
+        for (var i=0; i<li.length;i++){
+            li[i].setAttribute("class","hover")
+        }
+        document.getElementById(menuname).setAttribute("class","active")       
+
+        window.doGetComponent(pagename).then( (result) => {
+                var obj = JSON.parse(result)
+                var cs = document.createElement("style")
+                cs.setAttribute("id","pageStyle")
+                cs.innerHTML = obj.css
+                document.head.appendChild(cs)
+                //document.getElementById('pageStyle').innerHTML = obj.css   
+
+                document.getElementById('pageContent').innerHTML = obj.html
+
+                var js = document.createElement("script")
+                js.setAttribute("id","pageScript")
+                js.innerHTML = obj.js
+                document.head.appendChild(js)
+                //document.getElementById('pageScript').innerHTML = obj.js   
+                
+                initPage() 
+            }
+        )        
+    }
+</script>
 </head> 
-<body>
-    <ul>
-        <li><a class="active" onclick="window.doChangePage('qianbao.html','')">钱包</a></li>
-        <li><a onclick="window.doChangePage('transfer.html','')">转账</a></li>
-        <li><a onclick="window.doChangePage('contractasset.html','')">合约资产</a></li>
-        <li><a onclick="window.doChangePage('tools.html','')">工具</a></li>
-        <li><a onclick="window.doChangePage('system.html','')">系统</a></li>
-    </ul>
- 
+<!--body oncontextmenu="return false" onselectstart="return false"-->
+<body >
+    <div style="width: 98%;height: 98%;background: rgb(251, 251, 251);position: absolute;"> 
+        <div id = "menudiv" style="display: flex;">
+            <div style="width: 80%;">
+                <ul>
+                    <li><a id="qianbao" class="active" onclick="changePage('qianbao','qianbao')">钱包</a></li>
+                    <li><a id="transfer" onclick="changePage('transfer','transfer')">转账</a></li>
+                    <li><a id="contractasset" onclick="changePage('contractasset','contractasset')">合约资产</a></li>
+                    <li><a id="tools" onclick="changePage('tools','tools')">工具</a></li>
+                    <li><a id="system" onclick="changePage('system','system')">系统</a></li>
+                </ul>   
+            </div>  
+            <div style="width: 50%;display: flex;align-items: center;background-color: #333;">
+                <select id="add" name="add" onchange="change()" style="font-size: 14px;height: 25px;width: 300px;border-radius: 0px;"></select>
+            </div>      
+        </div>    
+
+        <div style="margin: 0 auto;background-color: aquamarine;text-align: center;">
+            <div id="pageContent" style="margin: 0 auto;background-color: rgb(236, 255, 127);text-align: center;"></div>   
+        </div>
+        <div id = 'rightmenudiv'> </div>  
+    </div>    
 </body>
 </html>
