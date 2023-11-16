@@ -485,7 +485,10 @@ func doGetComponent(com string) string {
 		Pagecss, err1 := os.ReadFile(dir + "/res/" + com + ".css")
 		if err1 != nil {
 			fmt.Println("doGetComponent get " + com + ".css error")
-			return ""
+		}
+		Pagejs, err3 := os.ReadFile(dir + "/res/" + com + ".js")
+		if err3 != nil {
+			fmt.Println("doGetComponent get " + com + ".js error")
 		}
 		Pagehtml, err2 := os.ReadFile(dir + "/res/" + com + ".html")
 		if err2 != nil {
@@ -493,11 +496,6 @@ func doGetComponent(com string) string {
 			return ""
 		}
 
-		Pagejs, err3 := os.ReadFile(dir + "/res/" + com + ".js")
-		if err3 != nil {
-			fmt.Println("doGetComponent get " + com + ".js error")
-			return ""
-		}
 		result := pagejson{string(Pagecss), string(Pagehtml), string(Pagejs)}
 		re, err := json.Marshal(result)
 		if err != nil {

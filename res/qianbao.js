@@ -44,7 +44,7 @@ function addAccountElement(acc,table){
 
         var td4 = document.createElement("td")               
         var bt = document.createElement("input")
-        bt.setAttribute("class","button1")
+        bt.setAttribute("class","button2")
         bt.setAttribute("type","button")
         bt.setAttribute("value","修改别名")
         bt.setAttribute("onclick","changeName("+"'address"+i +"'" +",'name"+i+"')")
@@ -53,7 +53,7 @@ function addAccountElement(acc,table){
 
         var td5 = document.createElement("td") 
         var bt2 = document.createElement("input")
-        bt2.setAttribute("class","button1")
+        bt2.setAttribute("class","button2")
         bt2.setAttribute("type","button")
         bt2.setAttribute("value","管理")
         bt2.setAttribute("onclick","management("+"'address"+i +"'" +",'name"+i+"')")
