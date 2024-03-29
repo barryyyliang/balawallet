@@ -26,7 +26,7 @@ function addAccountElement(acc,table){
         ipt.setAttribute("type","text")
         ipt.setAttribute("value",par[0])
         ipt.setAttribute("size","45")   
-        ipt.setAttribute("disabled","")         
+        ipt.setAttribute("readonly","readonly")       //此处不用disable属性，disable属性会导致自定义copy菜单无法拷贝内容  
         var td2 = document.createElement("td")
         td2.append(ipt)
         tr.append(td2)
