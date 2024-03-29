@@ -21,7 +21,8 @@ function ontransfer() {
 
 function change(){
     window.doWebLog("value changed")
-    var address = document.getElementById("add").value            
+    var address = document.getElementById("add").value 
+    document.getElementById("selectedAdd").value =  address         
     window.doGetAccountName(address).then ( (result) => {
         window.doWebLog(result)
         document.getElementById("name").value = result
@@ -34,6 +35,7 @@ function change(){
 }
 
 function initPage() {
+    change()
     window.doGetFee().then ( (result) => {
         window.doWebLog("get fee:" + result)
         if (result.length == 0 ) {

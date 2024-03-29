@@ -11,12 +11,15 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
+
+	//"github.com/ethereum/go-ethereum/crypto/sha3"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/syndtr/goleveldb/leveldb"
 )
@@ -291,14 +294,15 @@ func doTransfer(from string, to string, value string, pass string) string {
 
 //获取账户余额
 func doGetBalance(add string) string {
-	connect, err := ethclient.Dial(G_Config["nodeAddress"])
-	defer connect.Close()
-	if err != nil {
-		fmt.Println("can not connect to node:" + err.Error())
-		return ""
-	}
-
+	//connect, err := ethclient.Dial(G_Config["nodeAddress"])
+	connect := G_Etherclient
+	now := time.Now()
+	fmt.Println("start:")
+	fmt.Println(now.UnixMilli())
 	balance, err := connect.BalanceAt(context.Background(), common.HexToAddress(add), nil)
+	now = time.Now()
+	fmt.Println("end:")
+	fmt.Println(now.UnixMilli())
 
 	if err == nil {
 		return weiToether(balance.String())
@@ -568,7 +572,6 @@ func getChainInfo(connect *ethclient.Client, from string) (uint64, *big.Int, *bi
 }
 
 func doDeployContract(from string, filepath string, pass string) string {
-
 	connect, err := ethclient.Dial(G_Config["nodeAddress"])
 	var re []byte
 	if err != nil {
@@ -644,4 +647,96 @@ func doDeployContract(from string, filepath string, pass string) string {
 	}
 	fmt.Println(string(re))
 	return string(re)
+}
+
+func doGetContract() string {
+	type contract struct {
+		Type    string `json:"type"`
+		Address string `json:"address"`
+		Name    string `json:"name"`
+	}
+	type contracts struct {
+		Contracts []contract `json:"contracts"`
+	}
+	var res contracts
+	//账户信息
+	db, err := leveldb.OpenFile(datadir+"contract", nil)
+	defer db.Close()
+	if err == nil {
+		it := db.NewIterator(nil, nil)
+		defer it.Release()
+		for it.Next() {
+			var aa contract
+			json.Unmarshal(it.Value(), &aa)
+			res.Contracts = append(res.Contracts, aa)
+			fmt.Println("contract:" + string(it.Value()))
+		}
+	}
+
+	result, err2 := json.Marshal(res)
+	if err2 == nil {
+		return string(result)
+	} else {
+		fmt.Println(err2.Error())
+	}
+	return ""
+}
+
+func doImportContract(cons string) {
+	fmt.Println("doImportContract:" + cons)
+	type contract struct {
+		Type    string `json:"type"`
+		Address string `json:"address"`
+		Name    string `json:"name"`
+	}
+
+	var jcons contract
+	err := json.Unmarshal([]byte(cons), &jcons)
+	if err == nil {
+		if jcons.Name == "" {
+			ctx := context.Background()
+			connect, err3 := ethclient.Dial(G_Config["nodeAddress"])
+			if err3 == nil {
+				defer connect.Close()
+				var conAdd common.Address = common.HexToAddress(jcons.Address)
+				transferFnSignature := []byte("name()")
+				hash := crypto.Keccak256(transferFnSignature)
+				methodID := hash[:4]
+				fmt.Println(string(methodID))
+				var data []byte
+				data = append(data, methodID...)
+				msg := ethereum.CallMsg{
+					From:      common.HexToAddress("0x28b149020d2152179873ec60bed6bf7cd705775d"), // the sender of the 'transaction'
+					To:        &conAdd,                                                           // the destination contract (nil for contract creation)
+					Gas:       0,                                                                 // if 0, the call executes with near-infinite gas
+					GasPrice:  nil,                                                               // wei <-> gas exchange ratio
+					GasFeeCap: nil,                                                               // EIP-1559 fee cap per gas.
+					GasTipCap: nil,                                                               // EIP-1559 tip per gas.
+					Value:     big.NewInt(0),                                                     // amount of wei sent along with the call
+					Data:      data,                                                              // input data, usually an ABI-encoded contract method invocation
+				}
+				result, err5 := connect.CallContract(ctx, msg, nil)
+				if err5 != nil {
+					fmt.Println("get contract name error:" + err5.Error())
+				}
+				sresult := string(result)
+				sresult = strings.ReplaceAll(sresult, string([]byte{0x00}), "")
+				fmt.Println("get contract name:" + string(sresult))
+				jcons.Name = sresult
+			}
+		}
+		db, err2 := leveldb.OpenFile(datadir+"contract", nil)
+		defer db.Close()
+		jvalue, _ := json.Marshal(jcons)
+		if err2 == nil {
+			if db.Put([]byte(jcons.Address), jvalue, nil) != nil {
+				fmt.Println("write db error:" + string(jvalue))
+			}
+		} else {
+			fmt.Println("open contract db error:" + err2.Error())
+		}
+
+	} else {
+		fmt.Println("get wrong parameter:" + cons)
+	}
 }

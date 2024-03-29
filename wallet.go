@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/ethereum/go-ethereum/accounts/keystore"
+	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/webview/webview"
 )
 
@@ -22,6 +23,7 @@ var currentAccount string
 
 //var nodeaddress string = "http://localhost:8545"
 var G_Config = make(map[string]string)
+var G_Etherclient *ethclient.Client
 
 func main() {
 	win = webview.New(true)
@@ -44,6 +46,8 @@ func main() {
 	win.Bind("doGetComponent", doGetComponent)
 	win.Bind("doConfig", doConfig)
 	win.Bind("doGetConfig", doGetConfig)
+	win.Bind("doGetContract", doGetContract)
+	win.Bind("doImportContract", doImportContract)
 
 	path, _ := filepath.Abs(filepath.Dir(os.Args[0]))
 	dir = strings.Replace(path, "\\", "/", -1)
@@ -61,6 +65,7 @@ func main() {
 	par, _ := json.Marshal(conf)
 
 	doGetConfig(string(par))
+	G_Etherclient, _ = ethclient.Dial(G_Config["nodeAddress"])
 
 	content, err := os.ReadFile(dir + "/res/main.html")
 	if err != nil {

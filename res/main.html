@@ -87,10 +87,6 @@
 
     function initMenu(acc) {
         var se = document.getElementById("add")
-        var option = document.createElement("option")
-        option.text = ""
-        option.value = ""
-        se.add(option)
         for (i=0; i<acc.length; i++){
             window.doWebLog(acc[i])
             var par = acc[i].split('-')
@@ -99,7 +95,6 @@
             option.value = par[0]
             se.add(option)
         }
-        se.value = ""  
     }
 
     function changePage(menuname,pagename){
@@ -143,9 +138,9 @@
         <div id = "menudiv" style="display: flex;">
             <div style="width: 80%;">
                 <ul>
-                    <li><a id="qianbao" class="active" onclick="changePage('qianbao','qianbao')">钱包</a></li>
-                    <li><a id="transfer" onclick="changePage('transfer','transfer')">转账</a></li>
+                    <li><a id="qianbao" class="active" onclick="changePage('qianbao','qianbao')">钱包</a></li>                    
                     <li><a id="contractasset" onclick="changePage('contractasset','contractasset')">合约资产</a></li>
+                    <li><a id="transfer" onclick="changePage('transfer','transfer')">转账</a></li>
                     <li><a id="tools" onclick="changePage('tools','tools')">工具</a></li>
                     <li><a id="system" onclick="changePage('system','system')">系统</a></li>
                 </ul>   

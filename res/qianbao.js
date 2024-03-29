@@ -42,6 +42,15 @@ function addAccountElement(acc,table){
         td3.append(ipt2)
         tr.append(td3)
 
+        var td4 = document.createElement("td")
+        var ipt3 = document.createElement("input")
+        ipt3.setAttribute("id","balance"+i)
+        ipt3.setAttribute("style","font-size: 14px;height:25px;")
+        ipt3.setAttribute("type","text")
+        ipt3.setAttribute("size","20")  
+        td4.append(ipt3)
+        tr.append(td4)
+
         var td4 = document.createElement("td")               
         var bt = document.createElement("input")
         bt.setAttribute("class","button2")
@@ -51,19 +60,22 @@ function addAccountElement(acc,table){
         td4.append(bt) 
         tr.append(td4)
 
-        var td5 = document.createElement("td") 
-        var bt2 = document.createElement("input")
-        bt2.setAttribute("class","button2")
-        bt2.setAttribute("type","button")
-        bt2.setAttribute("value","管理")
-        bt2.setAttribute("onclick","management("+"'address"+i +"'" +",'name"+i+"')")
-        td5.append(bt2)          
-        tr.append(td5)
-
         table.append(tr)
     }
     //ShowDiv("MyDiv","fade")
 
+}
+
+async function initBalance(){
+    // 获取每个地址的balance
+    window.doWebLog("initBalance")
+    var table = document.getElementById("table1")
+    for(var i=1; i< table.rows.length;i++){
+        //window.doGetBalance(table.rows[i].cells[1].childNodes[0].value).then ( (result) => {
+            //table.rows[i].cells[3].childNodes[0].value = result
+        //})    
+        table.rows[i].cells[3].childNodes[0].value = await window.doGetBalance(table.rows[i].cells[1].childNodes[0].value)
+    }
 }
 
 function initPage(){
@@ -74,4 +86,6 @@ function initPage(){
         window.doWebLog("go to addelement")
         addAccountElement(arr,document.getElementById("table1"))
     })
+
+    setTimeout(initBalance,1000)
 }
