@@ -12,7 +12,7 @@ function management(address,name){
 function addAccountElement(acc,table){
     window.doWebLog("enter addelement")
     for (i=0; i<acc.length; i++){
-        var par = acc[i].split('-')
+        var par = acc[i]
 
         var tr = document.createElement("tr")
         tr.setAttribute("style","height:50px;")
@@ -24,7 +24,7 @@ function addAccountElement(acc,table){
         ipt.setAttribute("id","address"+i)
         ipt.setAttribute("style","font-size: 14px;height:25px;")
         ipt.setAttribute("type","text")
-        ipt.setAttribute("value",par[0])
+        ipt.setAttribute("value",par.address)
         ipt.setAttribute("size","45")   
         ipt.setAttribute("readonly","readonly")       //此处不用disable属性，disable属性会导致自定义copy菜单无法拷贝内容  
         var td2 = document.createElement("td")
@@ -37,7 +37,7 @@ function addAccountElement(acc,table){
         ipt2.setAttribute("id","name"+i)
         ipt2.setAttribute("style","font-size: 14px;height:25px;")
         ipt2.setAttribute("type","text")
-        ipt2.setAttribute("value",par[1])
+        ipt2.setAttribute("value",par.name)
         ipt2.setAttribute("size","20")  
         td3.append(ipt2)
         tr.append(td3)
@@ -82,9 +82,9 @@ function initPage(){
     window.doWebLog("qianbao init page")
     window.doGetAccounts().then( (result) => {
         window.doWebLog("get result" + result)
-        var arr = result.split(',')
+        var arr = JSON.parse(result)
         window.doWebLog("go to addelement")
-        addAccountElement(arr,document.getElementById("table1"))
+        addAccountElement(arr.accounts,document.getElementById("table1"))
     })
 
     setTimeout(initBalance,1000)

@@ -10,17 +10,16 @@
 function initPage(){
     window.doGetAccounts().then( (result) => {
         window.doWebLog("get result" + result)
-        var acc = result.split(',')
+        var acc = JSON.parse(result)
         window.doWebLog("go to addelement")
         var se = document.getElementById("acc")
         window.doWebLog("get select addelement")
-        for (i=0; i<acc.length; i++){
-            window.doWebLog(acc[i])
-            var par = acc[i].split('-')
-            var option = document.createElement("option")
-            option.text = par[0]
-            option.value = par[0]
-            window.doWebLog("add:" + par[0])
+        for (i=0; i<acc.accounts.length; i++){
+            window.doWebLog(acc.accounts[i])
+              var option = document.createElement("option")
+            option.text = acc.accounts[i].address
+            option.value = acc.accounts[i].address
+            window.doWebLog("add:" + acc.accounts[i].address)
             se.add(option)
         }            
     })

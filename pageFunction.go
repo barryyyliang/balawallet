@@ -86,6 +86,15 @@ func doWebLog(para string) {
 
 //获取账号列表
 func doGetAccounts() string {
+	type account struct {
+		Type    string `json:"type"`
+		Address string `json:"address"`
+		Name    string `json:"name"`
+	}
+	type accounts struct {
+		Accounts []account `json:"accounts"`
+	}
+
 	//账户信息
 	addressCache := make(map[string]string)
 	db, err := leveldb.OpenFile(datadir+"db", nil)
@@ -94,29 +103,24 @@ func doGetAccounts() string {
 		it := db.NewIterator(nil, nil)
 		defer it.Release()
 		for it.Next() {
-			//fmt.Println("get address:" + string(it.Key()) + ":" + string(it.Value()))
-			//fmt.Printf("get address: %s :\r\n", string(it.Key()))
 			addressCache[string(it.Key())] = string(it.Value())
-			//fmt.Println("map:" + string(it.Key()) + ":" + addressCache[string(it.Key())])
 		}
 	}
 
 	acc := ks.Accounts()
-	var acclist string
+	var acclist accounts
 	for i := 0; i < len(acc); i++ {
-		if 0 == i {
-			//fmt.Println("get name:" + acc[i].Address.String())
-			//fmt.Printf("get name: %s : \r\n", acc[i].Address.String())
-			add := acc[i].Address.String()
-			acclist = add + "-" + addressCache[add]
-		} else {
-			//fmt.Println("get name:" + acc[i].Address.String())
-			//fmt.Printf("get name: %s : \r\n", acc[i].Address.String())
-			add := acc[i].Address.String()
-			acclist = acclist + "," + add + "-" + addressCache[add]
-		}
+		add := acc[i].Address.String()
+		acclist.Accounts = append(acclist.Accounts, account{"eth", add, addressCache[add]})
 	}
-	return acclist
+
+	result, err2 := json.Marshal(acclist)
+	if err2 == nil {
+		return string(result)
+	} else {
+		fmt.Println(err2.Error())
+	}
+	return ""
 }
 
 func doChangeAccountName(address string, name string) {
@@ -572,8 +576,14 @@ func getChainInfo(connect *ethclient.Client, from string) (uint64, *big.Int, *bi
 }
 
 func doDeployContract(from string, filepath string, pass string) string {
-	connect, err := ethclient.Dial(G_Config["nodeAddress"])
 	var re []byte
+	if from == "" || filepath == "" || pass == "" {
+		fmt.Println("parameter error")
+		re, _ = json.Marshal(ErrorResult{1, "parameter error"})
+		return string(re)
+	}
+	connect, err := ethclient.Dial(G_Config["nodeAddress"])
+
 	if err != nil {
 		fmt.Println("can not connect to node:")
 		re, _ = json.Marshal(ErrorResult{1, "can not connet to node"})
@@ -599,7 +609,12 @@ func doDeployContract(from string, filepath string, pass string) string {
 			}
 			bin, err := os.ReadFile(filepath)
 			if err != nil {
-				re, _ = json.Marshal(ErrorResult{1, "can not read bin file"})
+				re, _ = json.Marshal(ErrorResult{1, err.Error()})
+				break
+			}
+			bytecode, err := hex.DecodeString(string(bin))
+			if err != nil {
+				re, _ = json.Marshal(ErrorResult{1, "can not read bin file:" + filepath})
 				break
 			}
 			msg := ethereum.CallMsg{
@@ -610,18 +625,19 @@ func doDeployContract(from string, filepath string, pass string) string {
 				GasFeeCap: tipsPrice,      // EIP-1559 fee cap per gas.
 				GasTipCap: tipsPrice,      // EIP-1559 tip per gas.
 				Value:     big.NewInt(0),  // amount of wei sent along with the call
-				Data:      bin,            // input data, usually an ABI-encoded contract method invocation
+				Data:      bytecode,       // input data, usually an ABI-encoded contract method invocation
 			}
 
 			gasLimit, err := connect.EstimateGas(ctx, msg)
 			if err != nil {
+				fmt.Println("get gaslimit:" + strconv.FormatInt(int64(gasLimit), 10))
 				re, _ = json.Marshal(ErrorResult{1, err.Error()})
 				break
 			}
 
 			//后续可以改为可设置消费的交易
 			//tx := types.NewTransaction(nounce, common.HexToAddress(to), &bigvalue, gasLimit, gasPrice, make([]byte, 0))
-			tx := newDeployTx(nounce, &bigvalue, gasLimit, gasPrice, tipsPrice, chainId, bin)
+			tx := newDeployTx(nounce, &bigvalue, gasLimit, gasPrice, tipsPrice, chainId, bytecode)
 			tx, err = ks.SignTxWithPassphrase(acc[i], pass, tx, chainId)
 			if err == nil {
 				err := connect.SendTransaction(ctx, tx)
@@ -630,6 +646,7 @@ func doDeployContract(from string, filepath string, pass string) string {
 				} else {
 					fmt.Println("deploy success")
 					re, _ = json.Marshal(ErrorResult{0, ""})
+					//connect.TransactionReceipt(ctx,tx.Hash())
 				}
 
 				json, err2 := tx.MarshalJSON()
