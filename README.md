@@ -65,5 +65,17 @@ func DecryptKey(keyjson []byte, auth string) (*Key, error) {
 }
 
 # windows编译
-window 编译 go build -ldflags="-H windowsgui"
+需要下载交叉编译器，建议：
+LLVM MinGW
+MSYS2
+WinLibs
+
+并设置环境变量
+set GOOS=windows
+set GOARCH=amd64
+set CGO_ENABLED=1  
+
+然后编译
+go build -ldflags="-H windowsgui"
+
 
