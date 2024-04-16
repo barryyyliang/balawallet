@@ -17,8 +17,6 @@ func S256() *BitCurve {
 	return theCurve
 }
 
-#windows编译
-window 编译 go build -ldflags="-H windowsgui"
 
 
 /Users/yongfuliang/go/pkg/mod/github.com/ethereum/go-ethereum@v1.11.5/crypto/secp256k1/curve.go
@@ -66,4 +64,6 @@ func DecryptKey(keyjson []byte, auth string) (*Key, error) {
 	}, nil
 }
 
+# windows编译
+window 编译 go build -ldflags="-H windowsgui"
 
