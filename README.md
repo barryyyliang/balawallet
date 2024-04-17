@@ -18,6 +18,7 @@ func S256() *BitCurve {
 }
 
 
+
 /Users/yongfuliang/go/pkg/mod/github.com/ethereum/go-ethereum@v1.11.5/crypto/secp256k1/curve.go
 func (BitCurve *BitCurve) ScalarBaseMult(k []byte) (*big.Int, *big.Int) -----通过私钥得到公钥
 
@@ -62,5 +63,19 @@ func DecryptKey(keyjson []byte, auth string) (*Key, error) {
 		PrivateKey: key,
 	}, nil
 }
+
+# windows编译
+需要下载交叉编译器，建议：
+LLVM MinGW
+MSYS2
+WinLibs
+
+并设置环境变量
+set GOOS=windows
+set GOARCH=amd64
+set CGO_ENABLED=1  
+
+然后编译
+go build -ldflags="-H windowsgui"
 
 
