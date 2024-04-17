@@ -533,9 +533,13 @@ func doGetComponent(com string) string {
 func doConfig(configs string) {
 	fmt.Println("enter doConfig")
 
-	json.Unmarshal([]byte(configs), &G_Config)
+	var config = make(map[string]string)
 
-	fmt.Println(G_Config)
+	json.Unmarshal([]byte(configs), &config)
+
+	G_Config = config
+
+	fmt.Println(config)
 
 	db, err := leveldb.OpenFile(datadir+"db", nil)
 	defer db.Close()
@@ -548,6 +552,9 @@ func doConfig(configs string) {
 			fmt.Println("put config:" + key + ":" + value)
 		}
 	}
+
+	// 配置更新后刷新链接
+	G_Etherclient = nil
 }
 
 func doGetConfig(configs string) string {
