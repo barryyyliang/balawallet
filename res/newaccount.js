@@ -3,7 +3,7 @@ function initPage() {
     
 } 
 
-function newacnt() {
+async function newacnt() {
     window.doWebLog("进入函数")
     var pa = document.getElementById("pass").value
     window.doWebLog("密码：")
@@ -16,5 +16,8 @@ function newacnt() {
         return
     }
     var name = document.getElementById("name").value
-    window.doNewAccount(pa,name)
+    var result = await window.doNewAccount(pa,name)
+    var obj = JSON.parse(result)
+    MYDIALOG.ShowDiv("MyDiv","fade", obj.Err);
+    initMenu()
 }

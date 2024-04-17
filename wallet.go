@@ -9,7 +9,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/ethereum/go-ethereum/ethclient"
-	"github.com/webview/webview"
+	webview "github.com/webview/webview_go"
 )
 
 var win webview.WebView
@@ -66,7 +66,12 @@ func main() {
 	par, _ := json.Marshal(conf)
 
 	doGetConfig(string(par))
-	G_Etherclient, _ = ethclient.Dial(G_Config["nodeAddress"])
+	var err error
+	G_Etherclient, err = ethclient.Dial(G_Config["nodeAddress"])
+	if err != nil {
+		G_Etherclient = nil
+		fmt.Println("can not connect to node")
+	}
 
 	content, err := os.ReadFile(dir + "/res/main.html")
 	if err != nil {

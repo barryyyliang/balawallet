@@ -51,13 +51,17 @@ func isAddressExist(db *leveldb.DB, adress string, name string) bool {
 }
 
 //新创建一个账号
-func doNewAccount(pass string, walletName string) {
+func doNewAccount(pass string, walletName string) string {
+	var re []byte
+	re, _ = json.Marshal(ErrorResult{0, "success"})
 	fmt.Println("password:" + pass)
 	scryptN := keystore.StandardScryptN
 	scryptP := keystore.StandardScryptP
 	account, err := keystore.StoreKey(accountdir, pass, scryptN, scryptP)
 	if err != nil {
 		fmt.Println("failed to generate new account")
+		re, _ = json.Marshal(ErrorResult{1, err.Error()})
+		return string(re)
 	}
 	fmt.Println(account.Address)
 	fmt.Println(account.URL)
@@ -72,10 +76,14 @@ func doNewAccount(pass string, walletName string) {
 		err = db.Put([]byte(account.Address.String()), []byte(walletName), nil)
 		if err != nil {
 			fmt.Println("put name err")
+			re, _ = json.Marshal(ErrorResult{1, "create success, but write name error"})
 		}
 	} else {
 		fmt.Println("name has existed")
+		re, _ = json.Marshal(ErrorResult{1, "create success, but name is exist"})
 	}
+
+	return string(re)
 
 }
 
@@ -240,15 +248,15 @@ func newDeployTx(nonce uint64, amount *big.Int, gasLimit uint64, gasPrice *big.I
 }
 
 func doTransfer(from string, to string, value string, pass string) string {
-	connect, err := ethclient.Dial(G_Config["nodeAddress"])
 	var re []byte
-	if err != nil {
-		fmt.Println("can not connect to node:")
-		re, _ = json.Marshal(ErrorResult{1, "can not connet to node"})
+	connect := getConnection()
+	if connect == nil {
+		fmt.Println("doTransfer: connection is nil")
+		re, _ = json.Marshal(ErrorResult{1, "can not coonnect to node"})
 		return string(re)
 	}
+
 	ctx := context.Background()
-	defer connect.Close()
 	acc := ks.Accounts()
 	for i := 0; i < len(acc); i++ {
 		fmt.Printf("get account: %s : \r\n", acc[i].Address.String())
@@ -298,8 +306,17 @@ func doTransfer(from string, to string, value string, pass string) string {
 
 //获取账户余额
 func doGetBalance(add string) string {
-	//connect, err := ethclient.Dial(G_Config["nodeAddress"])
-	connect := G_Etherclient
+	fmt.Println("doGetBalance: address is " + add)
+	if add == "" {
+		fmt.Println("doGetBalance: address is null")
+		return ""
+	}
+	connect := getConnection()
+	if connect == nil {
+		fmt.Println("doGetBalance: connection is nil")
+		return ""
+	}
+
 	now := time.Now()
 	fmt.Println("start:")
 	fmt.Println(now.UnixMilli())
@@ -402,13 +419,12 @@ func isNumber(value string) bool {
 }
 
 func doGetFee() string {
-	connect, err := ethclient.Dial(G_Config["nodeAddress"])
-	if err != nil {
-		fmt.Println("can not connect to node:")
+	connect := getConnection()
+	if connect == nil {
+		fmt.Println("doGetFee: connection is nil")
 		return ""
 	}
 	ctx := context.Background()
-	defer connect.Close()
 
 	price, err := connect.SuggestGasPrice(ctx)
 	if err != nil {
@@ -582,15 +598,14 @@ func doDeployContract(from string, filepath string, pass string) string {
 		re, _ = json.Marshal(ErrorResult{1, "parameter error"})
 		return string(re)
 	}
-	connect, err := ethclient.Dial(G_Config["nodeAddress"])
+	connect := getConnection()
 
-	if err != nil {
+	if connect == nil {
 		fmt.Println("can not connect to node:")
 		re, _ = json.Marshal(ErrorResult{1, "can not connet to node"})
 		return string(re)
 	}
 	ctx := context.Background()
-	defer connect.Close()
 	acc := ks.Accounts()
 	for i := 0; i < len(acc); i++ {
 		fmt.Printf("get account: %s : \r\n", acc[i].Address.String())
@@ -712,9 +727,8 @@ func doImportContract(cons string) {
 	if err == nil {
 		if jcons.Name == "" {
 			ctx := context.Background()
-			connect, err3 := ethclient.Dial(G_Config["nodeAddress"])
-			if err3 == nil {
-				defer connect.Close()
+			connect := getConnection()
+			if connect != nil {
 				var conAdd common.Address = common.HexToAddress(jcons.Address)
 				transferFnSignature := []byte("name()")
 				hash := crypto.Keccak256(transferFnSignature)
@@ -756,4 +770,17 @@ func doImportContract(cons string) {
 	} else {
 		fmt.Println("get wrong parameter:" + cons)
 	}
+}
+
+func getConnection() *ethclient.Client {
+	if G_Etherclient == nil {
+		connect, err := ethclient.Dial(G_Config["nodeAddress"])
+		if err != nil {
+			G_Etherclient = nil
+
+		} else {
+			G_Etherclient = connect
+		}
+	}
+	return G_Etherclient
 }

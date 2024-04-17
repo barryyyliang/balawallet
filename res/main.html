@@ -82,31 +82,23 @@
         //     }
         // )
 
-
-        result = await window.doGetAccounts()
-        var arr = JSON.parse(result)
-        initMenu(arr.accounts)
-        // window.doGetAccounts().then( (result) => {
-        //     window.doWebLog("get result" + result)
-        //     var arr = JSON.parse(result)
-        //     window.doWebLog("go to addelement")
-        //     initMenu(arr.accounts)
-        // })
-
-        changePage("qianbao","qianbao")
-          
+        initMenu()
+        changePage("qianbao","qianbao")          
     }
 
-    function initMenu(acc) {
+    async function initMenu() {
+        var result = await window.doGetAccounts()
+        var acc = JSON.parse(result)
         var se = document.getElementById("add")
-        for (i=0; i<acc.length; i++){
-            window.doWebLog(acc[i])
+        se.options.length = 0
+        for (i=0; i<acc.accounts.length; i++){
+            window.doWebLog(acc.accounts[i])
             var option = document.createElement("option")
-            option.text = acc[i].address
-            option.value = acc[i].address
+            option.text = acc.accounts[i].address
+            option.value = acc.accounts[i].address
             se.add(option)
         }
-    }
+    } 
 
     function changePage(menuname,pagename){
         window.doWebLog("change page to " + pagename)
