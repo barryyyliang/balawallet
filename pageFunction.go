@@ -63,10 +63,6 @@ func doNewAccount(pass string, walletName string) string {
 		re, _ = json.Marshal(ErrorResult{1, err.Error()})
 		return string(re)
 	}
-	fmt.Println(account.Address)
-	fmt.Println(account.URL)
-	fmt.Println(account.URL.Path)
-	fmt.Println(account.URL.Scheme)
 
 	//账户信息存库
 	db, err := leveldb.OpenFile(datadir+"db", nil)
@@ -211,7 +207,7 @@ func doExportAccount(add string, pa string) {
 
 		file, err := os.OpenFile(exportdir+add, os.O_RDWR|os.O_CREATE, 0666)
 		if err != nil {
-			fmt.Println("can not open file in export")
+			fmt.Println("can not open file in export:" + err.Error())
 			return
 		}
 		defer file.Close()
@@ -559,7 +555,12 @@ func doConfig(configs string) {
 
 func doGetConfig(configs string) string {
 	fmt.Println(configs)
-	db, _ := leveldb.OpenFile(datadir+"db", nil)
+	db, err := leveldb.OpenFile(datadir+"db", nil)
+	if err != nil {
+		fmt.Println("open db error:" + err.Error())
+		return ""
+	}
+
 	defer db.Close()
 
 	var configName []string

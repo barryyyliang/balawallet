@@ -57,6 +57,27 @@ func main() {
 	accountdir = dir + "/account/"
 	exportdir = dir + "/export/"
 
+	var err error
+	//创建必要的目录
+	_, err = os.Stat(datadir)
+	if err != nil {
+		if !os.IsExist(err) {
+			os.Mkdir("data", os.ModePerm)
+		}
+	}
+	_, err = os.Stat(accountdir)
+	if err != nil {
+		if !os.IsExist(err) {
+			os.Mkdir("account", os.ModePerm)
+		}
+	}
+	_, err = os.Stat(exportdir)
+	if err != nil {
+		if !os.IsExist(err) {
+			os.Mkdir("export", os.ModePerm)
+		}
+	}
+
 	//打开钱包
 	scryptN := keystore.StandardScryptN
 	scryptP := keystore.StandardScryptP
@@ -66,7 +87,6 @@ func main() {
 	par, _ := json.Marshal(conf)
 
 	doGetConfig(string(par))
-	var err error
 	G_Etherclient, err = ethclient.Dial(G_Config["nodeAddress"])
 	if err != nil {
 		G_Etherclient = nil
