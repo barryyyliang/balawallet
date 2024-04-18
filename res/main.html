@@ -84,6 +84,18 @@
 
         initMenu()
         changePage("qianbao","qianbao")          
+        checkConfig()
+    }
+
+    function checkConfig(){
+        window.doCheckNode().then ( (result) => {
+            var obj = JSON.parse(result)
+            window.doWebLog("checkconfig：" + result)
+            window.doWebLog(obj)
+            if (1 == obj.Code) {
+                MYDIALOG.ShowDiv("MyDiv","fade","还没有配置区块链节点，可在系统->系统配置中设置连接的节点地址")
+            }
+        })    
     }
 
     async function initMenu() {

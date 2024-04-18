@@ -23,7 +23,8 @@ var currentAccount string
 
 //var nodeaddress string = "http://localhost:8545"
 var G_Config = make(map[string]string)
-var G_Etherclient *ethclient.Client
+var G_Etherclient *ethclient.Client = nil
+var G_BlockchainConfig bool = true
 
 func main() {
 	win = webview.New(true)
@@ -49,6 +50,7 @@ func main() {
 	win.Bind("doGetContract", doGetContract)
 	win.Bind("doImportContract", doImportContract)
 	win.Bind("doDeployContract", doDeployContract)
+	win.Bind("doCheckNode", doCheckNode)
 
 	path, _ := filepath.Abs(filepath.Dir(os.Args[0]))
 	dir = strings.Replace(path, "\\", "/", -1)
@@ -87,10 +89,15 @@ func main() {
 	par, _ := json.Marshal(conf)
 
 	doGetConfig(string(par))
-	G_Etherclient, err = ethclient.Dial(G_Config["nodeAddress"])
-	if err != nil {
-		G_Etherclient = nil
-		fmt.Println("can not connect to node")
+	if G_Config["nodeAddress"] != "" {
+		G_Etherclient, err = ethclient.Dial(G_Config["nodeAddress"])
+		if err != nil {
+			G_Etherclient = nil
+			fmt.Println("can not connect to node")
+		}
+	} else {
+		fmt.Println("have not config blockchain node")
+		G_BlockchainConfig = false
 	}
 
 	content, err := os.ReadFile(dir + "/res/main.html")
