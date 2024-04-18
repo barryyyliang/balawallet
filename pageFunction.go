@@ -110,7 +110,8 @@ func doGetAccounts() string {
 	return ""
 }
 
-func doChangeAccountName(address string, name string) {
+func doChangeAccountName(address string, name string) string {
+	re, _ := json.Marshal(ErrorResult{0, "success"})
 	//账户信息存库
 	db, err := leveldb.OpenFile(datadir+"db", nil)
 	defer db.Close()
@@ -118,13 +119,14 @@ func doChangeAccountName(address string, name string) {
 	if isAddressExist(db, address, name) == false {
 		err = db.Put([]byte(address), []byte(name), nil)
 		if err != nil {
-			fmt.Println("put name err")
+			re, _ = json.Marshal(ErrorResult{1, "write db error" + err.Error()})
 		} else {
 			fmt.Println("put name:" + address + ":" + name)
 		}
 	} else {
-		fmt.Println("name has existed")
+		re, _ = json.Marshal(ErrorResult{1, "name has existed"})
 	}
+	return string(re)
 }
 
 func doGetAccountName(address string) string {
@@ -147,23 +149,26 @@ func doGetAccountName(address string) string {
 }
 
 //通过私钥导入账号
-func doImportAccount(pa string, name string, kk string) {
+func doImportAccount(pa string, name string, kk string) string {
+	re, _ := json.Marshal(ErrorResult{0, "success"})
 	fmt.Println("importAccount")
 	key := new(ecdsa.PrivateKey)
 	key.PublicKey.Curve = crypto.S256()
 	pp, err := hex.DecodeString(kk)
 	if err != nil {
-		fmt.Println("bad private key string")
+		re, _ = json.Marshal(ErrorResult{1, "bad private key string"})
+		return string(re)
 	}
 	key.D = new(big.Int)
 	key.D.SetBytes(pp)
 	key.PublicKey.X, key.PublicKey.Y = key.PublicKey.Curve.ScalarBaseMult(key.D.Bytes())
 	ks.ImportECDSA(key, pa)
+	return string(re)
 }
 
 //导出私钥
-func doExportAccount(add string, pa string) {
-	//fmt.Println("exportAccount")
+func doExportAccount(add string, pa string) string {
+	re, _ := json.Marshal(ErrorResult{0, "success"})
 	selectAccountFile := ""
 	acc := ks.Accounts()
 	for i := 0; i < len(acc); i++ {
@@ -175,23 +180,26 @@ func doExportAccount(add string, pa string) {
 	if selectAccountFile != "" {
 		keyjson, err := os.ReadFile(selectAccountFile)
 		if err != nil {
-			return
+			re, _ = json.Marshal(ErrorResult{1, "read account file error:" + err.Error()})
+			return string(re)
 		}
 		key, err := keystore.DecryptKey(keyjson, pa)
 		if err != nil {
-			fmt.Println(err.Error())
-			return
+			re, _ = json.Marshal(ErrorResult{1, "decryp account file error:" + err.Error()})
+			return string(re)
 		}
-		// Make sure we're really operating on the requested key (no swap attacks)
+		// 确保导出的是需要私钥
 		if key.Address.String() != add {
 			fmt.Errorf("key content mismatch: have account %x, want %s", key.Address, add)
-			return
+			re, _ = json.Marshal(ErrorResult{1, "key content mismatch:" + key.Address.String() + "-" + add})
+			return string(re)
 		}
 
 		file, err := os.OpenFile(exportdir+add, os.O_RDWR|os.O_CREATE, 0666)
 		if err != nil {
 			fmt.Println("can not open file in export:" + err.Error())
-			return
+			re, _ = json.Marshal(ErrorResult{1, "can not open file in export:" + err.Error()})
+			return string(re)
 		}
 		defer file.Close()
 
@@ -200,6 +208,7 @@ func doExportAccount(add string, pa string) {
 		writer.WriteString(value)
 		writer.Flush()
 	}
+	return string(re)
 }
 
 func doTransfer(from string, to string, value string, pass string) string {
@@ -400,9 +409,9 @@ func doGetComponent(com string) string {
 	}
 }
 
-func doConfig(configs string) {
+func doConfig(configs string) string {
 	fmt.Println("enter doConfig")
-
+	re, _ := json.Marshal(ErrorResult{0, "success"})
 	var config = make(map[string]string)
 
 	json.Unmarshal([]byte(configs), &config)
@@ -417,7 +426,8 @@ func doConfig(configs string) {
 	for key, value := range G_Config {
 		err = db.Put([]byte(key), []byte(value), nil)
 		if err != nil {
-			fmt.Println("put configi err")
+			fmt.Println("put config error")
+			re, _ = json.Marshal(ErrorResult{1, "write db error"})
 		} else {
 			fmt.Println("put config:" + key + ":" + value)
 		}
@@ -425,6 +435,8 @@ func doConfig(configs string) {
 
 	// 配置更新后刷新链接
 	G_Etherclient = nil
+
+	return string(re)
 }
 
 func doGetConfig(configs string) string {
@@ -574,7 +586,8 @@ func doGetContract() string {
 	return ""
 }
 
-func doImportContract(cons string) {
+func doImportContract(cons string) string {
+	re, _ := json.Marshal(ErrorResult{0, "success"})
 	fmt.Println("doImportContract:" + cons)
 	type contract struct {
 		Type    string `json:"type"`
@@ -622,14 +635,19 @@ func doImportContract(cons string) {
 		if err2 == nil {
 			if db.Put([]byte(jcons.Address), jvalue, nil) != nil {
 				fmt.Println("write db error:" + string(jvalue))
+				re, _ = json.Marshal(ErrorResult{1, "write db error"})
 			}
 		} else {
 			fmt.Println("open contract db error:" + err2.Error())
+			re, _ = json.Marshal(ErrorResult{1, "open db error"})
 		}
 
 	} else {
 		fmt.Println("get wrong parameter:" + cons)
+		re, _ = json.Marshal(ErrorResult{1, "get wrong parameter"})
 	}
+
+	return string(re)
 }
 
 func doCheckNode() string {
