@@ -38,9 +38,10 @@ func doNewAccount(pass string, walletName string) string {
 	var re []byte
 	re, _ = json.Marshal(ErrorResult{0, "success"})
 	fmt.Println("password:" + pass)
-	scryptN := keystore.StandardScryptN
-	scryptP := keystore.StandardScryptP
-	account, err := keystore.StoreKey(accountdir, pass, scryptN, scryptP)
+	//scryptN := keystore.StandardScryptN
+	//scryptP := keystore.StandardScryptP
+	//account, err := keystore.StoreKey(accountdir, pass, scryptN, scryptP)
+	account, err := ks.NewAccount(pass)
 	if err != nil {
 		fmt.Println("failed to generate new account")
 		re, _ = json.Marshal(ErrorResult{1, err.Error()})
@@ -145,7 +146,6 @@ func doGetAccountName(address string) string {
 		fmt.Println("open db error:" + err.Error())
 		return ""
 	}
-
 }
 
 //通过私钥导入账号
