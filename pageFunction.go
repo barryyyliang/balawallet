@@ -659,3 +659,19 @@ func doCheckNode() string {
 	}
 	return string(re)
 }
+
+func doLoadABI(filepath string) string {
+	var re []byte
+	if filepath == "" {
+		re, _ = json.Marshal(ErrorResult{1, "parameter error"})
+		return string(re)
+	}
+	abiContent, err := os.ReadFile(filepath)
+	if err != nil {
+		re, _ = json.Marshal(ErrorResult{2, err.Error()})
+		return string(re)
+	}
+
+	re, _ = json.Marshal(ErrorResult{0, string(abiContent)})
+	return string(re)
+}

@@ -1,0 +1,36 @@
+
+    <table id="contractTable" style="margin: 0 auto;font-size: 16px;text-align: center;height: 100px;">
+        
+        <tr>
+            <td>合约ABI（ABI):</td>
+            <td><input type="text" id="filePath" style="width:300px;font-size: 14px;height:25px;" ></td>
+            <!--td><button class="button1" onclick="selectfile()">选择</button></td-->
+            <td><button class="button1" onclick="loadABI()">加载</button></td>
+        </tr> 
+    </table>
+    <table id="functionTable" style="margin: 0 auto;font-size: 16px;text-align: center;height: 30px;">
+        
+        <tr>
+            <td style="padding:15px;" >调用方法</td>
+            <td style="padding:15px;">
+                <select id="acc" name="acc" style="font-size: 14px;height: 25px;width: 200px;border-radius: 0px;"></select>
+            </td>            
+        </tr> 
+    </table>
+    <table id="paramterTable" style="margin: 0 auto;font-size: 16px;text-align: center;border: 1px solid black;">
+        <tr>
+            <th style="background-color:green;">参数</th>
+            <th style="background-color:green;">值</th>
+            <th style="background-color:green;">类型</th>
+        </tr>
+        <tr>
+            <td style="padding:15px;">name</td>
+            <td style="padding:15px;"><input type="text" id="filePath" style="width:300px;font-size: 14px;height:25px;" ></td>
+            <td style="padding:15px;">unit256</td>
+        </tr> 
+    </table>
+    <div style="margin: 0 auto;background-color: text-align: center;">
+        <button class="button1" onclick="addNew({})">调用</button>
+    </div>
+
+        
