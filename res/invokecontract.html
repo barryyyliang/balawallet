@@ -13,24 +13,26 @@
         <tr>
             <td style="padding:15px;" >调用方法</td>
             <td style="padding:15px;">
-                <select id="acc" name="acc" style="font-size: 14px;height: 25px;width: 200px;border-radius: 0px;"></select>
+                <select id="contractFunc" name="contractFunc" onchange="changeFunc()" style="font-size: 14px;height: 25px;width: 200px;border-radius: 0px;"></select>
             </td>            
         </tr> 
     </table>
     <table id="paramterTable" style="margin: 0 auto;font-size: 16px;text-align: center;border: 1px solid black;">
         <tr>
-            <th style="background-color:green;">参数</th>
-            <th style="background-color:green;">值</th>
-            <th style="background-color:green;">类型</th>
+            <th style="background-color:green;width:50px;">参数</th>
+            <th style="background-color:green;width:300px;">值</th>
+            <th style="background-color:green;width:50px;">类型</th>
         </tr>
-        <tr>
-            <td style="padding:15px;">name</td>
-            <td style="padding:15px;"><input type="text" id="filePath" style="width:300px;font-size: 14px;height:25px;" ></td>
-            <td style="padding:15px;">unit256</td>
-        </tr> 
     </table>
     <div style="margin: 0 auto;background-color: text-align: center;">
-        <button class="button1" onclick="addNew({})">调用</button>
+        <button class="button1" onclick="invoke()">调用</button>
     </div>
+    <table id="outTable" style="margin: 0 auto;font-size: 16px;text-align: center;border: 1px solid black;">
+        <tr>
+            <th style="background-color:green;width:50px;">返回值</th>
+            <th style="background-color:green;width:300px;">值</th>
+            <th style="background-color:green;width:50px;">类型</th>
+        </tr>
+    </table>
 
         
