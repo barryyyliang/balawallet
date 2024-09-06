@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum"
+	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -626,6 +627,7 @@ func doImportContract(cons string) string {
 				sresult := string(result)
 				sresult = strings.ReplaceAll(sresult, string([]byte{0x00}), "")
 				fmt.Println("get contract name:" + string(sresult))
+				fmt.Println(data)
 				jcons.Name = sresult
 			}
 		}
@@ -674,4 +676,59 @@ func doLoadABI(filepath string) string {
 
 	re, _ = json.Marshal(ErrorResult{0, string(abiContent)})
 	return string(re)
+}
+
+func doReadContract(from string, to string, funcAbi string, paremters string) {
+	fmt.Println("doReadContract")
+	fmt.Println(funcAbi)
+	fmt.Println(paremters)
+	var toAdd common.Address = common.HexToAddress(to)
+	contractAbi, err := abi.JSON(strings.NewReader(funcAbi))
+	var parems []interface{}
+	var data []byte
+	if err == nil {
+		for _, method := range contractAbi.Methods {
+			var parStrings []string
+			json.Unmarshal([]byte(paremters), &parStrings)
+			for i, pType := range method.Inputs {
+				parems = append(parems, stringToValue(pType.Type.GetType(), parStrings[i]))
+				fmt.Println(parStrings[i])
+			}
+			data, err = contractAbi.Pack(method.RawName, parems...)
+			if err != nil {
+				fmt.Println("pack abi data err:" + err.Error())
+				return
+			}
+			connect := getConnection()
+			if connect != nil {
+				ctx := context.Background()
+				msg := ethereum.CallMsg{
+					From:      common.HexToAddress(from), // the sender of the 'transaction'
+					To:        &toAdd,                    // the destination contract (nil for contract creation)
+					Gas:       0,                         // if 0, the call executes with near-infinite gas
+					GasPrice:  nil,                       // wei <-> gas exchange ratio
+					GasFeeCap: nil,                       // EIP-1559 fee cap per gas.
+					GasTipCap: nil,                       // EIP-1559 tip per gas.
+					Value:     big.NewInt(0),             // amount of wei sent along with the call
+					Data:      data,                      // input data, usually an ABI-encoded contract method invocation
+				}
+				result, err5 := connect.CallContract(ctx, msg, nil)
+				if err5 == nil {
+					ret, _ := method.Outputs.Unpack(result)
+					for _, a := range ret {
+						aa := valueToString(a)
+						fmt.Println(aa)
+					}
+				} else {
+					fmt.Println("call contract error:" + err5.Error())
+				}
+				fmt.Println(result)
+			}
+
+			break
+		}
+	} else {
+		fmt.Println("parse abi error")
+	}
+
 }

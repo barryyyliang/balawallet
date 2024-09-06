@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"math/big"
+	"reflect"
 	"strconv"
 	"strings"
 
@@ -46,6 +47,19 @@ func newDynamicTx(nonce uint64, to common.Address, amount *big.Int, gasLimit uin
 func newDeployTx(nonce uint64, amount *big.Int, gasLimit uint64, gasPrice *big.Int, tipsPrice *big.Int, chain *big.Int, data []byte) *types.Transaction {
 	return types.NewTx(&types.DynamicFeeTx{
 		Nonce:     nonce,
+		Value:     amount,
+		Gas:       gasLimit,
+		GasFeeCap: gasPrice,
+		GasTipCap: tipsPrice,
+		ChainID:   chain,
+		Data:      data,
+	})
+}
+
+func newCallContractTx(nonce uint64, to common.Address, amount *big.Int, gasLimit uint64, gasPrice *big.Int, tipsPrice *big.Int, chain *big.Int, data []byte) *types.Transaction {
+	return types.NewTx(&types.DynamicFeeTx{
+		Nonce:     nonce,
+		To:        &to,
 		Value:     amount,
 		Gas:       gasLimit,
 		GasFeeCap: gasPrice,
@@ -173,4 +187,37 @@ func getConnection() *ethclient.Client {
 		}
 	}
 	return G_Etherclient
+}
+
+func stringToValue(t reflect.Type, value string) interface{} {
+
+	switch t.String() {
+	case "common.Address":
+		fmt.Println(t.String())
+		add := common.HexToAddress(value)
+		return add
+	case "*big.Int":
+		fmt.Println(t.String())
+		ret := new(big.Int)
+		ret.SetString(value, 10)
+		return ret
+	}
+
+	return nil
+}
+
+func valueToString(value interface{}) string {
+	var ret string
+	switch reflect.TypeOf(value).String() {
+	case "common.Address":
+		fmt.Println("common.Address")
+		add := value.(common.Address)
+		ret = add.String()
+	case "*big.Int":
+		fmt.Println("*big.Int")
+		v := new(big.Int)
+		v = value.(*big.Int)
+		ret = v.String()
+	}
+	return ret
 }

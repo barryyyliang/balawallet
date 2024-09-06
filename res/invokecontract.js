@@ -64,6 +64,7 @@
             window.doWebLog("changeFunc3");
             if (abijson[i].type === "function" && abijson[i].name === func){
                 window.doWebLog("changeFunc4");
+                document.getElementById("functype").value = abijson[i].stateMutability
                 var inputTable = document.getElementById("paramterTable")
                 for (var n=inputTable.rows.length-1;n>0;n--){
                     inputTable.removeChild(inputTable.rows[n])
@@ -84,7 +85,37 @@
     }
 
     function invoke() {
-        
+        window.doWebLog("invoke0")
+        //var functype = document.getElementById("functype").value
+        var funcName = document.getElementById("contractFunc").value
+        var i = 0
+        for ( ; i<abijson.length;i++){
+            if (abijson[i].type === "function" && abijson[i].name === funcName){
+                break               
+            } 
+        } 
+        var tmp = new Array()
+        tmp.push(abijson[i])
+        var func = JSON.stringify(tmp)
+        var parems = new Array()
+        var inputTable = document.getElementById("paramterTable")
+        window.doWebLog("invoke1")
+        var caddress = document.getElementById("caddress").value
+        window.doWebLog(caddress)
+        var from = document.getElementById("add").value
+        window.doWebLog(from)
+        for (var n=1;n<inputTable.rows.length;n++){
+            parems.push(inputTable.rows[n].cells[1].childNodes[0].value)
+        }
+
+        var paremsString = JSON.stringify(parems)
+        window.doReadContract(from,caddress,func, paremsString)
+
+        // if (functype === "view") {            
+
+        // } else {
+            
+        // }
     }
 
     function initPage(){
