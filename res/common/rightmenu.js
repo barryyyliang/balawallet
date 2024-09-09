@@ -89,22 +89,22 @@
 
     var MYDIALOG = {
         //模态对话框
-        ShowDiv:function (show_div, bg_div, dialog_content){
-            var showdiv = document.getElementById(show_div);
+        ShowDiv:function (dialog_content){
+            var showdiv = document.getElementById("MyDiv");
             showdiv.style.display='block';
-            var bgdiv = document.getElementById(bg_div);
+            var bgdiv = document.getElementById("fade");
             bgdiv.style.display='block';
             bgdiv.style.width = document.body.scrollWidth;
             bgdiv.style.height = document.body.scrollHeight;
             var contentdiv = document.getElementById("dialogcontent");
             contentdiv.innerHTML = dialog_content
-            //$("#"+bg_div).height($(document).height());
+            //$("#"+"fade").height($(document).height());
         },
 
         //关闭模态对话框
-        CloseDiv:function (show_div,bg_div){
-            document.getElementById(show_div).style.display='none';
-            document.getElementById(bg_div).style.display='none';
+        CloseDiv:function (){
+            document.getElementById("MyDiv").style.display='none';
+            document.getElementById("fade").style.display='none';
         }
     }
 

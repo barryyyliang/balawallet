@@ -191,33 +191,47 @@ func getConnection() *ethclient.Client {
 
 func stringToValue(t reflect.Type, value string) interface{} {
 
+	fmt.Println("string to value")
 	switch t.String() {
 	case "common.Address":
-		fmt.Println(t.String())
+		fmt.Println("common.Address")
 		add := common.HexToAddress(value)
 		return add
 	case "*big.Int":
-		fmt.Println(t.String())
+		fmt.Println("*big.Int")
 		ret := new(big.Int)
 		ret.SetString(value, 10)
 		return ret
+	case "string":
+		fmt.Println("string")
+		return value
 	}
-
 	return nil
 }
 
 func valueToString(value interface{}) string {
 	var ret string
+	fmt.Println(reflect.TypeOf(value).String())
 	switch reflect.TypeOf(value).String() {
 	case "common.Address":
-		fmt.Println("common.Address")
+		fmt.Println("type is common.Address")
 		add := value.(common.Address)
 		ret = add.String()
 	case "*big.Int":
-		fmt.Println("*big.Int")
+		fmt.Println("type is *big.Int")
 		v := new(big.Int)
 		v = value.(*big.Int)
 		ret = v.String()
+	case "string":
+		fmt.Println("type is string")
+		ret = value.(string)
+	case "bool":
+		v := value.(bool)
+		if v == true {
+			ret = "true"
+		} else {
+			ret = "false"
+		}
 	}
 	return ret
 }

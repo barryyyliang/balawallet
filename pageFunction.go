@@ -678,14 +678,16 @@ func doLoadABI(filepath string) string {
 	return string(re)
 }
 
-func doReadContract(from string, to string, funcAbi string, paremters string) {
+func doReadContract(from string, to string, funcAbi string, paremters string) string {
 	fmt.Println("doReadContract")
 	fmt.Println(funcAbi)
 	fmt.Println(paremters)
 	var toAdd common.Address = common.HexToAddress(to)
 	contractAbi, err := abi.JSON(strings.NewReader(funcAbi))
 	var parems []interface{}
+	var re ErrorResult = ErrorResult{0, ""}
 	var data []byte
+	var outs []string
 	if err == nil {
 		for _, method := range contractAbi.Methods {
 			var parStrings []string
@@ -696,8 +698,10 @@ func doReadContract(from string, to string, funcAbi string, paremters string) {
 			}
 			data, err = contractAbi.Pack(method.RawName, parems...)
 			if err != nil {
-				fmt.Println("pack abi data err:" + err.Error())
-				return
+				re.Code = 1
+				re.Err = "pack abi data err:" + err.Error()
+				tmp, _ := json.Marshal(re)
+				return string(tmp)
 			}
 			connect := getConnection()
 			if connect != nil {
@@ -717,18 +721,25 @@ func doReadContract(from string, to string, funcAbi string, paremters string) {
 					ret, _ := method.Outputs.Unpack(result)
 					for _, a := range ret {
 						aa := valueToString(a)
+						outs = append(outs, aa)
 						fmt.Println(aa)
 					}
+					bouts, _ := json.Marshal(outs)
+					re.Err = string(bouts)
 				} else {
-					fmt.Println("call contract error:" + err5.Error())
+					re.Code = 1
+					re.Err = "call contract error:" + err5.Error()
 				}
 				fmt.Println(result)
 			}
-
 			break
 		}
 	} else {
-		fmt.Println("parse abi error")
+		re.Code = 1
+		re.Err = "parse abi error"
 	}
-
+	fmt.Println(re.Err)
+	fmt.Println(re.Code)
+	tmp, _ := json.Marshal(re)
+	return string(tmp)
 }

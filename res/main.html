@@ -93,7 +93,7 @@
             window.doWebLog("checkconfig：" + result)
             window.doWebLog(obj)
             if (1 == obj.Code) {
-                MYDIALOG.ShowDiv("MyDiv","fade","还没有配置区块链节点，可在系统->系统配置中设置连接的节点地址")
+                MYDIALOG.ShowDiv("还没有配置区块链节点，可在系统->系统配置中设置连接的节点地址")
             }
         })    
     }
@@ -150,7 +150,7 @@
                 }
             catch(err){
                 window.doWebLog("get page component error:" + err.message)
-                MYDIALOG.ShowDiv("MyDiv","fade", "获取页面失败");
+                MYDIALOG.ShowDiv("获取页面失败");
             }               
 
         })        

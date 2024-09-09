@@ -33,11 +33,10 @@
         var strjson = await window.doLoadABI(filepath)
         var obj =  JSON.parse(strjson)
         if (obj.Code === 0){
-            window.doWebLog(obj.Err)
             try {
                 abijson = JSON.parse(obj.Err)
             } catch (e){
-                window.doWebLog("js parser error");
+                MYDIALOG.ShowDiv("js parser error");
                 return
             }
             var se = document.getElementById("contractFunc")
@@ -48,22 +47,18 @@
                     option.text = abijson[i].name
                     option.value = abijson[i].name
                     se.add(option)
-                    window.doWebLog(abijson[i].name);
                 }                
-            }            
+            }
+            changeFunc()            
         } else {
-            MYDIALOG.ShowDiv("MyDiv","fade", obj.Err);
+            MYDIALOG.ShowDiv(obj.Err);
         }
     }
 
     function changeFunc(){
-        window.doWebLog("changeFunc");
         var func = document.getElementById("contractFunc").value
-        window.doWebLog("changeFunc2");
         for (var i=0; i<abijson.length;i++){
-            window.doWebLog("changeFunc3");
             if (abijson[i].type === "function" && abijson[i].name === func){
-                window.doWebLog("changeFunc4");
                 document.getElementById("functype").value = abijson[i].stateMutability
                 var inputTable = document.getElementById("paramterTable")
                 for (var n=inputTable.rows.length-1;n>0;n--){
@@ -78,19 +73,28 @@
                 }
                 for (var n=0; n<abijson[i].outputs.length;n++){
                     addNew(outputTable,abijson[i].outputs[n])
-                } 
+                }
+                
+                window.doWebLog(abijson[i].stateMutability )
+                if (abijson[i].stateMutability === "view"){                    
+                    document.getElementById("btInvoke").innerHTML = "查询"
+                } else {
+                    document.getElementById("btInvoke").innerHTML = "调用"
+                }
+
                 break               
             } 
         } 
     }
 
-    function invoke() {
+    async function invoke() {
         window.doWebLog("invoke0")
-        //var functype = document.getElementById("functype").value
+        var functype = document.getElementById("functype").value
         var funcName = document.getElementById("contractFunc").value
         var i = 0
         for ( ; i<abijson.length;i++){
             if (abijson[i].type === "function" && abijson[i].name === funcName){
+                functype = abijson[i].stateMutability
                 break               
             } 
         } 
@@ -99,23 +103,34 @@
         var func = JSON.stringify(tmp)
         var parems = new Array()
         var inputTable = document.getElementById("paramterTable")
-        window.doWebLog("invoke1")
         var caddress = document.getElementById("caddress").value
-        window.doWebLog(caddress)
         var from = document.getElementById("add").value
-        window.doWebLog(from)
         for (var n=1;n<inputTable.rows.length;n++){
             parems.push(inputTable.rows[n].cells[1].childNodes[0].value)
         }
 
-        var paremsString = JSON.stringify(parems)
-        window.doReadContract(from,caddress,func, paremsString)
+        var paremsString = JSON.stringify(parems)       
 
-        // if (functype === "view") {            
-
-        // } else {
+        if (functype === "view") {  
+            var result = await window.doReadContract(from,caddress,func, paremsString)
+            var obj = JSON.parse(result)
+            if (obj.Code === 0) {
+                window.doWebLog("invoke 2")
+                var outsTable = document.getElementById("outTable")
+                var outs = JSON.parse(obj.Err)
+                for (var n=1;n<outsTable.rows.length;n++){
+                    if (n-1 < outs.length) {
+                        outsTable.rows[n].cells[1].childNodes[0].value = outs[n-1]
+                    } else {
+                        MYDIALOG.ShowDiv("输出参数少于需要的数量")
+                    }                    
+                }
+            } else {
+                MYDIALOG.ShowDiv(obj.Err)
+            }
+        } else {
             
-        // }
+        }
     }
 
     function initPage(){

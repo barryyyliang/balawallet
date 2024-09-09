@@ -12,9 +12,9 @@ function ontransfer() {
     window.doTransfer(add, toAddress,amount,pa).then((result) => {
         var obj = JSON.parse(result)
         if (obj.Code === 0) {
-            MYDIALOG.ShowDiv("MyDiv","fade", "转账成功");
+            MYDIALOG.ShowDiv("转账成功");
         } else {
-            MYDIALOG.ShowDiv("MyDiv","fade", obj.Err);
+            MYDIALOG.ShowDiv(obj.Err);
         }
     })
 }
@@ -40,7 +40,7 @@ function initPage() {
         window.doWebLog("get fee:" + result)
         if (result.length == 0 ) {
             window.doWebLog("cannot get fee")
-            MYDIALOG.ShowDiv("MyDiv","fade", "无法获得预估转账费用");
+            MYDIALOG.ShowDiv("无法获得预估转账费用");
             return;
         }
         var se = document.getElementById("fee");
