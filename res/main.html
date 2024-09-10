@@ -111,11 +111,28 @@
             se.add(option)
         }
     } 
+    var currentMenu
+    var currentPage
+    function setCurrentMenu(menuName){
+        currentMenu = menuName
+    }
+    function getCurrentMenu(){
+        return currentMenu
+    }
+    function setCurrentPage(pageName){
+        currentPage = pageName
+    }
+    function getCurrentPage(){
+        return currentPage
+    }
+
 
     function changePage(menuname,pagename){
         window.doWebLog("change page to " + pagename)
         window.doWebLog("change menu to " + menuname)
         MYDIALOG.CloseDiv("MyDiv","fade")
+        currentMenu = menuname
+        currentPage = pagename
 
         var li = document.getElementsByClassName("active")
         for (var i=0; i<li.length;i++){
@@ -171,7 +188,7 @@
                 </ul>   
             </div>  
             <div style="width: 50%;display: flex;align-items: center;background-color: #333;">
-                <select id="add" name="add" onchange="change()" style="font-size: 14px;height: 25px;width: 300px;border-radius: 0px;"></select>
+                <select id="add" name="add" onchange="accountChange()" style="font-size: 14px;height: 25px;width: 300px;border-radius: 0px;"></select>
             </div>      
         </div>    
 

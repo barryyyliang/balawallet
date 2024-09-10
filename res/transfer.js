@@ -19,23 +19,27 @@ function ontransfer() {
     })
 }
 
-function change(){
-    window.doWebLog("value changed")
+function accountChange(){
     var address = document.getElementById("add").value 
     document.getElementById("selectedAdd").value =  address         
     window.doGetAccountName(address).then ( (result) => {
-        window.doWebLog(result)
         document.getElementById("name").value = result
-    }
-    )
-    window.doGetBalance(address).then ( (result) => {
-        document.getElementById("balance").value = result
-    }
-    )
+    })
+    window.doGetBalance(address).then ( (result) => {        
+        if ( getCurrentPage() != "transfer"){
+            return
+        }
+        var jsonObj = JSON.parse(result)
+        if (jsonObj.Code === 0){
+            var blObj = JSON.parse(jsonObj.Err)
+            document.getElementById("balance").value = blObj.Balance
+        } else {
+            MYDIALOG.ShowDiv(jsonObj.Err);
+        }
+    })
 }
 
-function initPage() {
-    change()
+function getFee(){
     window.doGetFee().then ( (result) => {
         window.doWebLog("get fee:" + result)
         if (result.length == 0 ) {
@@ -45,8 +49,16 @@ function initPage() {
         }
         var se = document.getElementById("fee");
         se.value = result;
-    }
-    )            
+    })  
+}
+
+function updateTable(){
+    accountChange()
+    getFee()
+}
+
+function initPage() {    
+    setTimeout(updateTable,100)          
 } 
  
 

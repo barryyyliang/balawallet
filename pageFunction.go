@@ -271,15 +271,16 @@ func doTransfer(from string, to string, value string, pass string) string {
 
 //获取账户余额
 func doGetBalance(add string) string {
+	var re []byte
 	fmt.Println("doGetBalance: address is " + add)
 	if add == "" {
-		fmt.Println("doGetBalance: address is null")
-		return ""
+		re, _ = json.Marshal(ErrorResult{1, "address is null"})
+		return string(re)
 	}
 	connect := getConnection()
 	if connect == nil {
-		fmt.Println("doGetBalance: connection is nil")
-		return ""
+		re, _ = json.Marshal(ErrorResult{1, "can not get conneciton to node"})
+		return string(re)
 	}
 
 	now := time.Now()
@@ -291,10 +292,16 @@ func doGetBalance(add string) string {
 	fmt.Println(now.UnixMilli())
 
 	if err == nil {
-		return weiToether(balance.String())
+		type bl struct {
+			Address string
+			Balance string
+		}
+		tmp, _ := json.Marshal(bl{add, weiToether(balance.String())})
+		re, _ = json.Marshal(ErrorResult{0, string(tmp)})
+		return string(re)
 	} else {
-		fmt.Println("get balance error:" + err.Error())
-		return ""
+		re, _ = json.Marshal(ErrorResult{1, "get balance error:" + err.Error()})
+		return string(re)
 	}
 }
 
@@ -329,29 +336,7 @@ func doGetFee() string {
 func doGetComponent(com string) string {
 	fmt.Println("enter get" + com)
 
-	if com == "menu" {
-		type menujson struct {
-			Menumcss string `json:"css"`
-			Menuhtml string `json:"html"`
-		}
-		menucss, err1 := os.ReadFile(dir + "/res/common/menu.css")
-		if err1 != nil {
-			fmt.Println("doGetComponent get menu.css error")
-			return ""
-		}
-		menu, err2 := os.ReadFile(dir + "/res/common/menu.html")
-		if err2 != nil {
-			fmt.Println("doGetComponent get menu.html error")
-			return ""
-		}
-		result := menujson{string(menucss), string(menu)}
-		re, err := json.Marshal(result)
-		if err != nil {
-			fmt.Println("doGetComponent json error")
-			return ""
-		}
-		return string(re)
-	} else if com == "rightmenu" {
+	if com == "rightmenu" {
 		type menujson struct {
 			Menumcss string `json:"css"`
 			Menuhtml string `json:"html"`
