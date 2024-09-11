@@ -1,5 +1,6 @@
-
+//开始挖矿，才能执行交易
 miner.setEtherbase("0x2e8a86efe74c83b3bf0d18f114bbba0278f611a3")
+miner.start()
 
 
 //发送交易

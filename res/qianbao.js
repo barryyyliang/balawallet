@@ -106,7 +106,7 @@ function initPage(){
         window.doWebLog("go to addelement")
         addAccountElement(arr.accounts,document.getElementById("table1"))
     })
-    setTimeout(initBalance,1000)
+    setTimeout(initBalance,500)
 
     // var result = await window.doGetAccounts()
     // var arr = JSON.parse(result)

@@ -518,7 +518,7 @@ func doDeployContract(from string, filepath string, pass string) string {
 					re, _ = json.Marshal(ErrorResult{1, err.Error()})
 				} else {
 					fmt.Println("deploy success")
-					re, _ = json.Marshal(ErrorResult{0, ""})
+					re, _ = json.Marshal(ErrorResult{0, tx.Hash().Hex()})
 					//connect.TransactionReceipt(ctx,tx.Hash())
 				}
 
