@@ -1,11 +1,12 @@
 
-function onSaveConfig() {
+async function onSaveConfig() {
     var address = document.getElementById("nodeAddress").value
 
     var json = JSON.stringify({'nodeAddress':address})
     window.doWebLog(json)
 
-    window.doConfig(json)
+    var result = await window.doConfig(json)
+    showResult(result)
 }
 
 function initPage() {

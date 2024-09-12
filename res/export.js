@@ -1,10 +1,12 @@
- function exportAct() {
+ async function exportAct() {
     window.doWebLog("enter exportAct")
     var pa = document.getElementById("pass").value
     window.doWebLog("pa value:"+pa)
     var va = document.getElementById("add").value
     window.doWebLog("add value:" + va)  
-    window.doExportAccount(va, pa)
+    var result = await window.doExportAccount(va, pa)
+    showResult(result)
+    
 }
 
 function initPage(){

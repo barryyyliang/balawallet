@@ -9,13 +9,14 @@
         table.append(tr)
     }
 
-    function importContract(address,type){
+    async function importContract(address,type){
         var add = document.getElementById(address).value
         var ty = document.getElementById(type).value
         var obj = {type:ty,address:add,name:''}
 
         window.doWebLog("import contract:" + add)
-        window.doImportContract(JSON.stringify(obj))
+        var result = await window.doImportContract(JSON.stringify(obj))
+        showResult(result)
     }
 
     function newTr(obj){

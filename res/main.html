@@ -172,6 +172,15 @@
 
         })        
     }
+
+    function showResult(resutl) {
+        var objJson = JSON.parse(resutl)
+        if(objJson.Code === 0){
+            MYDIALOG.ShowDiv("操作成功")
+        } else {
+            MYDIALOG.ShowDiv("操作失败：" + objJson.Err)
+        }
+    }
 </script>
 </head> 
 <!--body oncontextmenu="return false" onselectstart="return false"-->

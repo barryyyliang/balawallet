@@ -1,4 +1,4 @@
-function importAct() {
+async function importAct() {
     window.doWebLog("进入函数importAct")
     var pa = document.getElementById("pass").value
     if (pa == ""){
@@ -21,7 +21,8 @@ function importAct() {
     }
     var name = document.getElementById("name").value
     var kk = document.getElementById("kk").value
-    window.doImportAccount(pa,name,kk)
+    var result = await window.doImportAccount(pa,name,kk)
+    showResult(result)
 }
 
 function initPage(){
