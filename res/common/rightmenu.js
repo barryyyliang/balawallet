@@ -18,6 +18,17 @@
         //用户触发click事件就可以关闭了，因为绑定在window上，按事件冒泡处理，不会影响菜单的功能
         document.querySelector('#menu').style.height=0;
     }
+
+    //支持 ctrl c  和 ctrl v 快捷键
+    document.onkeydown = function(event) {
+        if(event.ctrlKey || event.metaKey){            
+            if (event.key === 'v' || event.key === 'V'){
+                MYMENU.paste()
+            } else if (event.key === 'c' || event.key === 'C') {
+                MYMENU.copy()
+            }
+        } 
+    }
  
     var MYMENU = {
         copy:function (){
