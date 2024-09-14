@@ -17,6 +17,7 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 
 	//"github.com/ethereum/go-ethereum/crypto/sha3"
@@ -684,7 +685,7 @@ func doReadContract(from string, to string, funcAbi string, paremters string) st
 			data, err = contractAbi.Pack(method.RawName, parems...)
 			if err != nil {
 				re.Code = 1
-				re.Err = "pack abi data err:" + err.Error()
+				re.Msg = "pack abi data err:" + err.Error()
 				tmp, _ := json.Marshal(re)
 				return string(tmp)
 			}
@@ -710,10 +711,10 @@ func doReadContract(from string, to string, funcAbi string, paremters string) st
 						fmt.Println(aa)
 					}
 					bouts, _ := json.Marshal(outs)
-					re.Err = string(bouts)
+					re.Msg = string(bouts)
 				} else {
 					re.Code = 1
-					re.Err = "call contract error:" + err5.Error()
+					re.Msg = "call contract error:" + err5.Error()
 				}
 				fmt.Println(result)
 			}
@@ -721,10 +722,66 @@ func doReadContract(from string, to string, funcAbi string, paremters string) st
 		}
 	} else {
 		re.Code = 1
-		re.Err = "parse abi error"
+		re.Msg = "parse abi error"
 	}
-	fmt.Println(re.Err)
+	fmt.Println(re.Msg)
 	fmt.Println(re.Code)
 	tmp, _ := json.Marshal(re)
 	return string(tmp)
+}
+
+func doQueryTx(hs string) string {
+	type txinfo struct {
+		Transaction        *types.Transaction
+		TransactionReceipt *types.Receipt
+	}
+	fmt.Println("doQueryTx:" + hs)
+	var re []byte
+	var info txinfo
+	txhash := common.HexToHash(hs)
+	connect := getConnection()
+	ctx := context.Background()
+	tx, _, err := connect.TransactionByHash(ctx, txhash)
+	if err == nil {
+		//re, _ = tx.MarshalJSON()
+		info.Transaction = tx
+		receipt, err2 := connect.TransactionReceipt(ctx, txhash)
+		if err2 == nil {
+			info.TransactionReceipt = receipt
+		}
+	} else {
+		return err.Error()
+	}
+	re, _ = json.Marshal(info)
+	return string(re)
+}
+
+func doSignature(info string) string {
+	fmt.Println("server: doSignature :" + info)
+	var re []byte
+	var param = make(map[string]string)
+	err := json.Unmarshal([]byte(info), &param)
+	if err == nil {
+		fmt.Println("server: doSignature :1")
+		acc := ks.Accounts()
+		var i = 0
+		for i = 0; i < len(acc); i++ {
+			fmt.Println("server: doSignature :2")
+			if acc[i].Address.String() == param["Address"] {
+				fmt.Println("server: doSignature :3.1")
+				signature, err2 := ks.SignHashWithPassphrase(acc[i], "111", crypto.Keccak256([]byte(param["info"])))
+				if err2 == nil {
+					fmt.Println("server: doSignature :3")
+					re, _ = json.Marshal(ErrorResult{0, common.Bytes2Hex(signature)})
+				} else {
+					fmt.Println("server: doSignature :4" + err2.Error())
+				}
+				break
+			}
+		}
+	} else {
+		fmt.Println("server: doSignature :5" + err.Error())
+	}
+
+	return string(re)
 }

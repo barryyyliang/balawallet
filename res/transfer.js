@@ -14,7 +14,7 @@ function ontransfer() {
         if (obj.Code === 0) {
             MYDIALOG.ShowDiv("转账成功");
         } else {
-            MYDIALOG.ShowDiv(obj.Err);
+            MYDIALOG.ShowDiv(obj.Msg);
         }
     })
 }
@@ -31,10 +31,10 @@ function accountChange(){
         }
         var jsonObj = JSON.parse(result)
         if (jsonObj.Code === 0){
-            var blObj = JSON.parse(jsonObj.Err)
+            var blObj = JSON.parse(jsonObj.Msg)
             document.getElementById("balance").value = blObj.Balance
         } else {
-            MYDIALOG.ShowDiv(jsonObj.Err);
+            MYDIALOG.ShowDiv(jsonObj.Msg);
         }
     })
 }

@@ -18,9 +18,9 @@ async function deploy(){
     var result = await window.doDeployContract(address,file,"111")
     var jsonObj = JSON.parse(result)
     if (jsonObj.Code === 0 ){
-        MYDIALOG.ShowDiv("部署交易发送成功，交易 HASH：" + jsonObj.Err)
+        MYDIALOG.ShowDiv("部署交易发送成功，交易 HASH：" + jsonObj.Msg)
     } else {
-        MYDIALOG.ShowDiv("部署交易发送失败：" + jsonObj.Err)
+        MYDIALOG.ShowDiv("部署交易发送失败：" + jsonObj.Msg)
     }
 }
 

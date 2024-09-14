@@ -34,7 +34,7 @@
         var obj =  JSON.parse(strjson)
         if (obj.Code === 0){
             try {
-                abijson = JSON.parse(obj.Err)
+                abijson = JSON.parse(obj.Msg)
             } catch (e){
                 MYDIALOG.ShowDiv("js parser error");
                 return
@@ -51,7 +51,7 @@
             }
             changeFunc()            
         } else {
-            MYDIALOG.ShowDiv(obj.Err);
+            MYDIALOG.ShowDiv(obj.Msg);
         }
     }
 
@@ -117,7 +117,7 @@
             if (obj.Code === 0) {
                 window.doWebLog("invoke 2")
                 var outsTable = document.getElementById("outTable")
-                var outs = JSON.parse(obj.Err)
+                var outs = JSON.parse(obj.Msg)
                 for (var n=1;n<outsTable.rows.length;n++){
                     if (n-1 < outs.length) {
                         outsTable.rows[n].cells[1].childNodes[0].value = outs[n-1]
@@ -126,7 +126,7 @@
                     }                    
                 }
             } else {
-                MYDIALOG.ShowDiv(obj.Err)
+                MYDIALOG.ShowDiv(obj.Msg)
             }
         } else {
             

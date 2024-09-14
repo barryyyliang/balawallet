@@ -14,6 +14,6 @@ async function newacnt() {
     var name = document.getElementById("name").value
     var result = await window.doNewAccount(pa,name)
     var obj = JSON.parse(result)
-    MYDIALOG.ShowDiv(obj.Err);
+    MYDIALOG.ShowDiv(obj.Msg);
     initMenu()
 }

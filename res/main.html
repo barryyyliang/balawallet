@@ -178,8 +178,12 @@
         if(objJson.Code === 0){
             MYDIALOG.ShowDiv("操作成功")
         } else {
-            MYDIALOG.ShowDiv("操作失败：" + objJson.Err)
+            MYDIALOG.ShowDiv("操作失败：" + objJson.Msg)
         }
+    }
+
+    function getCurrentAccount(){
+        return  document.getElementById("add").value
     }
 </script>
 </head> 

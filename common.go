@@ -18,7 +18,7 @@ import (
 
 type ErrorResult struct {
 	Code int
-	Err  string
+	Msg  string
 }
 
 func isAddressExist(db *leveldb.DB, adress string, name string) bool {

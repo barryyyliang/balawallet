@@ -53,6 +53,8 @@ func main() {
 	win.Bind("doCheckNode", doCheckNode)
 	win.Bind("doLoadABI", doLoadABI)
 	win.Bind("doReadContract", doReadContract)
+	win.Bind("doQueryTx", doQueryTx)
+	win.Bind("doSignature", doSignature)
 
 	path, _ := filepath.Abs(filepath.Dir(os.Args[0]))
 	dir = strings.Replace(path, "\\", "/", -1)

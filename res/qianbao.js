@@ -80,7 +80,7 @@ function initBalance(){
                 }
                 var jsonObj = JSON.parse(result)
                 if (jsonObj.Code === 0){
-                    var blObj = JSON.parse(jsonObj.Err)
+                    var blObj = JSON.parse(jsonObj.Msg)
                     var table1 = document.getElementById("table1")
                     for(var n=1; n< table1.rows.length;n++){
                         if (table1.rows[n].cells[1].childNodes[0].value === blObj.Address){
@@ -88,7 +88,7 @@ function initBalance(){
                         }
                     }
                 } else {
-                    MYDIALOG.ShowDiv(jsonObj.Err);
+                    MYDIALOG.ShowDiv(jsonObj.Msg);
                 }
             })    
             //table.rows[i].cells[3].childNodes[0].value = await window.doGetBalance(table.rows[i].cells[1].childNodes[0].value)
