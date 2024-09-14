@@ -67,32 +67,22 @@ function addAccountElement(acc,table){
 }
 
 
-function initBalance(){
+async function initBalance(){
     // 获取每个地址的balance
     window.doWebLog("initBalance")
     if ( getCurrentPage() === "qianbao"){
         var table = document.getElementById("table1")
         for(var i =1; i< table.rows.length;i++){
-            window.doGetBalance(table.rows[i].cells[1].childNodes[0].value).then ( (result) => {
-                if ( getCurrentPage() != "qianbao"){
-                    window.doWebLog("get balance conceled, page changed")
-                    return
-                }
-                var jsonObj = JSON.parse(result)
-                if (jsonObj.Code === 0){
-                    var blObj = JSON.parse(jsonObj.Msg)
-                    var table1 = document.getElementById("table1")
-                    for(var n=1; n< table1.rows.length;n++){
-                        if (table1.rows[n].cells[1].childNodes[0].value === blObj.Address){
-                            table1.rows[n].cells[3].childNodes[0].value = blObj.Balance
-                        }
-                    }
-                } else {
-                    MYDIALOG.ShowDiv(jsonObj.Msg);
-                }
-            })    
-            //table.rows[i].cells[3].childNodes[0].value = await window.doGetBalance(table.rows[i].cells[1].childNodes[0].value)
-        }
+            result = await window.doGetBalance(table.rows[i].cells[1].childNodes[0].value)
+            var jsonObj = JSON.parse(result)
+            if (jsonObj.Code === 0){
+                var blObj = JSON.parse(jsonObj.Msg)
+                table.rows[i].cells[3].childNodes[0].value = blObj.Balance
+            } else {
+                MYDIALOG.ShowDiv(jsonObj.Msg);
+                return
+            }
+        }   
     } else {
         window.doWebLog("get balance conceled, page changed")
    }

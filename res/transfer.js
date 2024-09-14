@@ -19,24 +19,21 @@ function ontransfer() {
     })
 }
 
-function accountChange(){
+async function accountChange(){
     var address = document.getElementById("add").value 
     document.getElementById("selectedAdd").value =  address         
-    window.doGetAccountName(address).then ( (result) => {
-        document.getElementById("name").value = result
-    })
-    window.doGetBalance(address).then ( (result) => {        
-        if ( getCurrentPage() != "transfer"){
-            return
-        }
+    ret = await window.doGetAccountName(address)
+    document.getElementById("name").value = ret
+    window.doGetBalance(address).then ((result) =>{
         var jsonObj = JSON.parse(result)
         if (jsonObj.Code === 0){
             var blObj = JSON.parse(jsonObj.Msg)
             document.getElementById("balance").value = blObj.Balance
+            getFee()
         } else {
             MYDIALOG.ShowDiv(jsonObj.Msg);
         }
-    })
+    })        
 }
 
 function getFee(){
@@ -52,13 +49,8 @@ function getFee(){
     })  
 }
 
-function updateTable(){
-    accountChange()
-    getFee()
-}
-
 function initPage() {    
-    setTimeout(updateTable,100)          
+    setTimeout(accountChange,100)          
 } 
  
 
