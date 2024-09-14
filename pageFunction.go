@@ -287,7 +287,9 @@ func doGetBalance(add string) string {
 	now := time.Now()
 	fmt.Println("start:")
 	fmt.Println(now.UnixMilli())
-	balance, err := connect.BalanceAt(context.Background(), common.HexToAddress(add), nil)
+	ctx, fuc := context.WithTimeout(context.Background(), 3*time.Second)
+	defer fuc()
+	balance, err := connect.BalanceAt(ctx, common.HexToAddress(add), nil)
 	now = time.Now()
 	fmt.Println("end:")
 	fmt.Println(now.UnixMilli())
@@ -312,8 +314,8 @@ func doGetFee() string {
 		fmt.Println("doGetFee: connection is nil")
 		return ""
 	}
-	ctx := context.Background()
-
+	ctx, fuc := context.WithTimeout(context.Background(), 3*time.Second)
+	defer fuc()
 	price, err := connect.SuggestGasPrice(ctx)
 	if err != nil {
 		fmt.Println("get price error:" + err.Error())
@@ -586,7 +588,8 @@ func doImportContract(cons string) string {
 	err := json.Unmarshal([]byte(cons), &jcons)
 	if err == nil {
 		if jcons.Name == "" {
-			ctx := context.Background()
+			ctx, fuc := context.WithTimeout(context.Background(), 3*time.Second)
+			defer fuc()
 			connect := getConnection()
 			if connect != nil {
 				var conAdd common.Address = common.HexToAddress(jcons.Address)
@@ -691,7 +694,8 @@ func doReadContract(from string, to string, funcAbi string, paremters string) st
 			}
 			connect := getConnection()
 			if connect != nil {
-				ctx := context.Background()
+				ctx, fuc := context.WithTimeout(context.Background(), 3*time.Second)
+				defer fuc()
 				msg := ethereum.CallMsg{
 					From:      common.HexToAddress(from), // the sender of the 'transaction'
 					To:        &toAdd,                    // the destination contract (nil for contract creation)
@@ -740,7 +744,8 @@ func doQueryTx(hs string) string {
 	var info txinfo
 	txhash := common.HexToHash(hs)
 	connect := getConnection()
-	ctx := context.Background()
+	ctx, fuc := context.WithTimeout(context.Background(), 3*time.Second)
+	defer fuc()
 	tx, _, err := connect.TransactionByHash(ctx, txhash)
 	if err == nil {
 		//re, _ = tx.MarshalJSON()
