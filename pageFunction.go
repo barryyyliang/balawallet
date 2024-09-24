@@ -452,13 +452,15 @@ func doGetConfig(configs string) string {
 	return string(re)
 }
 
-func doDeployContract(from string, filepath string, pass string) string {
+func doDeployContract(from string, file string, pass string) string {
 	var re []byte
-	if from == "" || filepath == "" || pass == "" {
+	if from == "" || file == "" || pass == "" {
 		fmt.Println("parameter error")
 		re, _ = json.Marshal(ErrorResult{1, "parameter error"})
 		return string(re)
 	}
+	filepath := G_Config["contractDir"]
+	filepath = filepath + "/" + file
 	connect := getConnection()
 
 	if connect == nil {
@@ -475,7 +477,6 @@ func doDeployContract(from string, filepath string, pass string) string {
 			if err != nil {
 				re, _ = json.Marshal(ErrorResult{1, err.Error()})
 				break
-
 			}
 
 			nounce, gasPrice, tipsPrice, chainId, err := getChainInfo(connect, from)
@@ -651,12 +652,15 @@ func doCheckNode() string {
 	return string(re)
 }
 
-func doLoadABI(filepath string) string {
+func doLoadABI(file string) string {
 	var re []byte
+	filepath := G_Config["contractDir"]
+	filepath = filepath + "/" + file
 	if filepath == "" {
 		re, _ = json.Marshal(ErrorResult{1, "parameter error"})
 		return string(re)
 	}
+
 	abiContent, err := os.ReadFile(filepath)
 	if err != nil {
 		re, _ = json.Marshal(ErrorResult{2, err.Error()})
@@ -789,4 +793,51 @@ func doSignature(info string) string {
 	}
 
 	return string(re)
+}
+
+func doGetAbiFile() string {
+	re := ErrorResult{0, ""}
+	var conf = [1]string{"contractDir"}
+	par, _ := json.Marshal(conf)
+	doGetConfig(string(par))
+	var dir = G_Config["contractDir"]
+	if dir != "" {
+		names, err := getFiles(dir, ".abi")
+		if err == nil {
+			tmp, _ := json.Marshal(names)
+			re.Msg = string(tmp)
+		} else {
+			re.Code = 1
+			re.Msg = err.Error()
+		}
+	} else {
+		re.Code = 1
+		re.Msg = "contract dir name not config"
+	}
+
+	bre, _ := json.Marshal(re)
+	return string(bre)
+}
+
+func doGetBinFile() string {
+	re := ErrorResult{0, ""}
+	var conf = [1]string{"contractDir"}
+	par, _ := json.Marshal(conf)
+	doGetConfig(string(par))
+	var dir = G_Config["contractDir"]
+	if dir != "" {
+		names, err := getFiles(dir, ".bin")
+		if err == nil {
+			tmp, _ := json.Marshal(names)
+			re.Msg = string(tmp)
+		} else {
+			re.Code = 1
+			re.Msg = err.Error()
+		}
+	} else {
+		re.Code = 1
+		re.Msg = "contract dir name not config"
+	}
+	bre, _ := json.Marshal(re)
+	return string(bre)
 }

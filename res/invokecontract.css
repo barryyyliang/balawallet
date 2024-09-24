@@ -1,3 +1,52 @@
+table{
+    margin: 0 auto;
+    font-size: 16px;
+    text-align: center;
+}
+tr {
+    height:50px;
+}
+th {    
+    background-color:green;
+}
+input {
+    font-size: 14px;
+    height: 25px;
+    width: 200px;
+}
+th {
+    height:30px;
+}
+
+div {
+    margin: 0 auto;
+    text-align:center;
+}
+
+select {
+    font-size: 16px;
+    height: 30px;
+    border-radius: 0px;
+}
+
+input {
+    font-size: 16px;
+    height:25px;
+    width:300px;
+}
+
+.table1{
+    margin: 0 auto;
+    font-size: 16px;
+    text-align: center;
+    border: 1px solid black;
+}
+
+
+.trth{
+    height:30px;
+}
+
 
 .button1 {
     background-color: #656865d8; /* Green */

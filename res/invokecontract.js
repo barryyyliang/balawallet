@@ -8,15 +8,12 @@
 
     function newTr(obj){
         var tr = document.createElement("tr")
-        tr.setAttribute("style","height:50px;")
-
 
         var td1 = document.createElement("td")
         td1.innerText = obj.name
         tr.append(td1)
 
         var ipt = document.createElement("input")
-        ipt.setAttribute("style","width:300px;font-size: 14px;height:25px;")
         ipt.setAttribute("type","text")
         var td2 = document.createElement("td")
         td2.append(ipt)
@@ -29,7 +26,7 @@
     }
 
     async function loadABI(){
-        var filepath = document.getElementById("filePath").value
+        var filepath = document.getElementById("abiFile").value
         var strjson = await window.doLoadABI(filepath)
         var obj =  JSON.parse(strjson)
         if (obj.Code === 0){
@@ -78,10 +75,11 @@
                 window.doWebLog(abijson[i].stateMutability )
                 if (abijson[i].stateMutability === "view"){                    
                     document.getElementById("btInvoke").innerHTML = "查询"
+                    document.getElementById("outTable").style.visibility =  "visible"
                 } else {
                     document.getElementById("btInvoke").innerHTML = "调用"
+                    document.getElementById("outTable").style.visibility =  "hidden"
                 }
-
                 break               
             } 
         } 
@@ -118,6 +116,7 @@
                 window.doWebLog("invoke 2")
                 var outsTable = document.getElementById("outTable")
                 var outs = JSON.parse(obj.Msg)
+                window.doWebLog("invoke 3:"+outs)
                 for (var n=1;n<outsTable.rows.length;n++){
                     if (n-1 < outs.length) {
                         outsTable.rows[n].cells[1].childNodes[0].value = outs[n-1]
@@ -133,8 +132,22 @@
         }
     }
 
-    function initPage(){
+    async function initPage(){
         window.doWebLog("init page invokecontract")
+        var result = await window.doGetAbiFile()
+        var jsonObj = JSON.parse(result)
+        if (jsonObj.Code === 0 ){
+            var names = JSON.parse(jsonObj.Msg)
+            var seFile = document.getElementById("abiFile")
+            for(var i=0;i<names.length;i++){
+                var option = document.createElement("option")
+                option.text = names[i]
+                option.value = names[i]
+                seFile.add(option)
+            }
+        } else {
+            MYDIALOG.ShowDiv(jsonObj.Msg)
+        }
     }
 
 

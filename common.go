@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"math/big"
+	"os"
 	"reflect"
 	"strconv"
 	"strings"
@@ -234,4 +235,33 @@ func valueToString(value interface{}) string {
 		}
 	}
 	return ret
+}
+
+func getFiles(dir string, suffix string) ([]string, error) {
+	fmt.Println("server:getFiles:")
+	var re []string
+	abiDir, err := os.Open(dir)
+	if err == nil {
+		files, err2 := abiDir.Readdir(-1)
+		if err2 == nil {
+			var name string
+			var namelen int
+			var suffixlen = len(suffix)
+			for _, file := range files {
+				name = file.Name()
+				namelen = len(name)
+				if file.IsDir() || namelen < suffixlen {
+					continue
+				}
+				if name[namelen-suffixlen:namelen] == suffix {
+					re = append(re, name)
+				}
+			}
+		} else {
+			return re, err2
+		}
+	} else {
+		return re, err
+	}
+	return re, nil
 }
