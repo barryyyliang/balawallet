@@ -89,6 +89,16 @@
         window.doWebLog("invoke0")
         var functype = document.getElementById("functype").value
         var funcName = document.getElementById("contractFunc").value
+        var caddress = document.getElementById("caddress").value
+        var from = document.getElementById("add").value
+        if(caddress === ""){
+            MYDIALOG.ShowDiv("合约地址为空")
+            return
+        }
+        if(funcName === ""){
+            MYDIALOG.ShowDiv("合约参数为空，先加载 abi 文件")
+            return
+        }
         var i = 0
         for ( ; i<abijson.length;i++){
             if (abijson[i].type === "function" && abijson[i].name === funcName){
@@ -101,8 +111,7 @@
         var func = JSON.stringify(tmp)
         var parems = new Array()
         var inputTable = document.getElementById("paramterTable")
-        var caddress = document.getElementById("caddress").value
-        var from = document.getElementById("add").value
+
         for (var n=1;n<inputTable.rows.length;n++){
             parems.push(inputTable.rows[n].cells[1].childNodes[0].value)
         }
