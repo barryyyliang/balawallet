@@ -21,19 +21,19 @@ var resdir string
 var exportdir string
 var currentAccount string
 
-//var nodeaddress string = "http://localhost:8545"
 var G_Config = make(map[string]string)
 var G_Etherclient *ethclient.Client = nil
 var G_BlockchainConfig bool = true
 
 func main() {
+	Init()
 	win = webview.New(true)
 	defer win.Destroy()
 	win.SetTitle("我的钱包")
 	win.SetSize(800, 480, webview.HintNone)
 
 	//注册全局函数
-	win.Bind("doChangePage", doChangePage)
+	//win.Bind("doChangePage", doChangePage)
 	win.Bind("doNewAccount", doNewAccount)
 	win.Bind("doWebLog", doWebLog)
 	win.Bind("doGetAccounts", doGetAccounts)
@@ -61,7 +61,7 @@ func main() {
 	path, _ := filepath.Abs(filepath.Dir(os.Args[0]))
 	dir = strings.Replace(path, "\\", "/", -1)
 	datadir = dir + "/data/"
-	resdir = dir + "/res/"
+	//resdir = dir + "/res/"
 	accountdir = dir + "/account/"
 	exportdir = dir + "/export/"
 
@@ -70,19 +70,22 @@ func main() {
 	_, err = os.Stat(datadir)
 	if err != nil {
 		if !os.IsExist(err) {
-			os.Mkdir("data", os.ModePerm)
+			os.Mkdir(datadir, os.ModePerm)
 		}
 	}
 	_, err = os.Stat(accountdir)
 	if err != nil {
 		if !os.IsExist(err) {
-			os.Mkdir("account", os.ModePerm)
+			os.Mkdir(accountdir, os.ModePerm)
 		}
 	}
 	_, err = os.Stat(exportdir)
 	if err != nil {
 		if !os.IsExist(err) {
-			os.Mkdir("export", os.ModePerm)
+			err = os.Mkdir(exportdir, os.ModePerm)
+			if err != nil {
+				fmt.Println("create export dir error:" + err.Error())
+			}
 		}
 	}
 
@@ -106,8 +109,8 @@ func main() {
 		G_BlockchainConfig = false
 	}
 
-	content, err := os.ReadFile(dir + "/res/main.html")
-	if err != nil {
+	content := G_Files["/main.html"]
+	if len(content) == 0 {
 		fmt.Println("can not read html")
 	}
 	win.SetHtml(string(content))

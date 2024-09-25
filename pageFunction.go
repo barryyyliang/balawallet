@@ -25,15 +25,15 @@ import (
 	"github.com/syndtr/goleveldb/leveldb"
 )
 
-//页面切换
-func doChangePage(page string, param string) {
-	fmt.Println(resdir + page)
-	content, err := os.ReadFile(resdir + page)
-	if err != nil {
-		fmt.Println("can not read html")
-	}
-	win.SetHtml(string(content))
-}
+// //页面切换
+// func doChangePage(page string, param string) {
+// 	fmt.Println(resdir + page)
+// 	content, err := os.ReadFile(resdir + page)
+// 	if err != nil {
+// 		fmt.Println("can not read html")
+// 	}
+// 	win.SetHtml(string(content))
+// }
 
 //新创建一个账号
 func doNewAccount(pass string, walletName string) string {
@@ -336,6 +336,68 @@ func doGetFee() string {
 	return str
 }
 
+// func doGetComponent(com string) string {
+// 	fmt.Println("enter get" + com)
+
+// 	if com == "rightmenu" {
+// 		type menujson struct {
+// 			Menumcss string `json:"css"`
+// 			Menuhtml string `json:"html"`
+// 			Menujs   string `json:"js"`
+// 		}
+// 		menucss, err1 := os.ReadFile(dir + "/res/common/rightmenu.css")
+// 		if err1 != nil {
+// 			fmt.Println("doGetComponent get rightmenu.css error")
+// 			return ""
+// 		}
+// 		menu, err2 := os.ReadFile(dir + "/res/common/rightmenu.html")
+// 		if err2 != nil {
+// 			fmt.Println("doGetComponent get rightmenu.html error")
+// 			return ""
+// 		}
+
+// 		menujs, err3 := os.ReadFile(dir + "/res/common/rightmenu.js")
+// 		if err3 != nil {
+// 			fmt.Println("doGetComponent get rightmenu.js error")
+// 			return ""
+// 		}
+// 		result := menujson{string(menucss), string(menu), string(menujs)}
+// 		re, err := json.Marshal(result)
+// 		if err != nil {
+// 			fmt.Println("doGetComponent json error")
+// 			return ""
+// 		}
+// 		return string(re)
+// 	} else {
+// 		type pagejson struct {
+// 			Pagecss  string `json:"css"`
+// 			Pagehtml string `json:"html"`
+// 			Pagejs   string `json:"js"`
+// 		}
+// 		Pagecss, err1 := os.ReadFile(dir + "/res/" + com + ".css")
+// 		if err1 != nil {
+// 			fmt.Println("doGetComponent get " + com + ".css error")
+// 		}
+// 		Pagejs, err3 := os.ReadFile(dir + "/res/" + com + ".js")
+// 		if err3 != nil {
+// 			fmt.Println("doGetComponent get " + com + ".js error")
+// 		}
+// 		Pagehtml, err2 := os.ReadFile(dir + "/res/" + com + ".html")
+// 		if err2 != nil {
+// 			fmt.Println("doGetComponent get " + com + ".html error")
+// 			return ""
+// 		}
+
+// 		result := pagejson{string(Pagecss), string(Pagehtml), string(Pagejs)}
+// 		re, err := json.Marshal(result)
+// 		if err != nil {
+// 			fmt.Println("doGetComponent json error")
+// 			return ""
+// 		}
+// 		return string(re)
+// 	}
+// }
+
 func doGetComponent(com string) string {
 	fmt.Println("enter get" + com)
 
@@ -345,22 +407,10 @@ func doGetComponent(com string) string {
 			Menuhtml string `json:"html"`
 			Menujs   string `json:"js"`
 		}
-		menucss, err1 := os.ReadFile(dir + "/res/common/rightmenu.css")
-		if err1 != nil {
-			fmt.Println("doGetComponent get rightmenu.css error")
-			return ""
-		}
-		menu, err2 := os.ReadFile(dir + "/res/common/rightmenu.html")
-		if err2 != nil {
-			fmt.Println("doGetComponent get rightmenu.html error")
-			return ""
-		}
+		menucss := G_Files["/common/rightmenu.css"]
+		menu := G_Files["/common/rightmenu.html"]
+		menujs := G_Files["/common/rightmenu.js"]
 
-		menujs, err3 := os.ReadFile(dir + "/res/common/rightmenu.js")
-		if err3 != nil {
-			fmt.Println("doGetComponent get rightmenu.js error")
-			return ""
-		}
 		result := menujson{string(menucss), string(menu), string(menujs)}
 		re, err := json.Marshal(result)
 		if err != nil {
@@ -374,19 +424,9 @@ func doGetComponent(com string) string {
 			Pagehtml string `json:"html"`
 			Pagejs   string `json:"js"`
 		}
-		Pagecss, err1 := os.ReadFile(dir + "/res/" + com + ".css")
-		if err1 != nil {
-			fmt.Println("doGetComponent get " + com + ".css error")
-		}
-		Pagejs, err3 := os.ReadFile(dir + "/res/" + com + ".js")
-		if err3 != nil {
-			fmt.Println("doGetComponent get " + com + ".js error")
-		}
-		Pagehtml, err2 := os.ReadFile(dir + "/res/" + com + ".html")
-		if err2 != nil {
-			fmt.Println("doGetComponent get " + com + ".html error")
-			return ""
-		}
+		Pagecss := G_Files["/"+com+".css"]
+		Pagejs := G_Files["/"+com+".js"]
+		Pagehtml := G_Files["/"+com+".html"]
 
 		result := pagejson{string(Pagecss), string(Pagehtml), string(Pagejs)}
 		re, err := json.Marshal(result)
