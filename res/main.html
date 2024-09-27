@@ -120,10 +120,14 @@
     }
 
 
-    function changePage(menuname,pagename){
+    function changePage(menuname,pagename){    
+        if(pagename === currentPage){
+            return
+        }
         window.doWebLog("change page to " + pagename)
         window.doWebLog("change menu to " + menuname)
         MYDIALOG.CloseDiv("MyDiv","fade")
+
         currentMenu = menuname
         currentPage = pagename
 
@@ -139,24 +143,50 @@
             try{
                     obj = JSON.parse(result)
                     document.getElementById('pageStyle').remove() 
-                    document.getElementById('pageContent').innerHTML = ""
-                    document.getElementById('pageScript')
+                    //document.getElementById('pageContent').innerHTML = ""
+                    document.getElementById('pageScript').remove()
 
                     var cs = document.createElement("style")
                     cs.setAttribute("id","pageStyle")
                     cs.innerHTML = obj.css
                     document.head.appendChild(cs)
-                    //document.getElementById('pageStyle').innerHTML = obj.css   
-
-                    document.getElementById('pageContent').innerHTML = obj.html
 
                     var js = document.createElement("script")
                     js.setAttribute("id","pageScript")
                     js.innerHTML = obj.js
                     document.head.appendChild(js)
                     //document.getElementById('pageScript').innerHTML = obj.js   
-                
-                     initPage() 
+
+                    var content = document.getElementById('pageContent')
+                    var hasHistory = false
+                    for(var i = 0;i<content.children.length;i++){
+                        window.doWebLog("get a none div node:"+content.childNodes[i].id)
+                      
+                        if (content.children[i].id === pagename){
+                            //content.childNodes[i].style.width = "100%"
+                            window.doWebLog("make show")
+                            content.children[i].style.height = "100%"
+                            content.children[i].style.display = "block"
+
+                            hasHistory = true
+                        } else {
+                            //content.childNodes[i].style.width = "0px"
+                            window.doWebLog("make hide")
+                            content.children[i].style.display = "none"
+                            content.childNodes[i].style.height = "0px"
+                        }
+                    }
+
+                    if (hasHistory === false){
+                        var page = document.createElement("div")
+                        page.setAttribute("id",pagename)  
+                        page.setAttribute("style","width:100%;height:100%")  
+                        page.innerHTML = obj.html
+                        content.appendChild(page)
+                        initPage() 
+                    }
+                    //document.getElementById('pageContent').innerHTML = obj.html                
+                    //initPage() 
                 }
             catch(err){
                 window.doWebLog("get page component error:" + err.message)
@@ -182,8 +212,8 @@
 </head> 
 <!--body oncontextmenu="return false" onselectstart="return false"-->
 <body >
-    <div style="width: 98%;height: 98%;background: rgb(251, 251, 251);position: absolute;"> 
-        <div id = "menudiv" style="display: flex;">
+    <div style="width: 98%;height: 98%;background: rgb(251, 251, 251);position: absolute;display: flex;flex-direction: column;"> 
+        <div id = "menudiv" style="display: flex;width: 100%;">
             <div style="width: 80%;">
                 <ul>
                     <li><a id="qianbao" class="active" onclick="changePage('qianbao','qianbao')">钱包</a></li>                    
@@ -198,8 +228,8 @@
             </div>      
         </div>    
 
-        <div style="margin: 0 auto;text-align: center;">
-            <div id="pageContent" style="margin: 0 auto;text-align: center;background: rgb(240, 240, 240)"></div>   
+        <div style="margin: 0 auto;text-align: center;overflow: auto;flex: 1;width: 100%;">
+            <div id="pageContent" style="margin: 0 auto;text-align: center;background: rgb(240, 240, 240);overflow: auto;"></div>   
         </div>
         <div id = 'rightmenudiv'> </div>  
     </div>    
