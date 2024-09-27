@@ -56,7 +56,6 @@
         var func = document.getElementById("contractFunc").value
         for (var i=0; i<abijson.length;i++){
             if (abijson[i].type === "function" && abijson[i].name === func){
-                document.getElementById("functype").value = abijson[i].stateMutability
                 var inputTable = document.getElementById("paramterTable")
                 for (var n=inputTable.rows.length-1;n>0;n--){
                     inputTable.removeChild(inputTable.rows[n])
@@ -76,9 +75,11 @@
                 if (abijson[i].stateMutability === "view"){                    
                     document.getElementById("btInvoke").innerHTML = "查询"
                     document.getElementById("outTable").style.visibility =  "visible"
+                    document.getElementById("assTable").style.visibility = "hidden"
                 } else {
                     document.getElementById("btInvoke").innerHTML = "调用"
                     document.getElementById("outTable").style.visibility =  "hidden"
+                    document.getElementById("assTable").style.visibility = "visible"
                 }
                 break               
             } 
@@ -87,7 +88,7 @@
 
     async function invoke() {
         window.doWebLog("invoke0")
-        var functype = document.getElementById("functype").value
+        var functype
         var funcName = document.getElementById("contractFunc").value
         var caddress = document.getElementById("caddress").value
         var from = document.getElementById("add").value
@@ -137,7 +138,19 @@
                 MYDIALOG.ShowDiv(obj.Msg)
             }
         } else {
-            
+            var ass = document.getElementById("ass").value
+            if(ass === ""){
+                MYDIALOG.ShowDiv("发送交易需要账户密码，不能为空")
+                return
+            }
+            var result = await window.doInvokeContract(from,caddress,func, paremsString,ass)
+            var obj = JSON.parse(result)
+            if(obj.Code === 0){
+                MYDIALOG.ShowDiv("交易发送成功，\r\n 交易 ID：\r\n"+obj.Msg)
+            } else {
+                MYDIALOG.ShowDiv(obj.Msg)
+            }
+
         }
     }
 

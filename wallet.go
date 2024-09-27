@@ -57,6 +57,7 @@ func main() {
 	win.Bind("doSignature", doSignature)
 	win.Bind("doGetAbiFile", doGetAbiFile)
 	win.Bind("doGetBinFile", doGetBinFile)
+	win.Bind("doInvokeContract", doInvokeContract)
 
 	path, _ := filepath.Abs(filepath.Dir(os.Args[0]))
 	dir = strings.Replace(path, "\\", "/", -1)

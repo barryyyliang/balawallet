@@ -48,6 +48,7 @@ function addAccountElement(acc,table){
         ipt3.setAttribute("style","font-size: 14px;height:25px;")
         ipt3.setAttribute("type","text")
         ipt3.setAttribute("size","20")  
+        ipt3.setAttribute("readonly","readonly") 
         td4.append(ipt3)
         tr.append(td4)
 

@@ -15,11 +15,10 @@
     </div>
     <table id="functionTable">  
         <tr>
-            <td style="padding:15px;" >调用方法</td>
-            <td style="padding:15px;">
-                <select id="contractFunc" name="contractFunc" onchange="changeFunc()" style="width: 200px;"></select>
-            </td>
-            <td><input type="text" id="functype" style="width:100px;" readonly="readonly" ></td>           
+            <td >合约函数:</td>
+            <td >
+                <select id="contractFunc" name="contractFunc" onchange="changeFunc()" style="width: 300px;"></select>
+            </td>        
         </tr> 
     </table>
     <table id="paramterTable" class="table1">
@@ -29,10 +28,16 @@
             <th style="width:50px;">类型</th>
         </tr>
     </table>
+    <table id="assTable" style="visibility:hidden">        
+        <tr>
+            <td>账户密码:</td>
+            <td><input type="password" id="ass" ></td>
+        </tr> 
+    </table>
     <div >
         <button id="btInvoke" name="btInvoke" type="button" class="button1" onclick="invoke()">调用</button>
     </div>
-    <table id="outTable" class="table1">
+    <table id="outTable" class="table1" style="visibility:hidden">
         <tr class="trth">
             <th style="width:50px;">返回值</th>
             <th style="width:300px;">值</th>

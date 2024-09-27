@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum"
+	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/ethereum/go-ethereum/common"
@@ -776,6 +777,107 @@ func doReadContract(from string, to string, funcAbi string, paremters string) st
 	fmt.Println(re.Code)
 	tmp, _ := json.Marshal(re)
 	return string(tmp)
+}
+
+func doInvokeContract(from string, conAddr string, funcAbi string, param string, pass string) string {
+	var re []byte
+	if from == "" || pass == "" || conAddr == "" {
+		fmt.Println("parameter error")
+		re, _ = json.Marshal(ErrorResult{1, "parameter error"})
+		return string(re)
+	}
+	connect := getConnection()
+	var toAdd common.Address = common.HexToAddress(conAddr)
+
+	if connect == nil {
+		fmt.Println("can not connect to node:")
+		re, _ = json.Marshal(ErrorResult{1, "can not connet to node"})
+		return string(re)
+	}
+	ctx := context.Background()
+	acc := ks.Accounts()
+	var current accounts.Account
+	var isExist bool = false
+	for i := 0; i < len(acc); i++ {
+		fmt.Printf("get account: %s : \r\n", acc[i].Address.String())
+		if from == acc[i].Address.String() {
+			current = acc[i]
+			isExist = true
+			break
+		}
+	}
+	if isExist == false {
+		re, _ = json.Marshal(ErrorResult{1, "can not find account"})
+		return string(re)
+	}
+
+	bigvalue, err := etherTowei("0")
+	nounce, gasPrice, tipsPrice, chainId, err := getChainInfo(connect, from)
+	if err != nil {
+		re, _ = json.Marshal(ErrorResult{1, err.Error()})
+	}
+
+	contractAbi, err := abi.JSON(strings.NewReader(funcAbi))
+	var parems []interface{}
+	var parStrings []string
+	var data []byte
+	if err == nil {
+		for _, method := range contractAbi.Methods {
+			json.Unmarshal([]byte(param), &parStrings)
+			for i, pType := range method.Inputs {
+				parems = append(parems, stringToValue(pType.Type.GetType(), parStrings[i]))
+				fmt.Println(parStrings[i])
+			}
+			data, err = contractAbi.Pack(method.RawName, parems...)
+			if err != nil {
+				tmp, _ := json.Marshal(ErrorResult{1, "pack abi data err:" + err.Error()})
+				return string(tmp)
+			}
+		}
+	}
+
+	msg := ethereum.CallMsg{
+		From:      current.Address, // the sender of the 'transaction'
+		To:        &toAdd,          // the destination contract (nil for contract creation)
+		Gas:       0,               // if 0, the call executes with near-infinite gas
+		GasPrice:  gasPrice,        // wei <-> gas exchange ratio
+		GasFeeCap: tipsPrice,       // EIP-1559 fee cap per gas.
+		GasTipCap: tipsPrice,       // EIP-1559 tip per gas.
+		Value:     big.NewInt(0),   // amount of wei sent along with the call
+		Data:      data,            // input data, usually an ABI-encoded contract method invocation
+	}
+
+	gasLimit, err := connect.EstimateGas(ctx, msg)
+	if err != nil {
+		fmt.Println("get gaslimit:" + strconv.FormatInt(int64(gasLimit), 10))
+		re, _ = json.Marshal(ErrorResult{1, err.Error()})
+	}
+
+	tx := newCallContractTx(nounce, toAdd, &bigvalue, gasLimit, gasPrice, tipsPrice, chainId, data)
+	tx, err = ks.SignTxWithPassphrase(current, pass, tx, chainId)
+	if err == nil {
+		err := connect.SendTransaction(ctx, tx)
+		if err != nil {
+			re, _ = json.Marshal(ErrorResult{1, err.Error()})
+		} else {
+			fmt.Println("invoke success")
+			re, _ = json.Marshal(ErrorResult{0, tx.Hash().Hex()})
+			//connect.TransactionReceipt(ctx,tx.Hash())
+		}
+
+		json, err2 := tx.MarshalJSON()
+		if err2 == nil {
+			fmt.Println(string(json))
+		} else {
+			fmt.Println("marshaljson tx err")
+		}
+	} else {
+		fmt.Println("sign tx err")
+		re, _ = json.Marshal(ErrorResult{1, err.Error()})
+	}
+
+	fmt.Println(string(re))
+	return string(re)
 }
 
 func doQueryTx(hs string) string {
