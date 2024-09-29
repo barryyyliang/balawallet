@@ -159,15 +159,14 @@
 
                     var content = document.getElementById('pageContent')
                     var hasHistory = false
-                    for(var i = 0;i<content.children.length;i++){
-                        window.doWebLog("get a none div node:"+content.childNodes[i].id)
-                      
-                        if (content.children[i].id === pagename){
+                    var i = 0
+                    for(i = 0;i<content.children.length;i++){
+                        window.doWebLog("get a none div node:"+content.childNodes[i].id)                      
+                        if (content.children[i].id === "page_" + pagename){
                             //content.childNodes[i].style.width = "100%"
                             window.doWebLog("make show")
                             content.children[i].style.height = "100%"
                             content.children[i].style.display = "block"
-
                             hasHistory = true
                         } else {
                             //content.childNodes[i].style.width = "0px"
@@ -177,9 +176,14 @@
                         }
                     }
 
+                    if (hasHistory === true && (pagename === "qianbao" || pagename === "transfer")){
+                        document.getElementById("page_" + pagename).remove()
+                        hasHistory = false
+                    }
+
                     if (hasHistory === false){
                         var page = document.createElement("div")
-                        page.setAttribute("id",pagename)  
+                        page.setAttribute("id","page_" + pagename)  
                         page.setAttribute("style","width:100%;height:100%")  
                         page.innerHTML = obj.html
                         content.appendChild(page)

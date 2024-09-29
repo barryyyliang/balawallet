@@ -72,7 +72,7 @@ async function initBalance(){
     // 获取每个地址的balance
     window.doWebLog("initBalance")
     if ( getCurrentPage() === "qianbao"){
-        var table = document.getElementById("table1")
+        var table = document.getElementById("tableWallet")
         for(var i =1; i< table.rows.length;i++){
             result = await window.doGetBalance(table.rows[i].cells[1].childNodes[0].value)
             var jsonObj = JSON.parse(result)
@@ -95,7 +95,7 @@ function initPage(){
         window.doWebLog("get result" + result)
         var arr = JSON.parse(result)
         window.doWebLog("go to addelement")
-        addAccountElement(arr.accounts,document.getElementById("table1"))
+        addAccountElement(arr.accounts,document.getElementById("tableWallet"))
     })
     setTimeout(initBalance,500)
 
