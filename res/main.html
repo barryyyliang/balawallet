@@ -5,6 +5,17 @@
 <title>数字货币钱包</title> 
 <style>
 
+    table, th, td {
+        frame: void;
+    }
+    tr {
+        height:50px;
+    }
+    input {
+        font-size: 16px;
+        height: 25px;
+        width: 300px;
+    }
     /*主菜单*/
    
     ul {
@@ -215,27 +226,27 @@
 </script>
 </head> 
 <!--body oncontextmenu="return false" onselectstart="return false"-->
-<body >
-    <div style="width: 98%;height: 98%;background: rgb(251, 251, 251);position: absolute;display: flex;flex-direction: column;"> 
-        <div id = "menudiv" style="display: flex;width: 100%;">
-            <div style="width: 80%;">
-                <ul>
-                    <li><a id="qianbao" class="active" onclick="changePage('qianbao','qianbao')">钱包</a></li>                    
-                    <li><a id="contractasset" onclick="changePage('contractasset','contractasset')">合约资产</a></li>
-                    <li><a id="transfer" onclick="changePage('transfer','transfer')">转账</a></li>
-                    <li><a id="tools" onclick="changePage('tools','tools')">工具</a></li>
-                    <li><a id="system" onclick="changePage('system','system')">系统</a></li>
-                </ul>   
-            </div>  
-            <div style="width: 50%;display: flex;align-items: center;background-color: #333;">
-                <select id="add" name="add" onchange="accountChange()" style="font-size: 14px;height: 25px;width: 300px;border-radius: 0px;"></select>
-            </div>      
-        </div>    
-
-        <div style="margin: 0 auto;text-align: center;overflow: auto;flex: 1;width: 100%;">
-            <div id="pageContent" style="margin: 0 auto;text-align: center;background: rgb(240, 240, 240);overflow: auto;"></div>   
-        </div>
-        <div id = 'rightmenudiv'> </div>  
-    </div>    
+<body style="background: rgb(230, 230, 230);"></body>
+    <div id = "menudiv" style="z-index: 100;;display: flex;background-color: #333;position: fixed;top: 0%;left: 0%;width: 100%;">
+        <div style="margin-right: auto;">
+            <ul>
+                <li><a id="qianbao" class="active" onclick="changePage('qianbao','qianbao')">钱包</a></li>                    
+                <li><a id="contractasset" onclick="changePage('contractasset','contractasset')">合约资产</a></li>
+                <li><a id="transfer" onclick="changePage('transfer','transfer')">转账</a></li>
+                <li><a id="tools" onclick="changePage('tools','tools')">工具</a></li>
+                <li><a id="system" onclick="changePage('system','system')">系统</a></li>
+            </ul>   
+        </div>  
+        <div style="display: flex;align-items: center;">
+            <select id="add" name="add" onchange="accountChange()" style="font-size: 14px;height: 25px;width: 300px;border-radius: 0px;"></select>
+        </div>      
+    </div>   
+    <div style="width: 100%;top: 60px;position: absolute;display: flex;flex-direction: column;text-align: center;"> 
+        <div style="margin: 0 auto;text-align: center;">
+            <div id="pageContent" style="margin: 0 auto;text-align: center;"></div>   
+        </div>        
+    </div>
+    <div id = 'rightmenudiv' style="margin: 0 auto;text-align: center;"> </div>      
 </body>
+   
 </html>

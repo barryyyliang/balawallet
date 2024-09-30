@@ -57,14 +57,15 @@
         for (var i=0; i<abijson.length;i++){
             if (abijson[i].type === "function" && abijson[i].name === func){
                 var inputTable = document.getElementById("paramterTable")
-                for (var n=inputTable.rows.length-1;n>0;n--){
+                window.doWebLog("row:" + inputTable.rows.length)
+                for (var n=inputTable.rows.length-1;n>1;n--){
                     inputTable.removeChild(inputTable.rows[n])
                 }
                 for (var n=0; n<abijson[i].inputs.length;n++){
                     addNew(inputTable,abijson[i].inputs[n])
                 } 
                 var outputTable = document.getElementById("outTable")
-                for (var n=outputTable.rows.length-1;n>0;n--){
+                for (var n=outputTable.rows.length-1;n>1;n--){
                     outputTable.removeChild(outputTable.rows[n])
                 }
                 for (var n=0; n<abijson[i].outputs.length;n++){
@@ -74,12 +75,14 @@
                 window.doWebLog(abijson[i].stateMutability )
                 if (abijson[i].stateMutability === "view"){                    
                     document.getElementById("btInvoke").innerHTML = "查询"
-                    document.getElementById("outTable").style.visibility =  "visible"
-                    document.getElementById("assTable").style.visibility = "hidden"
+                    document.getElementById("outTableDiv").style.visibility =  "visible"
+                    document.getElementById("assDiv").style.visibility = "hidden"
+                    document.getElementById("assDiv").style.height = "0px"
                 } else {
                     document.getElementById("btInvoke").innerHTML = "调用"
-                    document.getElementById("outTable").style.visibility =  "hidden"
-                    document.getElementById("assTable").style.visibility = "visible"
+                    document.getElementById("outTableDiv").style.visibility =  "hidden"
+                    document.getElementById("assDiv").style.visibility = "visible"
+                    document.getElementById("assDiv").style.height = ""
                 }
                 break               
             } 
@@ -113,7 +116,7 @@
         var parems = new Array()
         var inputTable = document.getElementById("paramterTable")
 
-        for (var n=1;n<inputTable.rows.length;n++){
+        for (var n=2;n<inputTable.rows.length;n++){
             parems.push(inputTable.rows[n].cells[1].childNodes[0].value)
         }
 
@@ -127,9 +130,9 @@
                 var outsTable = document.getElementById("outTable")
                 var outs = JSON.parse(obj.Msg)
                 window.doWebLog("invoke 3:"+outs)
-                for (var n=1;n<outsTable.rows.length;n++){
-                    if (n-1 < outs.length) {
-                        outsTable.rows[n].cells[1].childNodes[0].value = outs[n-1]
+                for (var n=2;n<outsTable.rows.length;n++){
+                    if (n-2 < outs.length) {
+                        outsTable.rows[n].cells[1].childNodes[0].value = outs[n-2]
                     } else {
                         MYDIALOG.ShowDiv("输出参数少于需要的数量")
                     }                    
