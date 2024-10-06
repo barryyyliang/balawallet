@@ -186,8 +186,8 @@
                             content.childNodes[i].style.height = "0px"
                         }
                     }
-
-                    if (hasHistory === true && (pagename === "qianbao" || pagename === "transfer")){
+                    // only save two history page
+                    if (hasHistory === true && pagename != "invokecontract" && pagename != "querytx"){
                         document.getElementById("page_" + pagename).remove()
                         hasHistory = false
                     }

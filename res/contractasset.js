@@ -2,7 +2,7 @@
     
     function addNew(obj){
         window.doWebLog("addnew")
-        var table = document.getElementById("contractTable")
+        var table = document.getElementById("assetTable")
         window.doWebLog("get table")
         var tr = addNewTr()
         window.doWebLog("get new tr")
@@ -113,7 +113,7 @@
                 window.doWebLog("get result json" + obj)
                 for(var i = 0; i < obj.contracts.length;i++)
                 {
-                    var table = document.getElementById("contractTable")
+                    var table = document.getElementById("assetTable")
                     var tr = initTr(obj.contracts[i])
                     table.append(tr)
                 }
