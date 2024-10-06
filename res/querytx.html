@@ -1,12 +1,11 @@
-
 <table style="margin: 0 auto;font-size: 16px;text-align: center;">
     <tr>
         <td>交易 hash:</td>
         <td><input type="text" id="txhash" style="width:300px;font-size: 14px;height:25px;" ></td>
         <!--td><button class="button1" onclick="selectfile()">选择</button></td-->
-        <td><button class="button1" onclick="queryByHash()"> 查询</button></td>
+        <td><button class="button1" style="width:100px;"onclick="queryByHash()"> 查询</button></td>
     </tr> 
 </table>
 <div style="margin: 0 auto;font-size: 16px;text-align: center;">
-    <textarea id="txinfo"  name="txinfo" rows="10" cols="50" readonly  style="margin: 0 auto;font-size: 16px;"></textarea>
+    <textarea id="txinfo"  name="txinfo" rows="10" cols="50" readonly  style="margin: 0 auto;font-size: 16px;overflow:auto"></textarea>
 </div>

@@ -12,7 +12,7 @@
         //改变自定义菜单的宽，让它显示出来
         menu.style.width='100px';
         menu.style.height='auto';
-    }
+      }
     //鼠标左键任意位置单击, 关闭右键菜单
     window.onclick=function(e){
         //用户触发click事件就可以关闭了，因为绑定在window上，按事件冒泡处理，不会影响菜单的功能
