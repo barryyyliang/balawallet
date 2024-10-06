@@ -139,6 +139,15 @@
         window.doWebLog("change menu to " + menuname)
         MYDIALOG.CloseDiv("MyDiv","fade")
 
+        try{
+            if (currentPage != "invokecontract" && pagename != "querytx"){
+            document.getElementById("page_" + currentPage).remove()
+            }
+        } catch (e) {
+            MYDIALOG.ShowDiv("删除页面失败："+e.message);
+        }
+
+
         currentMenu = menuname
         currentPage = pagename
 
@@ -185,11 +194,6 @@
                             content.children[i].style.display = "none"
                             content.childNodes[i].style.height = "0px"
                         }
-                    }
-                    // only save two history page
-                    if (hasHistory === true && pagename != "invokecontract" && pagename != "querytx"){
-                        document.getElementById("page_" + pagename).remove()
-                        hasHistory = false
                     }
 
                     if (hasHistory === false){
