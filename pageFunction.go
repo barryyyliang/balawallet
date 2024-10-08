@@ -38,14 +38,14 @@ import (
 
 //新创建一个账号
 func doNewAccount(pass string, walletName string) string {
-	re := getResult(0, "")
+	re := getResult(Msg_success, "")
 	//scryptN := keystore.StandardScryptN
 	//scryptP := keystore.StandardScryptP
 	//account, err := keystore.StoreKey(accountdir, pass, scryptN, scryptP)
 	account, err := ks.NewAccount(pass)
 	if err != nil {
 		fmt.Println("failed to generate new account")
-		re = getResult(1, err.Error())
+		re = getResult(Msg_createuser_fail, err.Error())
 		return string(re)
 	}
 
@@ -57,11 +57,11 @@ func doNewAccount(pass string, walletName string) string {
 		err = db.Put([]byte(account.Address.String()), []byte(walletName), nil)
 		if err != nil {
 			fmt.Println("put name err")
-			re = getResult(2, err.Error())
+			re = getResult(Msg_writename_fail, err.Error())
 		}
 	} else {
 		fmt.Println("name has existed")
-		re = getResult(3, "")
+		re = getResult(Msg_createuser_nameexists, "")
 	}
 
 	return string(re)
@@ -113,7 +113,7 @@ func doGetAccounts() string {
 }
 
 func doChangeAccountName(address string, name string) string {
-	re := getResult(0, "")
+	re := getResult(Msg_success, "")
 	//账户信息存库
 	db, err := leveldb.OpenFile(datadir+"db", nil)
 	defer db.Close()
@@ -121,12 +121,12 @@ func doChangeAccountName(address string, name string) string {
 	if isAddressExist(db, address, name) == false {
 		err = db.Put([]byte(address), []byte(name), nil)
 		if err != nil {
-			re = getResult(4, err.Error())
+			re = getResult(Msg_writedb_fail, err.Error())
 		} else {
 			fmt.Println("put name:" + address + ":" + name)
 		}
 	} else {
-		re = getResult(5, "")
+		re = getResult(Msg_changename_nameexists, "")
 	}
 	return string(re)
 }
@@ -151,13 +151,13 @@ func doGetAccountName(address string) string {
 
 //通过私钥导入账号
 func doImportAccount(pa string, name string, kk string) string {
-	re := getResult(0, "")
+	re := getResult(Msg_success, "")
 	fmt.Println("importAccount")
 	key := new(ecdsa.PrivateKey)
 	key.PublicKey.Curve = crypto.S256()
 	pp, err := hex.DecodeString(kk)
 	if err != nil {
-		re = getResult(6, err.Error())
+		re = getResult(Msg_privatekey_error, err.Error())
 		return string(re)
 	}
 	key.D = new(big.Int)
@@ -169,7 +169,7 @@ func doImportAccount(pa string, name string, kk string) string {
 
 //导出私钥
 func doExportAccount(add string, pa string) string {
-	re := getResult(0, "")
+	re := getResult(Msg_success, "")
 	selectAccountFile := ""
 	acc := ks.Accounts()
 	for i := 0; i < len(acc); i++ {
@@ -181,25 +181,25 @@ func doExportAccount(add string, pa string) string {
 	if selectAccountFile != "" {
 		keyjson, err := os.ReadFile(selectAccountFile)
 		if err != nil {
-			re = getResult(7, err.Error())
+			re = getResult(Msg_readaccountfile_fail, err.Error())
 			return string(re)
 		}
 		key, err := keystore.DecryptKey(keyjson, pa)
 		if err != nil {
-			re = getResult(8, err.Error())
+			re = getResult(Msg_decryptprivatekey_fail, err.Error())
 			return string(re)
 		}
 		// 确保导出的是需要私钥
 		if key.Address.String() != add {
 			fmt.Errorf("key content mismatch: have account %x, want %s", key.Address, add)
-			re = getResult(9, key.Address.String()+"-"+add)
+			re = getResult(Msg_addressprivatekey_mismatch, key.Address.String()+"-"+add)
 			return string(re)
 		}
 
 		file, err := os.OpenFile(exportdir+add, os.O_RDWR|os.O_CREATE, 0666)
 		if err != nil {
 			fmt.Println("can not open file in export:" + err.Error())
-			re = getResult(10, err.Error())
+			re = getResult(Msg_openexportfile_fail, err.Error())
 			return string(re)
 		}
 		defer file.Close()
@@ -217,7 +217,7 @@ func doTransfer(from string, to string, value string, pass string) string {
 	connect := getConnection()
 	if connect == nil {
 		fmt.Println("doTransfer: connection is nil")
-		re, _ = json.Marshal(ErrorResult{1, "can not coonnect to node"})
+		re = getResult(Msg_connectnode_fail, "")
 		return string(re)
 	}
 
@@ -228,14 +228,13 @@ func doTransfer(from string, to string, value string, pass string) string {
 		if from == acc[i].Address.String() {
 			bigvalue, err := etherTowei(value)
 			if err != nil {
-				re, _ = json.Marshal(ErrorResult{1, err.Error()})
+				re = getResult(Msg_weitoether_fail, err.Error())
 				break
-
 			}
 			var gasLimit uint64 = 21000
 			nounce, gasPrice, tipsPrice, chainId, err := getChainInfo(connect, from)
 			if err != nil {
-				re, _ = json.Marshal(ErrorResult{1, err.Error()})
+				re = getResult(Msg_getchaininfo_fail, err.Error())
 				break
 			}
 			//后续可以改为可设置消费的交易
@@ -246,26 +245,18 @@ func doTransfer(from string, to string, value string, pass string) string {
 				err := connect.SendTransaction(ctx, tx)
 				if err != nil {
 					fmt.Println("transfer err:" + err.Error())
-					re, _ = json.Marshal(ErrorResult{1, err.Error()})
+					re = getResult(Msg_sendtransaction_fail, err.Error())
 				} else {
 					fmt.Println("transfer success")
-					re, _ = json.Marshal(ErrorResult{0, ""})
-				}
-
-				json, err2 := tx.MarshalJSON()
-				if err2 == nil {
-					fmt.Println(string(json))
-				} else {
-					fmt.Println("marshaljson tx err")
+					re = getResult(Msg_success, "")
 				}
 			} else {
 				fmt.Println("sign tx err")
-				re, _ = json.Marshal(ErrorResult{1, err.Error()})
+				re = getResult(Msg_signtransaction_fail, err.Error())
 			}
 			break
 		}
 	}
-	fmt.Println(string(re))
 	return string(re)
 }
 
@@ -273,13 +264,9 @@ func doTransfer(from string, to string, value string, pass string) string {
 func doGetBalance(add string) string {
 	var re []byte
 	fmt.Println("doGetBalance: address is " + add)
-	if add == "" {
-		re, _ = json.Marshal(ErrorResult{1, "address is null"})
-		return string(re)
-	}
 	connect := getConnection()
 	if connect == nil {
-		re, _ = json.Marshal(ErrorResult{1, "can not get conneciton to node"})
+		re = getResult(Msg_connectnode_fail, "")
 		return string(re)
 	}
 
@@ -302,7 +289,7 @@ func doGetBalance(add string) string {
 		re, _ = json.Marshal(ErrorResult{0, string(tmp)})
 		return string(re)
 	} else {
-		re, _ = json.Marshal(ErrorResult{1, "get balance error:" + err.Error()})
+		re = getResult(Msg_getbalance_fail, err.Error())
 		return string(re)
 	}
 }
@@ -439,7 +426,7 @@ func doGetComponent(com string) string {
 
 func doConfig(configs string) string {
 	fmt.Println("enter doConfig")
-	re, _ := json.Marshal(ErrorResult{0, "success"})
+	re := getResult(Msg_success, "")
 	var config = make(map[string]string)
 
 	json.Unmarshal([]byte(configs), &config)
@@ -455,15 +442,13 @@ func doConfig(configs string) string {
 		err = db.Put([]byte(key), []byte(value), nil)
 		if err != nil {
 			fmt.Println("put config error")
-			re, _ = json.Marshal(ErrorResult{1, "write db error"})
+			re = getResult(Msg_writedb_fail, err.Error())
 		} else {
 			fmt.Println("put config:" + key + ":" + value)
 		}
 	}
-
 	// 配置更新后刷新链接
 	G_Etherclient = nil
-
 	return string(re)
 }
 
@@ -495,7 +480,7 @@ func doDeployContract(from string, file string, pass string) string {
 	var re []byte
 	if from == "" || file == "" || pass == "" {
 		fmt.Println("parameter error")
-		re, _ = json.Marshal(ErrorResult{1, "parameter error"})
+		re = getResult(Msg_param_error, "")
 		return string(re)
 	}
 	filepath := G_Config["contractDir"]
@@ -504,7 +489,7 @@ func doDeployContract(from string, file string, pass string) string {
 
 	if connect == nil {
 		fmt.Println("can not connect to node:")
-		re, _ = json.Marshal(ErrorResult{1, "can not connet to node"})
+		re = getResult(Msg_connectnode_fail, "")
 		return string(re)
 	}
 	ctx := context.Background()
@@ -514,23 +499,23 @@ func doDeployContract(from string, file string, pass string) string {
 		if from == acc[i].Address.String() {
 			bigvalue, err := etherTowei("0")
 			if err != nil {
-				re, _ = json.Marshal(ErrorResult{1, err.Error()})
+				re = getResult(Msg_weitoether_fail, err.Error())
 				break
 			}
 
 			nounce, gasPrice, tipsPrice, chainId, err := getChainInfo(connect, from)
 			if err != nil {
-				re, _ = json.Marshal(ErrorResult{1, err.Error()})
+				re = getResult(Msg_getchaininfo_fail, err.Error())
 				break
 			}
 			bin, err := os.ReadFile(filepath)
 			if err != nil {
-				re, _ = json.Marshal(ErrorResult{1, err.Error()})
+				re = getResult(Msg_openfile_fail, err.Error())
 				break
 			}
 			bytecode, err := hex.DecodeString(string(bin))
 			if err != nil {
-				re, _ = json.Marshal(ErrorResult{1, "can not read bin file:" + filepath})
+				re = getResult(Msg_decodebinfile_fail, err.Error())
 				break
 			}
 			msg := ethereum.CallMsg{
@@ -547,7 +532,7 @@ func doDeployContract(from string, file string, pass string) string {
 			gasLimit, err := connect.EstimateGas(ctx, msg)
 			if err != nil {
 				fmt.Println("get gaslimit:" + strconv.FormatInt(int64(gasLimit), 10))
-				re, _ = json.Marshal(ErrorResult{1, err.Error()})
+				re = getResult(Msg_getgaslimit_fail, err.Error())
 				break
 			}
 
@@ -558,18 +543,11 @@ func doDeployContract(from string, file string, pass string) string {
 			if err == nil {
 				err := connect.SendTransaction(ctx, tx)
 				if err != nil {
-					re, _ = json.Marshal(ErrorResult{1, err.Error()})
+					re = getResult(Msg_sendtransaction_fail, err.Error())
 				} else {
 					fmt.Println("deploy success")
 					re, _ = json.Marshal(ErrorResult{0, tx.Hash().Hex()})
 					//connect.TransactionReceipt(ctx,tx.Hash())
-				}
-
-				json, err2 := tx.MarshalJSON()
-				if err2 == nil {
-					fmt.Println(string(json))
-				} else {
-					fmt.Println("marshaljson tx err")
 				}
 			} else {
 				fmt.Println("sign tx err")
@@ -578,7 +556,6 @@ func doDeployContract(from string, file string, pass string) string {
 			break
 		}
 	}
-	fmt.Println(string(re))
 	return string(re)
 }
 
@@ -616,7 +593,7 @@ func doGetContract() string {
 }
 
 func doImportContract(cons string) string {
-	re, _ := json.Marshal(ErrorResult{0, "success"})
+	re := getResult(Msg_success, "")
 	fmt.Println("doImportContract:" + cons)
 	type contract struct {
 		Type    string `json:"type"`

@@ -267,7 +267,7 @@ func getFiles(dir string, suffix string) ([]string, error) {
 	return re, nil
 }
 
-func getResult(code int, addMsg string) []byte {
+func getResult(code uint, addMsg string) []byte {
 	var re []byte
 	msg := G_Msg["zh"][code]
 	if msg == "" {

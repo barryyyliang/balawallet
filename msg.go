@@ -1,18 +1,56 @@
 package main
 
-var G_Msg = make(map[string]map[int]string)
+var G_Msg = make(map[string]map[uint]string)
+
+const (
+	Msg_success                    uint = 0
+	Msg_fail                       uint = 1
+	Msg_createuser_fail            uint = 2
+	Msg_writename_fail             uint = 3
+	Msg_createuser_nameexists      uint = 4
+	Msg_writedb_fail               uint = 5
+	Msg_changename_nameexists      uint = 6
+	Msg_privatekey_error           uint = 7
+	Msg_readaccountfile_fail       uint = 8
+	Msg_decryptprivatekey_fail     uint = 9
+	Msg_addressprivatekey_mismatch uint = 10
+	Msg_openexportfile_fail        uint = 11
+	Msg_connectnode_fail           uint = 12
+	Msg_weitoether_fail            uint = 13
+	Msg_getchaininfo_fail          uint = 14
+	Msg_sendtransaction_fail       uint = 15
+	Msg_signtransaction_fail       uint = 16
+	Msg_getbalance_fail            uint = 17
+	Msg_opendb_fail                uint = 18
+	Msg_param_error                uint = 19
+	Msg_openfile_fail              uint = 20
+	Msg_decodebinfile_fail         uint = 21
+	Msg_getgaslimit_fail           uint = 22
+)
 
 func initMsg() {
-	G_Msg["zh"] = make(map[int]string)
-	G_Msg["zh"][0] = "操作成功"
-	G_Msg["zh"][1] = "创建账户失败"
-	G_Msg["zh"][2] = "创建账户成功，写名称失败，可在钱包页面修改名称"
-	G_Msg["zh"][3] = "创建账户成功，名称已存在，可在钱包页面修改名称"
-	G_Msg["zh"][4] = "写数据库失败"
-	G_Msg["zh"][5] = "名称已存在"
-	G_Msg["zh"][6] = "私钥格式错误，解析私钥失败"
-	G_Msg["zh"][7] = "读取密钥文件失败"
-	G_Msg["zh"][8] = "解密密钥文件失败"
-	G_Msg["zh"][9] = "地址和私钥不匹配"
-	G_Msg["zh"][10] = "打开导出文件失败"
+	G_Msg["zh"] = make(map[uint]string)
+	G_Msg["zh"][Msg_success] = "操作成功"
+	G_Msg["zh"][Msg_fail] = "操作失败"
+	G_Msg["zh"][Msg_createuser_fail] = "创建账户失败"
+	G_Msg["zh"][Msg_writename_fail] = "创建账户成功，写名称失败，可在钱包页面修改名称"
+	G_Msg["zh"][Msg_createuser_nameexists] = "创建账户成功，名称已存在，可在钱包页面修改名称"
+	G_Msg["zh"][Msg_writedb_fail] = "写数据库失败"
+	G_Msg["zh"][Msg_changename_nameexists] = "名称已存在"
+	G_Msg["zh"][Msg_privatekey_error] = "私钥格式错误，解析私钥失败"
+	G_Msg["zh"][Msg_readaccountfile_fail] = "读取密钥文件失败"
+	G_Msg["zh"][Msg_decryptprivatekey_fail] = "解密密钥文件失败"
+	G_Msg["zh"][Msg_addressprivatekey_mismatch] = "地址和私钥不匹配"
+	G_Msg["zh"][Msg_openexportfile_fail] = "打开导出文件失败"
+	G_Msg["zh"][Msg_connectnode_fail] = "连接节点失败"
+	G_Msg["zh"][Msg_weitoether_fail] = "eth转wei失败"
+	G_Msg["zh"][Msg_getchaininfo_fail] = "获取链信息失败"
+	G_Msg["zh"][Msg_sendtransaction_fail] = "发送交易失败"
+	G_Msg["zh"][Msg_signtransaction_fail] = "对交易进行签名失败"
+	G_Msg["zh"][Msg_getbalance_fail] = "查询余额失败"
+	G_Msg["zh"][Msg_opendb_fail] = "打开数据库失败"
+	G_Msg["zh"][Msg_param_error] = "参数错误"
+	G_Msg["zh"][Msg_openfile_fail] = "打开文件错误"
+	G_Msg["zh"][Msg_decodebinfile_fail] = "解码合约bin文件失败"
+	G_Msg["zh"][Msg_getgaslimit_fail] = "获取预估gas失败"
 }
