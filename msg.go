@@ -26,6 +26,12 @@ const (
 	Msg_openfile_fail              uint = 20
 	Msg_decodebinfile_fail         uint = 21
 	Msg_getgaslimit_fail           uint = 22
+	Msg_nodeconfig_null            uint = 23
+	Msg_packabiparam_error         uint = 24
+	Msg_callcontract_fail          uint = 25
+	Msg_parseabi_fail              uint = 26
+	Msg_findaccount_fail           uint = 27
+	Msg_contractdirconfig_null     uint = 28
 )
 
 func initMsg() {
@@ -53,4 +59,10 @@ func initMsg() {
 	G_Msg["zh"][Msg_openfile_fail] = "打开文件错误"
 	G_Msg["zh"][Msg_decodebinfile_fail] = "解码合约bin文件失败"
 	G_Msg["zh"][Msg_getgaslimit_fail] = "获取预估gas失败"
+	G_Msg["zh"][Msg_nodeconfig_null] = "还没有配置区块链节点，可在系统->系统配置中设置连接的节点地址"
+	G_Msg["zh"][Msg_packabiparam_error] = "组装abi参数失败"
+	G_Msg["zh"][Msg_callcontract_fail] = "调用合约失败"
+	G_Msg["zh"][Msg_parseabi_fail] = "解析ABI文件失败"
+	G_Msg["zh"][Msg_findaccount_fail] = "找不到指定的账户"
+	G_Msg["zh"][Msg_contractdirconfig_null] = "还没有配置合约文件目录，可在系统->系统配置中设置"
 }

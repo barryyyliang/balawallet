@@ -643,16 +643,16 @@ func doImportContract(cons string) string {
 		if err2 == nil {
 			if db.Put([]byte(jcons.Address), jvalue, nil) != nil {
 				fmt.Println("write db error:" + string(jvalue))
-				re, _ = json.Marshal(ErrorResult{1, "write db error"})
+				re = getResult(Msg_writedb_fail,"") 
 			}
 		} else {
 			fmt.Println("open contract db error:" + err2.Error())
-			re, _ = json.Marshal(ErrorResult{1, "open db error"})
+			re = getResult(Msg_opendb_fail,err2.Error())
 		}
 
 	} else {
 		fmt.Println("get wrong parameter:" + cons)
-		re, _ = json.Marshal(ErrorResult{1, "get wrong parameter"})
+		re = getResult(Msg_param_error,"")
 	}
 
 	return string(re)
@@ -661,9 +661,9 @@ func doImportContract(cons string) string {
 func doCheckNode() string {
 	var re []byte
 	if G_Config["nodeAddress"] != "" {
-		re, _ = json.Marshal(ErrorResult{0, "have config blockchain node"})
+		re = getResult(Msg_success,"")
 	} else {
-		re, _ = json.Marshal(ErrorResult{1, "have not config blockchain node"})
+		re = getResult(Msg_nodeconfig_null,"")
 	}
 	return string(re)
 }
@@ -673,13 +673,13 @@ func doLoadABI(file string) string {
 	filepath := G_Config["contractDir"]
 	filepath = filepath + "/" + file
 	if filepath == "" {
-		re, _ = json.Marshal(ErrorResult{1, "parameter error"})
+		re = getResult(Msg_param_error,"")
 		return string(re)
 	}
 
 	abiContent, err := os.ReadFile(filepath)
 	if err != nil {
-		re, _ = json.Marshal(ErrorResult{2, err.Error()})
+		re = getResult(Msg_openfile_fail,err.Error())
 		return string(re)
 	}
 
@@ -694,7 +694,7 @@ func doReadContract(from string, to string, funcAbi string, paremters string) st
 	var toAdd common.Address = common.HexToAddress(to)
 	contractAbi, err := abi.JSON(strings.NewReader(funcAbi))
 	var parems []interface{}
-	var re ErrorResult = ErrorResult{0, ""}
+	var re = getResult(Msg_success,"")
 	var data []byte
 	var outs []string
 	if err == nil {
@@ -707,10 +707,8 @@ func doReadContract(from string, to string, funcAbi string, paremters string) st
 			}
 			data, err = contractAbi.Pack(method.RawName, parems...)
 			if err != nil {
-				re.Code = 1
-				re.Msg = "pack abi data err:" + err.Error()
-				tmp, _ := json.Marshal(re)
-				return string(tmp)
+				re = getResult(Msg_packabiparam_error,err.Error())
+				return string(re)
 			}
 			connect := getConnection()
 			if connect != nil {
@@ -735,38 +733,30 @@ func doReadContract(from string, to string, funcAbi string, paremters string) st
 						fmt.Println(aa)
 					}
 					bouts, _ := json.Marshal(outs)
-					re.Msg = string(bouts)
+					re,_ = json.Marshal(ErrorResult{0,string(bouts)})
 				} else {
-					re.Code = 1
-					re.Msg = "call contract error:" + err5.Error()
+					re = getResult(Msg_callcontract_fail,err5.Error())
 				}
-				fmt.Println(result)
 			}
 			break
 		}
 	} else {
-		re.Code = 1
-		re.Msg = "parse abi error"
+		re = getResult(Msg_parseabi_fail,err.Error())
 	}
-	fmt.Println(re.Msg)
-	fmt.Println(re.Code)
-	tmp, _ := json.Marshal(re)
-	return string(tmp)
+	return string(re)
 }
 
 func doInvokeContract(from string, conAddr string, funcAbi string, param string, pass string) string {
 	var re []byte
 	if from == "" || pass == "" || conAddr == "" {
-		fmt.Println("parameter error")
-		re, _ = json.Marshal(ErrorResult{1, "parameter error"})
+		re = getResult(Msg_param_error,"")
 		return string(re)
 	}
 	connect := getConnection()
 	var toAdd common.Address = common.HexToAddress(conAddr)
 
 	if connect == nil {
-		fmt.Println("can not connect to node:")
-		re, _ = json.Marshal(ErrorResult{1, "can not connet to node"})
+		re = getResult(Msg_connectnode_fail,"")
 		return string(re)
 	}
 	ctx := context.Background()
@@ -782,14 +772,14 @@ func doInvokeContract(from string, conAddr string, funcAbi string, param string,
 		}
 	}
 	if isExist == false {
-		re, _ = json.Marshal(ErrorResult{1, "can not find account"})
+		re = getResult(Msg_findaccount_fail,from)
 		return string(re)
 	}
 
 	bigvalue, err := etherTowei("0")
 	nounce, gasPrice, tipsPrice, chainId, err := getChainInfo(connect, from)
 	if err != nil {
-		re, _ = json.Marshal(ErrorResult{1, err.Error()})
+		re = getResult(Msg_getchaininfo_fail,err.Error())
 	}
 
 	contractAbi, err := abi.JSON(strings.NewReader(funcAbi))
@@ -801,12 +791,11 @@ func doInvokeContract(from string, conAddr string, funcAbi string, param string,
 			json.Unmarshal([]byte(param), &parStrings)
 			for i, pType := range method.Inputs {
 				parems = append(parems, stringToValue(pType.Type.GetType(), parStrings[i]))
-				fmt.Println(parStrings[i])
 			}
 			data, err = contractAbi.Pack(method.RawName, parems...)
 			if err != nil {
-				tmp, _ := json.Marshal(ErrorResult{1, "pack abi data err:" + err.Error()})
-				return string(tmp)
+				re = getResult(Msg_packabiparam_error,err.Error()) 
+				return string(re)
 			}
 		}
 	}
@@ -825,7 +814,7 @@ func doInvokeContract(from string, conAddr string, funcAbi string, param string,
 	gasLimit, err := connect.EstimateGas(ctx, msg)
 	if err != nil {
 		fmt.Println("get gaslimit:" + strconv.FormatInt(int64(gasLimit), 10))
-		re, _ = json.Marshal(ErrorResult{1, err.Error()})
+		re = getResult(Msg_getgaslimit_fail,err.Error())
 	}
 
 	tx := newCallContractTx(nounce, toAdd, &bigvalue, gasLimit, gasPrice, tipsPrice, chainId, data)
@@ -835,23 +824,14 @@ func doInvokeContract(from string, conAddr string, funcAbi string, param string,
 		if err != nil {
 			re, _ = json.Marshal(ErrorResult{1, err.Error()})
 		} else {
-			fmt.Println("invoke success")
 			re, _ = json.Marshal(ErrorResult{0, tx.Hash().Hex()})
 			//connect.TransactionReceipt(ctx,tx.Hash())
 		}
 
-		json, err2 := tx.MarshalJSON()
-		if err2 == nil {
-			fmt.Println(string(json))
-		} else {
-			fmt.Println("marshaljson tx err")
-		}
 	} else {
-		fmt.Println("sign tx err")
-		re, _ = json.Marshal(ErrorResult{1, err.Error()})
+		re = getResult(Msg_signtransaction_fail,err.Error())
 	}
 
-	fmt.Println(string(re))
 	return string(re)
 }
 
@@ -901,22 +881,20 @@ func doSignature(info string) string {
 					fmt.Println("server: doSignature :3")
 					re, _ = json.Marshal(ErrorResult{0, common.Bytes2Hex(signature)})
 				} else {
-					fmt.Println("server: doSignature :4" + err2.Error())
-					re, _ = json.Marshal(ErrorResult{1, err2.Error()})
+					re = getResult(Msg_fail,err2.Error())
 				}
 				break
 			}
 		}
 	} else {
-		fmt.Println("server: doSignature :5" + err.Error())
-		re, _ = json.Marshal(ErrorResult{1, err.Error()})
+		re = getResult(Msg_param_error, err.Error())
 	}
 
 	return string(re)
 }
 
 func doGetAbiFile() string {
-	re := ErrorResult{0, ""}
+	re := getResult(Msg_success,"")
 	var conf = [1]string{"contractDir"}
 	par, _ := json.Marshal(conf)
 	doGetConfig(string(par))
@@ -925,22 +903,18 @@ func doGetAbiFile() string {
 		names, err := getFiles(dir, ".abi")
 		if err == nil {
 			tmp, _ := json.Marshal(names)
-			re.Msg = string(tmp)
+			re,_ = json.Marshal(ErrorResult{0,string(tmp)})
 		} else {
-			re.Code = 1
-			re.Msg = err.Error()
+			re = getResult(Msg_openfile_fail,err.Error())
 		}
 	} else {
-		re.Code = 1
-		re.Msg = "contract dir name not config"
+		re = getResult(Msg_contractdirconfig_null,"")
 	}
-
-	bre, _ := json.Marshal(re)
-	return string(bre)
+	return string(re)
 }
 
 func doGetBinFile() string {
-	re := ErrorResult{0, ""}
+	re := getResult(Msg_success,"")
 	var conf = [1]string{"contractDir"}
 	par, _ := json.Marshal(conf)
 	doGetConfig(string(par))
@@ -949,15 +923,12 @@ func doGetBinFile() string {
 		names, err := getFiles(dir, ".bin")
 		if err == nil {
 			tmp, _ := json.Marshal(names)
-			re.Msg = string(tmp)
+			re,_ = json.Marshal(ErrorResult{0,string(tmp)})
 		} else {
-			re.Code = 1
-			re.Msg = err.Error()
+			re = getResult(Msg_openfile_fail,err.Error())
 		}
 	} else {
-		re.Code = 1
-		re.Msg = "contract dir name not config"
+		re = getResult(Msg_contractdirconfig_null,"")
 	}
-	bre, _ := json.Marshal(re)
-	return string(bre)
+	return string(re)
 }

@@ -87,7 +87,7 @@ async function initBalance(){
    }
 }
 
-function initPage(){
+async function initPage(){
     window.doWebLog("qianbao init page")
     window.doGetAccounts().then( (result) => {
         window.doWebLog("get result" + result)
@@ -95,8 +95,10 @@ function initPage(){
         window.doWebLog("go to addelement")
         addAccountElement(arr.accounts,document.getElementById("tableWallet"))
     })
-    setTimeout(initBalance,500)
-
+    var re = await window.doCheckNode()
+    if(re.Code === 0){
+        setTimeout(initBalance,500)
+    }
     // var result = await window.doGetAccounts()
     // var arr = JSON.parse(result)
     // addAccountElement(arr.accounts,document.getElementById("table1"))

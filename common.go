@@ -19,7 +19,7 @@ import (
 )
 
 type ErrorResult struct {
-	Code int
+	Code uint
 	Msg  string
 }
 

@@ -101,8 +101,8 @@
             var obj = JSON.parse(result)
             window.doWebLog("checkconfig：" + result)
             window.doWebLog(obj)
-            if (1 == obj.Code) {
-                MYDIALOG.ShowDiv("还没有配置区块链节点，可在系统->系统配置中设置连接的节点地址")
+            if ( 0 != obj.Code) {
+                MYDIALOG.ShowDiv(obj.Msg)
             }
         })    
     }
@@ -136,7 +136,7 @@
     }
 
 
-    function changePage(menuname,pagename){    
+    async function changePage(menuname,pagename){    
         if(pagename === currentPage){
             return
         }
@@ -152,7 +152,6 @@
             MYDIALOG.ShowDiv("删除页面失败："+e.message);
         }
 
-
         currentMenu = menuname
         currentPage = pagename
 
@@ -162,62 +161,60 @@
         }
         document.getElementById(menuname).setAttribute("class","active")       
 
-        window.doGetComponent(pagename).then( (result) => {
-            window.doWebLog("change page to :"+ pagename)
-            var obj
-            try{
-                    obj = JSON.parse(result)
-                    document.getElementById('pageStyle').remove() 
-                    //document.getElementById('pageContent').innerHTML = ""
-                    document.getElementById('pageScript').remove()
+        var result = await window.doGetComponent(pagename)
+        window.doWebLog("change page to :"+ pagename)
+        var obj
+        try{
+                obj = JSON.parse(result)
+                document.getElementById('pageStyle').remove() 
+                //document.getElementById('pageContent').innerHTML = ""
+                document.getElementById('pageScript').remove()
 
-                    var cs = document.createElement("style")
-                    cs.setAttribute("id","pageStyle")
-                    cs.innerHTML = obj.css
-                    document.head.appendChild(cs)
+                var cs = document.createElement("style")
+                cs.setAttribute("id","pageStyle")
+                cs.innerHTML = obj.css
+                document.head.appendChild(cs)
 
-                    var js = document.createElement("script")
-                    js.setAttribute("id","pageScript")
-                    js.innerHTML = obj.js
-                    document.head.appendChild(js)
-                    //document.getElementById('pageScript').innerHTML = obj.js   
+                var js = document.createElement("script")
+                js.setAttribute("id","pageScript")
+                js.innerHTML = obj.js
+                document.head.appendChild(js)
+                //document.getElementById('pageScript').innerHTML = obj.js   
 
-                    var content = document.getElementById('pageContent')
-                    var hasHistory = false
-                    var i = 0
-                    for(i = 0;i<content.children.length;i++){
-                        window.doWebLog("get a none div node:"+content.childNodes[i].id)                      
-                        if (content.children[i].id === "page_" + pagename){
-                            //content.childNodes[i].style.width = "100%"
-                            window.doWebLog("make show")
-                            content.children[i].style.height = "100%"
-                            content.children[i].style.display = "block"
-                            hasHistory = true
-                        } else {
-                            //content.childNodes[i].style.width = "0px"
-                            window.doWebLog("make hide")
-                            content.children[i].style.display = "none"
-                            content.childNodes[i].style.height = "0px"
-                        }
+                var content = document.getElementById('pageContent')
+                var hasHistory = false
+                var i = 0
+                for(i = 0;i<content.children.length;i++){
+                    window.doWebLog("get a none div node:"+content.childNodes[i].id)                      
+                    if (content.children[i].id === "page_" + pagename){
+                        //content.childNodes[i].style.width = "100%"
+                        window.doWebLog("make show")
+                        content.children[i].style.height = "100%"
+                        content.children[i].style.display = "block"
+                        hasHistory = true
+                    } else {
+                        //content.childNodes[i].style.width = "0px"
+                        window.doWebLog("make hide")
+                        content.children[i].style.display = "none"
+                        content.childNodes[i].style.height = "0px"
                     }
-
-                    if (hasHistory === false){
-                        var page = document.createElement("div")
-                        page.setAttribute("id","page_" + pagename)  
-                        page.setAttribute("style","width:100%;height:100%")  
-                        page.innerHTML = obj.html
-                        content.appendChild(page)
-                        initPage() 
-                    }
-                    //document.getElementById('pageContent').innerHTML = obj.html                
-                    //initPage() 
                 }
-            catch(err){
-                window.doWebLog("get page component error:" + err.message)
-                MYDIALOG.ShowDiv("获取页面失败");
-            }               
 
-        })        
+                if (hasHistory === false){
+                    var page = document.createElement("div")
+                    page.setAttribute("id","page_" + pagename)  
+                    page.setAttribute("style","width:100%;height:100%")  
+                    page.innerHTML = obj.html
+                    content.appendChild(page)
+                    initPage() 
+                }
+                //document.getElementById('pageContent').innerHTML = obj.html                
+                //initPage() 
+            }
+        catch(err){
+            window.doWebLog("get page component error:" + err.message)
+            MYDIALOG.ShowDiv("获取页面失败");
+        }        
     }
 
     function showResult(resutl) {
