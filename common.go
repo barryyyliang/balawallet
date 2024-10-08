@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"math/big"
 	"os"
@@ -264,4 +265,17 @@ func getFiles(dir string, suffix string) ([]string, error) {
 		return re, err
 	}
 	return re, nil
+}
+
+func getResult(code int, addMsg string) []byte {
+	var re []byte
+	msg := G_Msg["zh"][code]
+	if msg == "" {
+		msg = "null"
+	}
+	if addMsg != "" {
+		msg = msg + ":" + addMsg
+	}
+	re, _ = json.Marshal(ErrorResult{code, msg})
+	return re
 }

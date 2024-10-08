@@ -4,7 +4,11 @@
 <meta charset="utf-8"> 
 <title>数字货币钱包</title> 
 <style>
-
+    div1{
+        margin: 0 auto;
+        font-size: 16px;
+        text-align: center;
+    }
     table, th, td {
         frame: void;
     }
@@ -62,6 +66,7 @@
     .button1:hover {
         box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
     }
+
 </style>
 <style id="stylerightmenu"></style>
 <style id="pageStyle"></style>
@@ -217,11 +222,7 @@
 
     function showResult(resutl) {
         var objJson = JSON.parse(resutl)
-        if(objJson.Code === 0){
-            MYDIALOG.ShowDiv("操作成功")
-        } else {
-            MYDIALOG.ShowDiv("操作失败：" + objJson.Msg)
-        }
+        MYDIALOG.ShowDiv(objJson.Msg)
     }
 
     function getCurrentAccount(){

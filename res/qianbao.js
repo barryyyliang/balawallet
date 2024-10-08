@@ -1,9 +1,10 @@
-function changeName(address,name){
+async function changeName(address,name){
     window.doWebLog("enter changeName")
     window.doWebLog(address)
     var addressvalue = document.getElementById(address).value
     var namevalue = document.getElementById(name).value
-    window.doChangeAccountName(addressvalue,namevalue)
+    var result = await window.doChangeAccountName(addressvalue,namevalue)
+    showResult(result)
 }
 function management(address,name){
     window.doWebLog("enter management")

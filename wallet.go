@@ -26,7 +26,8 @@ var G_Etherclient *ethclient.Client = nil
 var G_BlockchainConfig bool = true
 
 func main() {
-	Init()
+	InitHtmlFile()
+	initMsg()
 	win = webview.New(true)
 	defer win.Destroy()
 	win.SetTitle("我的钱包")

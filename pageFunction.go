@@ -38,16 +38,14 @@ import (
 
 //新创建一个账号
 func doNewAccount(pass string, walletName string) string {
-	var re []byte
-	re, _ = json.Marshal(ErrorResult{0, "success"})
-	fmt.Println("password:" + pass)
+	re := getResult(0, "")
 	//scryptN := keystore.StandardScryptN
 	//scryptP := keystore.StandardScryptP
 	//account, err := keystore.StoreKey(accountdir, pass, scryptN, scryptP)
 	account, err := ks.NewAccount(pass)
 	if err != nil {
 		fmt.Println("failed to generate new account")
-		re, _ = json.Marshal(ErrorResult{1, err.Error()})
+		re = getResult(1, err.Error())
 		return string(re)
 	}
 
@@ -59,11 +57,11 @@ func doNewAccount(pass string, walletName string) string {
 		err = db.Put([]byte(account.Address.String()), []byte(walletName), nil)
 		if err != nil {
 			fmt.Println("put name err")
-			re, _ = json.Marshal(ErrorResult{1, "create success, but write name error"})
+			re = getResult(2, err.Error())
 		}
 	} else {
 		fmt.Println("name has existed")
-		re, _ = json.Marshal(ErrorResult{1, "create success, but name is exist"})
+		re = getResult(3, "")
 	}
 
 	return string(re)
@@ -115,7 +113,7 @@ func doGetAccounts() string {
 }
 
 func doChangeAccountName(address string, name string) string {
-	re, _ := json.Marshal(ErrorResult{0, "success"})
+	re := getResult(0, "")
 	//账户信息存库
 	db, err := leveldb.OpenFile(datadir+"db", nil)
 	defer db.Close()
@@ -123,12 +121,12 @@ func doChangeAccountName(address string, name string) string {
 	if isAddressExist(db, address, name) == false {
 		err = db.Put([]byte(address), []byte(name), nil)
 		if err != nil {
-			re, _ = json.Marshal(ErrorResult{1, "write db error" + err.Error()})
+			re = getResult(4, err.Error())
 		} else {
 			fmt.Println("put name:" + address + ":" + name)
 		}
 	} else {
-		re, _ = json.Marshal(ErrorResult{1, "name has existed"})
+		re = getResult(5, "")
 	}
 	return string(re)
 }
@@ -153,13 +151,13 @@ func doGetAccountName(address string) string {
 
 //通过私钥导入账号
 func doImportAccount(pa string, name string, kk string) string {
-	re, _ := json.Marshal(ErrorResult{0, "success"})
+	re := getResult(0, "")
 	fmt.Println("importAccount")
 	key := new(ecdsa.PrivateKey)
 	key.PublicKey.Curve = crypto.S256()
 	pp, err := hex.DecodeString(kk)
 	if err != nil {
-		re, _ = json.Marshal(ErrorResult{1, "bad private key string"})
+		re = getResult(6, err.Error())
 		return string(re)
 	}
 	key.D = new(big.Int)
@@ -171,7 +169,7 @@ func doImportAccount(pa string, name string, kk string) string {
 
 //导出私钥
 func doExportAccount(add string, pa string) string {
-	re, _ := json.Marshal(ErrorResult{0, "success"})
+	re := getResult(0, "")
 	selectAccountFile := ""
 	acc := ks.Accounts()
 	for i := 0; i < len(acc); i++ {
@@ -183,25 +181,25 @@ func doExportAccount(add string, pa string) string {
 	if selectAccountFile != "" {
 		keyjson, err := os.ReadFile(selectAccountFile)
 		if err != nil {
-			re, _ = json.Marshal(ErrorResult{1, "read account file error:" + err.Error()})
+			re = getResult(7, err.Error())
 			return string(re)
 		}
 		key, err := keystore.DecryptKey(keyjson, pa)
 		if err != nil {
-			re, _ = json.Marshal(ErrorResult{1, "decryp account file error:" + err.Error()})
+			re = getResult(8, err.Error())
 			return string(re)
 		}
 		// 确保导出的是需要私钥
 		if key.Address.String() != add {
 			fmt.Errorf("key content mismatch: have account %x, want %s", key.Address, add)
-			re, _ = json.Marshal(ErrorResult{1, "key content mismatch:" + key.Address.String() + "-" + add})
+			re = getResult(9, key.Address.String()+"-"+add)
 			return string(re)
 		}
 
 		file, err := os.OpenFile(exportdir+add, os.O_RDWR|os.O_CREATE, 0666)
 		if err != nil {
 			fmt.Println("can not open file in export:" + err.Error())
-			re, _ = json.Marshal(ErrorResult{1, "can not open file in export:" + err.Error()})
+			re = getResult(10, err.Error())
 			return string(re)
 		}
 		defer file.Close()
@@ -912,6 +910,7 @@ func doSignature(info string) string {
 	var re []byte
 	var param = make(map[string]string)
 	err := json.Unmarshal([]byte(info), &param)
+	fmt.Println("server: doSignature 0:" + info)
 	if err == nil {
 		fmt.Println("server: doSignature :1")
 		acc := ks.Accounts()
@@ -920,18 +919,20 @@ func doSignature(info string) string {
 			fmt.Println("server: doSignature :2")
 			if acc[i].Address.String() == param["Address"] {
 				fmt.Println("server: doSignature :3.1")
-				signature, err2 := ks.SignHashWithPassphrase(acc[i], "111", crypto.Keccak256([]byte(param["info"])))
+				signature, err2 := ks.SignHashWithPassphrase(acc[i], param["Ass"], crypto.Keccak256([]byte(param["Info"])))
 				if err2 == nil {
 					fmt.Println("server: doSignature :3")
 					re, _ = json.Marshal(ErrorResult{0, common.Bytes2Hex(signature)})
 				} else {
 					fmt.Println("server: doSignature :4" + err2.Error())
+					re, _ = json.Marshal(ErrorResult{1, err2.Error()})
 				}
 				break
 			}
 		}
 	} else {
 		fmt.Println("server: doSignature :5" + err.Error())
+		re, _ = json.Marshal(ErrorResult{1, err.Error()})
 	}
 
 	return string(re)

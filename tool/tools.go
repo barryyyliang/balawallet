@@ -49,7 +49,7 @@ func main() {
 	f.Write([]byte("import \"encoding/hex\"\r\n\r\n"))
 	f.Write([]byte("var G_Files = make(map[string][]byte)\r\n\r\n"))
 
-	f.Write([]byte("func Init(){\r\n\r\n"))
+	f.Write([]byte("func InitHtmlFile(){\r\n\r\n"))
 	f.Write([]byte("var files = make(map[string]string)\r\n\r\n"))
 	addFile(f, dir+"/../res", "")
 	f.Write([]byte("\r\n\r\n"))
