@@ -8,7 +8,6 @@ async function changeName(address,name){
 }
 function management(address,name){
     window.doWebLog("enter management")
-
 }
 function addAccountElement(acc,table){
     window.doWebLog("enter addelement")
@@ -29,7 +28,6 @@ function addAccountElement(acc,table){
         var td2 = document.createElement("td")
         td2.append(ipt)
         tr.append(td2)
-
 
         var td3 = document.createElement("td")
         var ipt2 = document.createElement("input")
@@ -61,8 +59,6 @@ function addAccountElement(acc,table){
 
         table.append(tr)
     }
-    //ShowDiv("MyDiv","fade")
-
 }
 
 
@@ -96,7 +92,8 @@ async function initPage(){
         addAccountElement(arr.accounts,document.getElementById("tableWallet"))
     })
     var re = await window.doCheckNode()
-    if(re.Code === 0){
+    var obj = JSON.parse(re)
+    if(obj.Code === 0){
         setTimeout(initBalance,500)
     }
     // var result = await window.doGetAccounts()
