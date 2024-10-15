@@ -28,6 +28,7 @@ var G_BlockchainConfig bool = true
 func main() {
 	InitHtmlFile()
 	initMsg()
+	initRes()
 	win = webview.New(true)
 	defer win.Destroy()
 	win.SetTitle("我的钱包")
@@ -59,6 +60,7 @@ func main() {
 	win.Bind("doGetAbiFile", doGetAbiFile)
 	win.Bind("doGetBinFile", doGetBinFile)
 	win.Bind("doInvokeContract", doInvokeContract)
+	win.Bind("doGetRes",doGetRes)
 
 	path, _ := filepath.Abs(filepath.Dir(os.Args[0]))
 	dir = strings.Replace(path, "\\", "/", -1)

@@ -119,6 +119,14 @@
             option.value = acc.accounts[i].address
             se.add(option)
         }
+
+        var res = await window.doGetRes("main")
+        if (res != "") {
+            var resjson = JSON.parse(res)
+            for (var ele in resjson) {
+                 document.getElementById(ele).innerText = resjson[ele]
+            }
+        }
     } 
     var currentMenu
     var currentPage

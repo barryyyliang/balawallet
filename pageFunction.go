@@ -386,42 +386,53 @@ func doGetFee() string {
 
 func doGetComponent(com string) string {
 	fmt.Println("enter get" + com)
+	type pagejson struct {
+		Css string `json:"css"`
+		Html string `json:"html"`
+		Js   string `json:"js"`
+		Res  string `json:"res"`
+	}
+
+	result := pagejson{"", "", "",""}
+	var cssfile, htmlfile, jsfile string
 
 	if com == "rightmenu" {
-		type menujson struct {
-			Menumcss string `json:"css"`
-			Menuhtml string `json:"html"`
-			Menujs   string `json:"js"`
-		}
-		menucss := G_Files["/common/rightmenu.css"]
-		menu := G_Files["/common/rightmenu.html"]
-		menujs := G_Files["/common/rightmenu.js"]
-
-		result := menujson{string(menucss), string(menu), string(menujs)}
-		re, err := json.Marshal(result)
-		if err != nil {
-			fmt.Println("doGetComponent json error")
-			return ""
-		}
-		return string(re)
+		cssfile = "/common/rightmenu.css"
+		htmlfile = "/common/rightmenu.html"
+		jsfile = "/common/rightmenu.js"
 	} else {
-		type pagejson struct {
-			Pagecss  string `json:"css"`
-			Pagehtml string `json:"html"`
-			Pagejs   string `json:"js"`
-		}
-		Pagecss := G_Files["/"+com+".css"]
-		Pagejs := G_Files["/"+com+".js"]
-		Pagehtml := G_Files["/"+com+".html"]
-
-		result := pagejson{string(Pagecss), string(Pagehtml), string(Pagejs)}
-		re, err := json.Marshal(result)
-		if err != nil {
-			fmt.Println("doGetComponent json error")
-			return ""
-		}
-		return string(re)
+		cssfile = "/"+com+".css"
+		jsfile = "/"+com+".js"
+		htmlfile = "/"+com+".html"
 	}
+
+	result.Css = string(G_Files[cssfile])
+	result.Js = string(G_Files[jsfile])
+	result.Html = string(G_Files[htmlfile])
+	res := G_Res["en"][htmlfile]
+	if len(res) != 0 {
+		tmp, _ := json.Marshal(res)
+		result.Res = string(tmp)
+	}
+
+	re, err := json.Marshal(result)
+	if err != nil {
+		fmt.Println("doGetComponent json error")
+		return ""
+	}
+	return string(re)
+}
+
+func doGetRes(com string) string {
+	var re string = ""
+	htmlfile := "/"+com+".html"
+	res := G_Res["en"][htmlfile]
+	if len(res) != 0 {
+		tmp, _ := json.Marshal(res)
+		re = string(tmp)
+	}
+	fmt.Println("doGetRes:" + re)
+	return re
 }
 
 func doConfig(configs string) string {
