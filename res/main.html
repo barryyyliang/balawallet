@@ -73,6 +73,10 @@
 <script id="menuscript"></script>
 <script id="pageScript"></script>
 <script>
+    var currentMenu
+    var currentPage
+    var gResJson
+
     window.onload=async function() {
         window.doWebLog("qianbao page")
 
@@ -107,6 +111,29 @@
         })    
     }
 
+    async function gLoadRes() {
+        var res = await window.doGetRes(currentPage)
+        if (res != "") {
+            gResJson = JSON.parse(res)
+            for (var ele in gResJson) {
+                var obj = document.getElementById(ele)
+                window.doWebLog(ele+obj) 
+                if (obj != null) {
+                    obj.innerText = gResJson[ele]
+                }
+            }
+        }
+    }
+
+    function gGetRes(res) {
+        if (gResJson != null) {
+            return gResJson[res]
+        } else {
+            return ""
+        }
+    }
+    
+
     async function initMenu() {
         var result = await window.doGetAccounts()
         var acc = JSON.parse(result)
@@ -128,8 +155,7 @@
             }
         }
     } 
-    var currentMenu
-    var currentPage
+
     function setCurrentMenu(menuName){
         currentMenu = menuName
     }

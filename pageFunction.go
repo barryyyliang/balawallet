@@ -409,7 +409,11 @@ func doGetComponent(com string) string {
 	result.Css = string(G_Files[cssfile])
 	result.Js = string(G_Files[jsfile])
 	result.Html = string(G_Files[htmlfile])
-	res := G_Res["en"][htmlfile]
+	language := G_Config["language"]
+	if language == "" {
+		language = "zh-CN"
+	}
+	res := G_Res[language][htmlfile]
 	if len(res) != 0 {
 		tmp, _ := json.Marshal(res)
 		result.Res = string(tmp)
@@ -426,7 +430,11 @@ func doGetComponent(com string) string {
 func doGetRes(com string) string {
 	var re string = ""
 	htmlfile := "/"+com+".html"
-	res := G_Res["en"][htmlfile]
+	language := G_Config["language"]
+	if language == "" {
+		language = "zh-CN"
+	}
+	res := G_Res[language][htmlfile]
 	if len(res) != 0 {
 		tmp, _ := json.Marshal(res)
 		re = string(tmp)
@@ -441,14 +449,18 @@ func doConfig(configs string) string {
 	var config = make(map[string]string)
 
 	json.Unmarshal([]byte(configs), &config)
-
-	G_Config = config
-
 	fmt.Println(config)
 
-	db, err := leveldb.OpenFile(datadir+"db", nil)
-	defer db.Close()
+	for key, value := range config {
+		G_Config[key] = value
+	}
 
+	db, _ := leveldb.OpenFile(datadir+"db", nil)
+	defer db.Close()
+	tmp,_ := json.Marshal(G_Config)
+	db.Put([]byte("config"),tmp,nil)
+
+	/*
 	for key, value := range G_Config {
 		err = db.Put([]byte(key), []byte(value), nil)
 		if err != nil {
@@ -458,6 +470,7 @@ func doConfig(configs string) string {
 			fmt.Println("put config:" + key + ":" + value)
 		}
 	}
+	*/
 	// 配置更新后刷新链接
 	G_Etherclient = nil
 	return string(re)
@@ -465,6 +478,7 @@ func doConfig(configs string) string {
 
 func doGetConfig(configs string) string {
 	fmt.Println(configs)
+	var re string
 	db, err := leveldb.OpenFile(datadir+"db", nil)
 	if err != nil {
 		fmt.Println("open db error:" + err.Error())
@@ -473,17 +487,22 @@ func doGetConfig(configs string) string {
 
 	defer db.Close()
 
-	var configName []string
-	json.Unmarshal([]byte(configs), &configName)
-	for _, key := range configName {
-		data, err := db.Get([]byte(key), nil)
-		if err == nil {
-			G_Config[key] = string(data)
-		} else {
-			fmt.Println("get erro:" + err.Error())
+	data, err := db.Get([]byte("config"),nil)
+	json.Unmarshal(data, &G_Config)
+	
+	if configs != "" {
+		var configName []string
+		json.Unmarshal([]byte(configs), &configName)
+		var result = make(map[string]string) 
+		for _,value := range configName {
+			result[value] = G_Config[value]
 		}
+		tmp, _ := json.Marshal(result)
+		re = string(tmp)
+	} else {
+		tmp,_ := json.Marshal(G_Config)
+		re = string(tmp)
 	}
-	re, _ := json.Marshal(G_Config)
 	return string(re)
 }
 

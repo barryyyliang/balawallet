@@ -50,9 +50,9 @@ function addAccountElement(acc,table){
         var td4 = document.createElement("td")               
         var bt = document.createElement("input")
         bt.setAttribute("class","button1")
-        bt.setAttribute("style","width:100px")
+        //bt.setAttribute("style","width:100px")
         bt.setAttribute("type","button")
-        bt.setAttribute("value","修改别名")
+        bt.setAttribute("value",gGetRes("qianbao_changebutton"))
         bt.setAttribute("onclick","changeName("+"'address"+i +"'" +",'name"+i+"')")
         td4.append(bt) 
         tr.append(td4)
@@ -85,6 +85,7 @@ async function initBalance(){
 
 async function initPage(){
     window.doWebLog("qianbao init page")
+    gLoadRes()
     window.doGetAccounts().then( (result) => {
         window.doWebLog("get result" + result)
         var arr = JSON.parse(result)

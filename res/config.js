@@ -1,10 +1,12 @@
 
 async function onSaveConfig() {
-    var address = document.getElementById("nodeAddress").value
+    var obj = {}
+    obj["nodeAddress"] = document.getElementById("nodeAddress").value    
     window.doWebLog("onSaveConfig0")
-    var cDir = document.getElementById("contractDir").value
+    obj["contractDir"] = document.getElementById("contractDir").value
     window.doWebLog("onSaveConfig1")
-    var json = JSON.stringify({"nodeAddress":address,"contractDir":cDir })
+    obj["language"] = document.getElementById("language").value
+    var json = JSON.stringify(obj)
     window.doWebLog(json)
 
     var result = await window.doConfig(json)
@@ -16,7 +18,7 @@ function initPage() {
     var jsonconfig = JSON.stringify(["nodeAddress","contractDir"])
     window.doWebLog(jsonconfig)
     
-    window.doGetConfig(jsonconfig).then( (result) => {
+    window.doGetConfig("").then( (result) => {
         window.doWebLog("get result" + result)
         var acc = JSON.parse(result)
         for (var val in acc){
