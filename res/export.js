@@ -10,6 +10,7 @@
 }
 
 function initPage(){
+    gLoadRes()
     window.doGetAccounts().then( (result) => {
         window.doWebLog("get result" + result)
         var acc = JSON.parse(result)

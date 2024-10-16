@@ -26,5 +26,5 @@ async function importAct() {
 }
 
 function initPage(){
-
+    gLoadRes()
 }

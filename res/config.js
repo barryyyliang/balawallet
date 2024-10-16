@@ -14,10 +14,7 @@ async function onSaveConfig() {
 }
 
 function initPage() {
-
-    var jsonconfig = JSON.stringify(["nodeAddress","contractDir"])
-    window.doWebLog(jsonconfig)
-    
+    gLoadRes()
     window.doGetConfig("").then( (result) => {
         window.doWebLog("get result" + result)
         var acc = JSON.parse(result)

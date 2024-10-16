@@ -159,6 +159,7 @@
 
     async function initPage(){
         window.doWebLog("init page invokecontract")
+        gLoadRes()
         var result = await window.doGetAbiFile()
         var jsonObj = JSON.parse(result)
         if (jsonObj.Code === 0 ){

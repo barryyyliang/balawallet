@@ -36,4 +36,24 @@ func initRes() {
 	G_Res["en"]["/qianbao.html"]["qianbao_name"] = "Name"
 	G_Res["en"]["/qianbao.html"]["qianbao_balance"] = "Balance"
 	G_Res["en"]["/qianbao.html"]["qianbao_changebutton"] = "Change Name"
+
+	//contractasset
+	G_Res["zh-CN"]["/contractasset.html"] = make(map[string]string)
+	G_Res["zh-CN"]["/contractasset.html"]["contractasset_type"] = "合约类型" 
+	G_Res["zh-CN"]["/contractasset.html"]["contractasset_address"] = "合约地址" 
+	G_Res["zh-CN"]["/contractasset.html"]["contractasset_name"] = "资产名称" 
+	G_Res["zh-CN"]["/contractasset.html"]["contractasset_add"] = "添加" 
+	G_Res["zh-CN"]["/contractasset.html"]["contractasset_import"] = "导入" 
+
+	G_Res["en"]["/contractasset.html"] = make(map[string]string)
+	G_Res["en"]["/contractasset.html"]["contractasset_type"] = "Type" 
+	G_Res["en"]["/contractasset.html"]["contractasset_address"] = "Address" 
+	G_Res["en"]["/contractasset.html"]["contractasset_name"] = "Name" 
+	G_Res["en"]["/contractasset.html"]["contractasset_add"] = "Add" 
+	G_Res["en"]["/contractasset.html"]["contractasset_import"] = "Import" 
+
+	//contractasset
+	G_Res["zh-CN"]["/transfer.html"] = make(map[string]string)
+
+	G_Res["en"]["/transfer.html"] = make(map[string]string)
 }

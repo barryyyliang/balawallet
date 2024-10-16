@@ -1,5 +1,6 @@
 
 async function initPage() {
+    gLoadRes()
     var result = await window.doGetBinFile()
     var jsonObj = JSON.parse(result)
     if (jsonObj.Code === 0 ){

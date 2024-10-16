@@ -46,10 +46,10 @@
 
         var td4 = document.createElement("td")               
         var bt = document.createElement("input")
-        bt.setAttribute("style","width:50px")
+        //bt.setAttribute("style","width:50px")
         bt.setAttribute("type","button")
         bt.setAttribute("class","button1")
-        bt.setAttribute("value","导入")
+        bt.setAttribute("value",gGetRes("contractasset_import"))
         bt.setAttribute("onclick","importContract("+"'address"+number +"'" +",'type"+number+"')")
         td4.append(bt) 
         tr.append(td4)
@@ -107,6 +107,7 @@
 
     function initPage(){
         window.doWebLog("init page contractasset")
+        gLoadRes()
         window.doGetContract().then( (result) => {
             if (result != ""){
                 var obj = JSON.parse(result)

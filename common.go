@@ -269,7 +269,11 @@ func getFiles(dir string, suffix string) ([]string, error) {
 
 func getResult(code uint, addMsg string) []byte {
 	var re []byte
-	msg := G_Msg["zh"][code]
+	lang := G_Config["language"]
+	if lang == "" {
+		lang = "zh-CN"
+	} 
+	msg := G_Msg[lang][code]
 	if msg == "" {
 		msg = "null"
 	}

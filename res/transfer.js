@@ -50,6 +50,7 @@ function getFee(){
 }
 
 function initPage() {    
+    gLoadRes()
     setTimeout(accountChange,100)          
 } 
  

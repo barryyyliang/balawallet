@@ -1,6 +1,6 @@
 
 function initPage() {
-    
+    gLoadRes()
 } 
 
 async function newacnt() {
