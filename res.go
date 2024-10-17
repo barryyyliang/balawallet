@@ -54,6 +54,24 @@ func initRes() {
 
 	//contractasset
 	G_Res["zh-CN"]["/transfer.html"] = make(map[string]string)
+	G_Res["zh-CN"]["/transfer.html"]["transfer_from"] = "转出账户"
+	G_Res["zh-CN"]["/transfer.html"]["transfer_name"] = "账户别名"
+	G_Res["zh-CN"]["/transfer.html"]["transfer_balance"] = "账户余额"
+	G_Res["zh-CN"]["/transfer.html"]["transfer_to"] = "接收账户"
+	G_Res["zh-CN"]["/transfer.html"]["transfer_amount"] = "转账金额"
+	G_Res["zh-CN"]["/transfer.html"]["transfer_fee"] = "预估费用"
+	G_Res["zh-CN"]["/transfer.html"]["transfer_acc"] = "账户密码"
+	G_Res["zh-CN"]["/transfer.html"]["transfer_transfer"] = "转账"
+	
 
 	G_Res["en"]["/transfer.html"] = make(map[string]string)
+	G_Res["en"]["/transfer.html"]["transfer_from"] = "From"
+	G_Res["en"]["/transfer.html"]["transfer_name"] = "Name"
+	G_Res["en"]["/transfer.html"]["transfer_balance"] = "Balance"
+	G_Res["en"]["/transfer.html"]["transfer_to"] = "To"
+	G_Res["en"]["/transfer.html"]["transfer_amount"] = "Amount"
+	G_Res["en"]["/transfer.html"]["transfer_fee"] = "Fee"
+	G_Res["en"]["/transfer.html"]["transfer_acc"] = "Password"
+	G_Res["en"]["/transfer.html"]["transfer_transfer"] = "transfer"
+
 }

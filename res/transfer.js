@@ -49,8 +49,8 @@ function getFee(){
     })  
 }
 
-function initPage() {    
-    gLoadRes()
+async function initPage() {    
+    await gLoadRes()
     setTimeout(accountChange,100)          
 } 
  

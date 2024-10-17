@@ -17,6 +17,39 @@
     window.onclick=function(e){
         //用户触发click事件就可以关闭了，因为绑定在window上，按事件冒泡处理，不会影响菜单的功能
         document.querySelector('#menu').style.height=0;
+        document.querySelector('#toolMenu').style.height=0;
+        document.querySelector('#systemMenu').style.height=0;
+    }
+
+
+    function onToolsMenu(){
+        document.querySelector('#systemMenu').style.height=0;
+        var menu=document.getElementById("toolMenu")
+        window.doWebLog("get menu")
+         //根据事件对象中鼠标点击的位置，进行定位
+        var a = document.getElementById("tools")
+        rec = a.getBoundingClientRect()
+         menu.style.left=rec.left+'px';
+         menu.style.top=(rec.top+50)+'px';
+        window.doWebLog("set munu po")
+        //改变自定义菜单的宽，让它显示出来
+        menu.style.width='100px';
+        menu.style.height='auto';
+    }
+
+    function onSystemMenu(){
+        document.querySelector('#toolMenu').style.height=0;
+        var menu=document.getElementById("systemMenu")
+        window.doWebLog("get menu")
+         //根据事件对象中鼠标点击的位置，进行定位
+        var a = document.getElementById("system")
+        rec = a.getBoundingClientRect()
+         menu.style.left=rec.left+'px';
+         menu.style.top=(rec.top+50)+'px';
+        window.doWebLog("set munu po")
+        //改变自定义菜单的宽，让它显示出来
+        menu.style.width='100px';
+        menu.style.height='auto';
     }
 
     //支持 ctrl c  和 ctrl v 快捷键

@@ -177,6 +177,11 @@
         window.doWebLog("change page to " + pagename)
         window.doWebLog("change menu to " + menuname)
         MYDIALOG.CloseDiv("MyDiv","fade")
+        var menu = document.querySelector('#toolMenu')
+        if (menu != null) {
+            menu.style.height=0;
+        }
+        
 
         try{
             if (currentPage != ""  && currentPage != null && currentPage != "invokecontract" && pagename != "querytx"){
@@ -269,8 +274,10 @@
                 <li><a id="qianbao" class="active" onclick="changePage('qianbao','qianbao')">钱包</a></li>                    
                 <li><a id="contractasset" onclick="changePage('contractasset','contractasset')">合约资产</a></li>
                 <li><a id="transfer" onclick="changePage('transfer','transfer')">转账</a></li>
-                <li><a id="tools" onclick="changePage('tools','tools')">工具</a></li>
-                <li><a id="system" onclick="changePage('system','system')">系统</a></li>
+                <!--li><a id="tools" onclick="changePage('tools','tools')">工具</a></li-->
+                <li><a id="tools" onmouseover="onToolsMenu()">工具</a></li>
+                <!--li><a id="system" onclick="changePage('system','system')">系统</a></li-->
+                <li><a id="system" onmouseover="onSystemMenu()">系统</a></li>
             </ul>   
         </div>  
         <div style="display: flex;align-items: center;">

@@ -1,17 +1,17 @@
 <div style="margin: 0 auto;text-align: center;">
     <table id="table1" style="margin: 0 auto;font-size: 16px;text-align: center;">
         <tr>
-            <td>转出账户:</td>
+            <td id="transfer_from">转出账户:</td>
             <td>
                 <input type="text" id="selectedAdd" name="selectedAdd" style="width:300px" readonly="readonly">
             </td>
         </tr> 
         <tr>
-            <td>别名:</td>
+            <td id="transfer_name">别名:</td>
             <td><input type="text" id="name" name="name" style="width:300px" readonly="readonly"></td>
         </tr> 
         <tr>
-            <td>账户余额:</td>
+            <td id="transfer_balance">账户余额:</td>
             <td><input type="text" id="balance" name="balance" style="width:300px" readonly="readonly"></td>
         </tr> 
     </table>
@@ -19,24 +19,24 @@
 <div style="margin: 0 auto;text-align: center;">
     <table id="table2" style="margin: 0 auto;font-size: 16px;text-align: center;"> 
         <tr>
-            <td>接收地址:</td>
+            <td id="transfer_to">接收地址:</td>
             <td><input type="text" id="toAddress" name="toAddress" style="width:300px"></td>
         </tr> 
         <tr>
-            <td>转账金额:</td>
+            <td id="transfer_amount">转账金额:</td>
             <td><input type="text" id="amount" name="amount" style="width:300px"></td>
         </tr> 
         <tr>
-            <td>预估费用:</td>
+            <td id="transfer_fee">预估费用:</td>
             <td><input type="text" id="fee" name="fee" style="width:300px" disabled></td>
         </tr> 
         <tr>
-            <td>密码:</td>
+            <td id="transfer_acc">密码:</td>
             <td><input type="password" id="pass" name="pass" style="width:300px"></td>
         </tr> 
     </table>
 </div>
 
 <div style="margin: 0 auto;text-align: center;">
-    <button class="button1" onclick="ontransfer()">转账</button>
+    <button id="transfer_transfer" class="button1" onclick="ontransfer()">转账</button>
 </div>
