@@ -14,6 +14,21 @@ func initRes() {
 	G_Res["zh-CN"]["/main.html"]["transfer"] = "转账"
 	G_Res["zh-CN"]["/main.html"]["tools"] = "工具"
 	G_Res["zh-CN"]["/main.html"]["system"] = "系统"
+	G_Res["zh-CN"]["/main.html"]["main_close"] = "关闭"
+	G_Res["zh-CN"]["/main.html"]["main_copy"] = "拷贝"
+	G_Res["zh-CN"]["/main.html"]["main_paste"] = "粘贴"
+	G_Res["zh-CN"]["/main.html"]["main_cut"] = "剪切"
+	G_Res["zh-CN"]["/main.html"]["main_clear"] = "清除"
+	G_Res["zh-CN"]["/main.html"]["main_deploy"] = "部署合约"
+	G_Res["zh-CN"]["/main.html"]["main_invoke"] = "调用合约"
+	G_Res["zh-CN"]["/main.html"]["main_query"] = "查询交易"
+	G_Res["zh-CN"]["/main.html"]["main_sign"] = "数字签名"
+	G_Res["zh-CN"]["/main.html"]["main_newaccount"] = "新建账户"
+	G_Res["zh-CN"]["/main.html"]["main_importaccount"] = "导入账户"
+	G_Res["zh-CN"]["/main.html"]["main_exportaccount"] = "导出账户"
+	G_Res["zh-CN"]["/main.html"]["main_config"] = "系统设置"
+	G_Res["zh-CN"]["/main.html"]["main_about"] = "关于 Web3Wallet"
+	
 
 	G_Res["en"]["/main.html"] = make(map[string]string)
 	G_Res["en"]["/main.html"]["qianbao"] = "Wallet"
@@ -21,6 +36,21 @@ func initRes() {
 	G_Res["en"]["/main.html"]["transfer"] = "Transfer"
 	G_Res["en"]["/main.html"]["tools"] = "Tools"
 	G_Res["en"]["/main.html"]["system"] = "System"
+	G_Res["en"]["/main.html"]["main_close"] = "Close"
+	G_Res["en"]["/main.html"]["main_copy"] = "Copy"
+	G_Res["en"]["/main.html"]["main_paste"] = "Paste"
+	G_Res["en"]["/main.html"]["main_cut"] = "Cut"
+	G_Res["en"]["/main.html"]["main_clear"] = "Clear"
+	G_Res["en"]["/main.html"]["main_deploy"] = "Deploy Contract"
+	G_Res["en"]["/main.html"]["main_invoke"] = "Invoke Contract"
+	G_Res["en"]["/main.html"]["main_query"] = "Query Transaction"
+	G_Res["en"]["/main.html"]["main_sign"] = "Sign Message"
+	G_Res["en"]["/main.html"]["main_newaccount"] = "Create Account"
+	G_Res["en"]["/main.html"]["main_importaccount"] = "Import Account"
+	G_Res["en"]["/main.html"]["main_exportaccount"] = "Export Account"
+	G_Res["en"]["/main.html"]["main_config"] = "System Config"
+	G_Res["en"]["/main.html"]["main_about"] = "About Web3Wallet"
+	
 
 	//qianbao
 	G_Res["zh-CN"]["/qianbao.html"] = make(map[string]string)

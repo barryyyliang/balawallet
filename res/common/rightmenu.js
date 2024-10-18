@@ -52,7 +52,6 @@
 
 
     function onToolsMenu(){
-        document.querySelector('#systemMenu').style.height=0;
         var menu=document.getElementById("toolMenu")
         window.doWebLog("get menu")
          //根据事件对象中鼠标点击的位置，进行定位
@@ -62,12 +61,11 @@
         menu.style.top=rec.bottom+'px';
         window.doWebLog("set munu po")
         //改变自定义菜单的宽，让它显示出来
-        menu.style.width='100px';
+        menu.style.width='auto';
         menu.style.height='auto';
     }
 
     function onSystemMenu(){
-        document.querySelector('#toolMenu').style.height=0;
         var menu=document.getElementById("systemMenu")
         window.doWebLog("get menu")
          //根据事件对象中鼠标点击的位置，进行定位
@@ -77,7 +75,7 @@
         menu.style.top=rec.bottom+'px';
         window.doWebLog("set munu po")
         //改变自定义菜单的宽，让它显示出来
-        menu.style.width='100px';
+        menu.style.width='auto';
         menu.style.height='auto';
     }
 
