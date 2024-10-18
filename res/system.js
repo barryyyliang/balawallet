@@ -1,5 +1,0 @@
-
-function initPage() {
-    gLoadRes()
-} 
-

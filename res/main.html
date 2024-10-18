@@ -271,13 +271,13 @@
     <div id = "menudiv" style="z-index: 100;;display: flex;background-color: #333;position: fixed;top: 0%;left: 0%;width: 100%;">
         <div style="margin-right: auto;">
             <ul>
-                <li><a id="qianbao" class="active" onclick="changePage('qianbao','qianbao')">钱包</a></li>                    
-                <li><a id="contractasset" onclick="changePage('contractasset','contractasset')">合约资产</a></li>
-                <li><a id="transfer" onclick="changePage('transfer','transfer')">转账</a></li>
+                <li><a id="qianbao" class="active" onmouseover="onMenuOver('qianbao')" onclick="changePage('qianbao','qianbao')">钱包</a></li>                    
+                <li><a id="contractasset" onmouseover="onMenuOver('contractasset')" onclick="changePage('contractasset','contractasset')">合约资产</a></li>
+                <li><a id="transfer" onmouseover="onMenuOver('transfer')" onclick="changePage('transfer','transfer')">转账</a></li>
                 <!--li><a id="tools" onclick="changePage('tools','tools')">工具</a></li-->
-                <li><a id="tools" onmouseover="onToolsMenu()">工具</a></li>
+                <li><a id="tools" onmouseover="onMenuOver('tools')" onclick="onToolsMenu()">工具</a></li>
                 <!--li><a id="system" onclick="changePage('system','system')">系统</a></li-->
-                <li><a id="system" onmouseover="onSystemMenu()">系统</a></li>
+                <li><a id="system" onmouseover="onMenuOver('system')" onclick="onSystemMenu()">系统</a></li>
             </ul>   
         </div>  
         <div style="display: flex;align-items: center;">

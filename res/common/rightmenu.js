@@ -17,8 +17,37 @@
     window.onclick=function(e){
         //用户触发click事件就可以关闭了，因为绑定在window上，按事件冒泡处理，不会影响菜单的功能
         document.querySelector('#menu').style.height=0;
-        document.querySelector('#toolMenu').style.height=0;
-        document.querySelector('#systemMenu').style.height=0;
+        var rec = document.getElementById("tools").getBoundingClientRect()
+        if(e.clientX>rec.left && e.clientX <rec.right && e.clientY >rec.top && e.clientY < rec.bottom) {
+
+        } else {          
+            document.getElementById("toolMenu").style.height=0;
+        }
+        var rec2=document.getElementById("system").getBoundingClientRect()
+        if(e.clientX>rec2.left && e.clientX <rec2.right && e.clientY >rec2.top && e.clientY < rec2.bottom) {
+
+        } else {
+            document.getElementById("systemMenu").style.height=0;
+        }        
+    }
+
+    function onMenuOver(id){
+        if (id != "tools"){
+            document.getElementById("toolMenu").style.height=0;
+        }
+        if (id != "system"){
+            document.getElementById("systemMenu").style.height=0;
+        }  
+    }
+
+    function onSystemOut(){
+        var e = event || window.event
+        var rec = document.getElementById("systemMenu").getBoundingClientRect()
+        if(e.clientX>rec.left && e.clientX <rec.right && e.clientY >rec.top && e.clientY < rec.bottom) {
+
+        } else {          
+            document.getElementById("systemMenu").style.height=0;
+        }
     }
 
 
@@ -29,8 +58,8 @@
          //根据事件对象中鼠标点击的位置，进行定位
         var a = document.getElementById("tools")
         rec = a.getBoundingClientRect()
-         menu.style.left=rec.left+'px';
-         menu.style.top=(rec.top+50)+'px';
+        menu.style.left=rec.left+'px';
+        menu.style.top=rec.bottom+'px';
         window.doWebLog("set munu po")
         //改变自定义菜单的宽，让它显示出来
         menu.style.width='100px';
@@ -44,8 +73,8 @@
          //根据事件对象中鼠标点击的位置，进行定位
         var a = document.getElementById("system")
         rec = a.getBoundingClientRect()
-         menu.style.left=rec.left+'px';
-         menu.style.top=(rec.top+50)+'px';
+        menu.style.left=rec.left+'px';
+        menu.style.top=rec.bottom+'px';
         window.doWebLog("set munu po")
         //改变自定义菜单的宽，让它显示出来
         menu.style.width='100px';
