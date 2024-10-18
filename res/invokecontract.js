@@ -74,12 +74,12 @@
                 
                 window.doWebLog(abijson[i].stateMutability )
                 if (abijson[i].stateMutability === "view"){                    
-                    document.getElementById("btInvoke").innerHTML = "查询"
+                    document.getElementById("invokecontract_invoke").innerHTML = gGetRes("invokecontract_query")
                     document.getElementById("outTableDiv").style.visibility =  "visible"
                     document.getElementById("assDiv").style.visibility = "hidden"
                     document.getElementById("assDiv").style.height = "0px"
                 } else {
-                    document.getElementById("btInvoke").innerHTML = "调用"
+                    document.getElementById("invokecontract_invoke").innerHTML = gGetRes("invokecontract_invoke")
                     document.getElementById("outTableDiv").style.visibility =  "hidden"
                     document.getElementById("assDiv").style.visibility = "visible"
                     document.getElementById("assDiv").style.height = ""

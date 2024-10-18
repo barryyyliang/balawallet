@@ -2,7 +2,7 @@
 <div >
     <table style="margin: 0 auto;font-size: 16px;text-align: center;">
         <tr>
-            <td>待签名信息</td>
+            <td id="signature_infomation">待签名信息</td>
         </tr> 
     </table>
 </div>
@@ -12,13 +12,13 @@
 <div >
     <table style="margin: auto;">        
         <tr>
-            <td>账户密码:</td>
+            <td id="signature_acc">账户密码:</td>
             <td><input type="password" id="sigAss" ></td>
         </tr> 
     </table>
 </div>
 <div >
-    <td><button class="button1" onclick="signature()">签名</button></td>
+    <td><button id="signature_sign" class="button1" onclick="signature()">签名</button></td>
 </div>
 <div >
     <textarea id="infosign"  name="infosign" rows="10" cols="50" readonly  style="margin: 0 auto;font-size: 16px;"></textarea>

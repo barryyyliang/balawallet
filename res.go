@@ -104,4 +104,60 @@ func initRes() {
 	G_Res["en"]["/transfer.html"]["transfer_acc"] = "Password"
 	G_Res["en"]["/transfer.html"]["transfer_transfer"] = "transfer"
 
+	//deploycontract
+	G_Res["zh-CN"]["/deploycontract.html"] = make(map[string]string)
+	G_Res["zh-CN"]["/deploycontract.html"]["deploycontract_file"] = "合约文件（bin)"
+	G_Res["zh-CN"]["/deploycontract.html"]["deploycontract_acc"] = "账户密码"
+	G_Res["zh-CN"]["/deploycontract.html"]["deploycontract_deploy"] = "部署"
+	
+
+	G_Res["en"]["/deploycontract.html"] = make(map[string]string)
+	G_Res["en"]["/deploycontract.html"]["deploycontract_file"] = "Contract Bin File"
+	G_Res["en"]["/deploycontract.html"]["deploycontract_acc"] = "Password"
+	G_Res["en"]["/deploycontract.html"]["deploycontract_deploy"] = "Deploy"
+
+	//deploycontract
+	G_Res["zh-CN"]["/invokecontract.html"] = make(map[string]string)
+	G_Res["zh-CN"]["/invokecontract.html"]["invokecontract_contractaddress"] = "合约地址"
+	G_Res["zh-CN"]["/invokecontract.html"]["invokecontract_contractabi"] = "合约ABI"
+	G_Res["zh-CN"]["/invokecontract.html"]["invokecontract_load"] = "加载"
+	G_Res["zh-CN"]["/invokecontract.html"]["invokecontract_function"] = "合约函数"
+	G_Res["zh-CN"]["/invokecontract.html"]["invokecontract_invoke"] = "调用"
+	G_Res["zh-CN"]["/invokecontract.html"]["invokecontract_query"] = "查询"
+	G_Res["zh-CN"]["/invokecontract.html"]["invokecontract_acc"] = "账户密码"
+	G_Res["zh-CN"]["/invokecontract.html"]["invokecontract_inputparameter"] = "输入参数"
+	G_Res["zh-CN"]["/invokecontract.html"]["invokecontract_parameter"] = "参数"
+	G_Res["zh-CN"]["/invokecontract.html"]["invokecontract_inputvalue"] = "值"
+	G_Res["zh-CN"]["/invokecontract.html"]["invokecontract_inputtype"] = "类型"
+	G_Res["zh-CN"]["/invokecontract.html"]["invokecontract_return"] = "返回结果"
+	G_Res["zh-CN"]["/invokecontract.html"]["invokecontract_returnname"] = "返回值"
+	G_Res["zh-CN"]["/invokecontract.html"]["invokecontract_returnvalue"] = "值"
+	G_Res["zh-CN"]["/invokecontract.html"]["invokecontract_returntype"] = "类型"
+
+	G_Res["en"]["/invokecontract.html"] = make(map[string]string)
+	G_Res["en"]["/invokecontract.html"]["invokecontract_contractaddress"] = "Contract Address"
+	G_Res["en"]["/invokecontract.html"]["invokecontract_contractabi"] = "Contract ABI"
+	G_Res["en"]["/invokecontract.html"]["invokecontract_load"] = "Load"
+	G_Res["en"]["/invokecontract.html"]["invokecontract_function"] = "Function"
+	G_Res["en"]["/invokecontract.html"]["invokecontract_invoke"] = "Invoke"
+	G_Res["en"]["/invokecontract.html"]["invokecontract_query"] = "Query"
+	G_Res["en"]["/invokecontract.html"]["invokecontract_acc"] = "Password"
+	G_Res["en"]["/invokecontract.html"]["invokecontract_inputparameter"] = "Input Parameters"
+	G_Res["en"]["/invokecontract.html"]["invokecontract_parameter"] = "Parameters"
+	G_Res["en"]["/invokecontract.html"]["invokecontract_inputvalue"] = "Value"
+	G_Res["en"]["/invokecontract.html"]["invokecontract_inputtype"] = "Type"
+	G_Res["en"]["/invokecontract.html"]["invokecontract_return"] = "The Results"
+	G_Res["en"]["/invokecontract.html"]["invokecontract_returnname"] = "Return Name"
+	G_Res["en"]["/invokecontract.html"]["invokecontract_returnvalue"] = "Value"
+	G_Res["en"]["/invokecontract.html"]["invokecontract_returntype"] = "Type"
+
+	//deploycontract
+	G_Res["zh-CN"]["/querytx.html"] = make(map[string]string)
+	G_Res["zh-CN"]["/querytx.html"]["querytx_txhash"] = "交易 hash"
+	G_Res["zh-CN"]["/querytx.html"]["querytx_query"] = "查询"	
+
+	G_Res["en"]["/querytx.html"] = make(map[string]string)
+	G_Res["en"]["/querytx.html"]["querytx_txhash"] = "TX Hash"
+	G_Res["en"]["/querytx.html"]["querytx_query"] = "Query"
+
 }

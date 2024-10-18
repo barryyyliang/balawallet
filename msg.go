@@ -32,6 +32,7 @@ const (
 	Msg_parseabi_fail              uint = 26
 	Msg_findaccount_fail           uint = 27
 	Msg_contractdirconfig_null     uint = 28
+	Msg_param_null                 uint = 29
 )
 
 func initMsg() {
@@ -65,6 +66,8 @@ func initMsg() {
 	G_Msg["zh-CN"][Msg_parseabi_fail] = "解析ABI文件失败"
 	G_Msg["zh-CN"][Msg_findaccount_fail] = "找不到指定的账户"
 	G_Msg["zh-CN"][Msg_contractdirconfig_null] = "还没有配置合约文件目录，可在系统->系统配置中设置"
+	G_Msg["zh-CN"][Msg_param_null] = "参数为空"
+	
 
 	G_Msg["en"] = make(map[uint]string)
 	G_Msg["en"][Msg_success] = "Success"
@@ -96,4 +99,5 @@ func initMsg() {
 	G_Msg["en"][Msg_parseabi_fail] = "Failed to parse ABI file"
 	G_Msg["en"][Msg_findaccount_fail] = "The account cannot be found"
 	G_Msg["en"][Msg_contractdirconfig_null] = "The contract file directory has not been configured yet. It can be set in System->System Configuration."
+	G_Msg["en"][Msg_param_null] = "Parameter is null"	
 }

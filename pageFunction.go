@@ -962,3 +962,17 @@ func doGetBinFile() string {
 	}
 	return string(re)
 }
+
+func doGetMsg(code string) string {
+	n,_ := strconv.Atoi(code)
+	lang := G_Config["language"]
+	if lang == "" {
+		lang = "zh-CN"
+	} 
+	msg := G_Msg[lang][uint(n)]
+	if msg == "" {
+		msg = "null"
+	}
+
+	return msg
+}
