@@ -27,13 +27,13 @@ function changedfile(){
 async function deploy(){
     var address = document.getElementById("add").value
     var file = document.getElementById("binFile").value
-    var ass = document.getElementById("ass").value
+    var ass = document.getElementById("deploycontract_ass").value
     var result = await window.doDeployContract(address,file,ass)
     var jsonObj = JSON.parse(result)
     if (jsonObj.Code === 0 ){
-        MYDIALOG.ShowDiv("部署交易发送成功，交易 HASH：" + jsonObj.Msg)
+        showMsg("34",jsonObj.Msg)
     } else {
-        MYDIALOG.ShowDiv("部署交易发送失败：" + jsonObj.Msg)
+        MYDIALOG.ShowDiv(jsonObj.Msg)
     }
 }
 

@@ -6,11 +6,7 @@ function ontransfer() {
     var amount = document.getElementById("amount").value
     window.doTransfer(add, toAddress,amount,pa).then((result) => {
         var obj = JSON.parse(result)
-        if (obj.Code === 0) {
-            MYDIALOG.ShowDiv("转账成功");
-        } else {
-            MYDIALOG.ShowDiv(obj.Msg);
-        }
+        MYDIALOG.ShowDiv(obj.Msg);
     })
 }
 

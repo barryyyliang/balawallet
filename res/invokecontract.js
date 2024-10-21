@@ -92,12 +92,12 @@
         var caddress = document.getElementById("caddress").value
         var from = document.getElementById("add").value
         if(caddress === ""){
-            var msg = window.doGetMsg("29")
+            var msg = await window.doGetMsg("29")
             MYDIALOG.ShowDiv(msg)
             return
         }
         if(funcName === ""){
-            var msg = window.doGetMsg("31")
+            var msg = await window.doGetMsg("31")
             MYDIALOG.ShowDiv(msg)
             return
         }
@@ -137,7 +137,7 @@
                 MYDIALOG.ShowDiv(obj.Msg)
             }
         } else {
-            var ass = document.getElementById("ass").value
+            var ass = document.getElementById("invokecontract_ass").value
             if(ass === ""){
                 showMsg("33","")
                 return

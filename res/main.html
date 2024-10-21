@@ -107,6 +107,13 @@
         })    
     }
 
+    async function gReloadRes() {
+        var res = await window.doGetRes(currentPage)
+        if (res != "") {
+            gResJson = JSON.parse(res)
+        }
+    }
+
     async function gLoadRes() {
         var res = await window.doGetRes(currentPage)
         if (res != "") {
@@ -234,6 +241,8 @@
                     page.innerHTML = obj.html
                     content.appendChild(page)
                     initPage() 
+                } else {
+                    gReloadRes()
                 }
                 //document.getElementById('pageContent').innerHTML = obj.html                
                 //initPage() 
