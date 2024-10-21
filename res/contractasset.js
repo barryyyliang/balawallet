@@ -1,11 +1,8 @@
     var number=0
     
     function addNew(obj){
-        window.doWebLog("addnew")
         var table = document.getElementById("assetTable")
-        window.doWebLog("get table")
         var tr = addNewTr()
-        window.doWebLog("get new tr")
         table.append(tr)
     }
 
@@ -63,8 +60,6 @@
         var add = document.getElementById(address).value
         var ty = document.getElementById(type).value
         var obj = {type:ty,address:add,name:''}
-
-        window.doWebLog("import contract:" + add)
         var result = await window.doImportContract(JSON.stringify(obj))
         showResult(result)
     }
@@ -106,13 +101,11 @@
     }
 
     function initPage(){
-        window.doWebLog("init page contractasset")
         gLoadRes()
         window.doGetContract().then( (result) => {
             if (result != ""){
                 var obj = JSON.parse(result)
-                window.doWebLog("get result json" + obj)
-                for(var i = 0; i < obj.contracts.length;i++)
+                  for(var i = 0; i < obj.contracts.length;i++)
                 {
                     var table = document.getElementById("assetTable")
                     var tr = initTr(obj.contracts[i])

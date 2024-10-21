@@ -14,22 +14,21 @@ async function signature(){
     if(info != "") {
         param.Info = info
     } else {
-        MYDIALOG.ShowDiv("未输入需要签名的信息")
+        showMsg("29","")
         return
     }
     if(ass != ""){
         param.Ass = ass
     } else {
-        MYDIALOG.ShowDiv("未输入签名账户的密码")
+        showMsg("29","")
         return
     }
-    window.doWebLog("web: sinature1")
     var result = await window.doSignature(JSON.stringify(param))
     var objJson = JSON.parse(result)
     if (objJson.Code === 0 ){
         document.getElementById("infosign").value = objJson.Msg
     } else {
-        MYDIALOG.ShowDiv("签名失败:"+objJson.Msg)
+        MYDIALOG.ShowDiv(objJson.Msg)
     }
 }
 

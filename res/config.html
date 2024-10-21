@@ -1,15 +1,15 @@
 
 <table id="table1" style="margin: 0 auto;font-size: 16px;text-align: center;">
     <tr>
-        <td>节点地址:</td>
+        <td id="config_address">节点地址:</td>
         <td><input type="text" id="nodeAddress" name="nodeAddress" style="width:300px"></td>
     </tr> 
     <tr>
-        <td>合约文件目录:</td>
+        <td id="config_contractdir">合约文件目录:</td>
         <td><input type="text" id="contractDir" name="contractDir" style="width:300px"></td>
     </tr> 
     <tr>
-        <td>系统语言:</td>
+        <td id="config_language">系统语言:</td>
         <td><select id="language" style="font-size: 16px;height: 25px;width: 300px;border-radius: 0px;">
             <option value="zh-CN">中文简体</option>
             <option value="zh-TW">中文繁體</option>
@@ -19,5 +19,5 @@
 
 </table>
 <div style="margin: 0 auto;text-align: center;">
-    <button class="button1" onclick="onSaveConfig()">保存</button>
+    <button id="config_save" class="button1" onclick="onSaveConfig()">保存</button>
 </div>

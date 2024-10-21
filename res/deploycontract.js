@@ -25,11 +25,9 @@ function changedfile(){
     document.getElementById("filePath").value = document.getElementById("contractFile").value
 }
 async function deploy(){
-    window.doWebLog("deploy contract")
     var address = document.getElementById("add").value
     var file = document.getElementById("binFile").value
     var ass = document.getElementById("ass").value
-    window.doWebLog("filename:" + file)
     var result = await window.doDeployContract(address,file,ass)
     var jsonObj = JSON.parse(result)
     if (jsonObj.Code === 0 ){

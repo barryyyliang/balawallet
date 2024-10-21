@@ -33,6 +33,12 @@ const (
 	Msg_findaccount_fail           uint = 27
 	Msg_contractdirconfig_null     uint = 28
 	Msg_param_null                 uint = 29
+	Msg_password_mismatch          uint = 30
+	Msg_function_null              uint = 31
+	Msg_result_mismatch            uint = 32
+	Msg_password_null              uint = 33
+	Msg_transaction_info           uint = 34
+	Msg_getfee_error               uint = 35
 )
 
 func initMsg() {
@@ -67,6 +73,14 @@ func initMsg() {
 	G_Msg["zh-CN"][Msg_findaccount_fail] = "找不到指定的账户"
 	G_Msg["zh-CN"][Msg_contractdirconfig_null] = "还没有配置合约文件目录，可在系统->系统配置中设置"
 	G_Msg["zh-CN"][Msg_param_null] = "参数为空"
+	G_Msg["zh-CN"][Msg_password_mismatch] = "两次输入的密码不一样"	
+	G_Msg["zh-CN"][Msg_function_null] = "函数为空，先加载 ABI 文件"	
+	G_Msg["zh-CN"][Msg_result_mismatch] = "输出参数少于需要的数量"	
+	G_Msg["zh-CN"][Msg_password_null] = "密码为空"	
+	G_Msg["zh-CN"][Msg_transaction_info] = "交易发送成功，交易 id "		
+	G_Msg["zh-CN"][Msg_getfee_error] = "获取预估交易费失败"	
+	
+	
 	
 
 	G_Msg["en"] = make(map[uint]string)
@@ -100,4 +114,10 @@ func initMsg() {
 	G_Msg["en"][Msg_findaccount_fail] = "The account cannot be found"
 	G_Msg["en"][Msg_contractdirconfig_null] = "The contract file directory has not been configured yet. It can be set in System->System Configuration."
 	G_Msg["en"][Msg_param_null] = "Parameter is null"	
+	G_Msg["en"][Msg_password_mismatch] = "The passwords entered twice are different"	
+	G_Msg["en"][Msg_function_null] = "The function is empty, load the ABI file first"	
+	G_Msg["en"][Msg_result_mismatch] = "There are fewer output parameters than required"	
+	G_Msg["en"][Msg_password_null] = "Password is empty"	
+	G_Msg["en"][Msg_transaction_info] = "Transaction sent successfully, transaction id: "	
+	G_Msg["en"][Msg_getfee_error] = "Failed to obtain estimated transaction fee"	
 }

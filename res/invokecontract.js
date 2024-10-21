@@ -2,7 +2,6 @@
 
     function addNew(table,obj){
         var tr = newTr(obj)
-        window.doWebLog("get new tr")
         table.append(tr)
     }
 
@@ -33,7 +32,7 @@
             try {
                 abijson = JSON.parse(obj.Msg)
             } catch (e){
-                MYDIALOG.ShowDiv("js parser error");
+                MYDIALOG.ShowDiv(e.message);
                 return
             }
             var se = document.getElementById("contractFunc")
@@ -57,7 +56,6 @@
         for (var i=0; i<abijson.length;i++){
             if (abijson[i].type === "function" && abijson[i].name === func){
                 var inputTable = document.getElementById("paramterTable")
-                window.doWebLog("row:" + inputTable.rows.length)
                 for (var n=inputTable.rows.length-1;n>1;n--){
                     inputTable.removeChild(inputTable.rows[n])
                 }
@@ -71,8 +69,7 @@
                 for (var n=0; n<abijson[i].outputs.length;n++){
                     addNew(outputTable,abijson[i].outputs[n])
                 }
-                
-                window.doWebLog(abijson[i].stateMutability )
+
                 if (abijson[i].stateMutability === "view"){                    
                     document.getElementById("invokecontract_invoke").innerHTML = gGetRes("invokecontract_query")
                     document.getElementById("outTableDiv").style.visibility =  "visible"
@@ -90,17 +87,18 @@
     }
 
     async function invoke() {
-        window.doWebLog("invoke0")
         var functype
         var funcName = document.getElementById("contractFunc").value
         var caddress = document.getElementById("caddress").value
         var from = document.getElementById("add").value
         if(caddress === ""){
-            MYDIALOG.ShowDiv("合约地址为空")
+            var msg = window.doGetMsg("29")
+            MYDIALOG.ShowDiv(msg)
             return
         }
         if(funcName === ""){
-            MYDIALOG.ShowDiv("合约参数为空，先加载 abi 文件")
+            var msg = window.doGetMsg("31")
+            MYDIALOG.ShowDiv(msg)
             return
         }
         var i = 0
@@ -126,15 +124,13 @@
             var result = await window.doReadContract(from,caddress,func, paremsString)
             var obj = JSON.parse(result)
             if (obj.Code === 0) {
-                window.doWebLog("invoke 2")
                 var outsTable = document.getElementById("outTable")
                 var outs = JSON.parse(obj.Msg)
-                window.doWebLog("invoke 3:"+outs)
                 for (var n=2;n<outsTable.rows.length;n++){
                     if (n-2 < outs.length) {
                         outsTable.rows[n].cells[1].childNodes[0].value = outs[n-2]
                     } else {
-                        MYDIALOG.ShowDiv("输出参数少于需要的数量")
+                        showMsg("32","")
                     }                    
                 }
             } else {
@@ -143,13 +139,13 @@
         } else {
             var ass = document.getElementById("ass").value
             if(ass === ""){
-                MYDIALOG.ShowDiv("发送交易需要账户密码，不能为空")
+                showMsg("33","")
                 return
             }
             var result = await window.doInvokeContract(from,caddress,func, paremsString,ass)
             var obj = JSON.parse(result)
             if(obj.Code === 0){
-                MYDIALOG.ShowDiv("交易发送成功，\r\n 交易 ID：\r\n"+obj.Msg)
+                showMsg("34",obj.Msg)
             } else {
                 MYDIALOG.ShowDiv(obj.Msg)
             }
@@ -158,7 +154,6 @@
     }
 
     async function initPage(){
-        window.doWebLog("init page invokecontract")
         gLoadRes()
         var result = await window.doGetAbiFile()
         var jsonObj = JSON.parse(result)

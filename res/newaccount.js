@@ -8,7 +8,8 @@ async function newacnt() {
     var repa = document.getElementById("repass").value
      window.doWebLog(repa)
     if (pa != repa){
-        MYDIALOG.ShowDiv("两次输入的密码不一致");
+        var msg = await window.doGetMsg("30")
+        MYDIALOG.ShowDiv(msg);
         return
     }
     var name = document.getElementById("name").value

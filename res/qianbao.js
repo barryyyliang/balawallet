@@ -1,6 +1,4 @@
 async function changeName(address,name){
-    window.doWebLog("enter changeName")
-    window.doWebLog(address)
     var addressvalue = document.getElementById(address).value
     var namevalue = document.getElementById(name).value
     var result = await window.doChangeAccountName(addressvalue,namevalue)
@@ -10,7 +8,6 @@ function management(address,name){
     window.doWebLog("enter management")
 }
 function addAccountElement(acc,table){
-    window.doWebLog("enter addelement")
     for (i=0; i<acc.length; i++){
         var par = acc[i]
 
@@ -64,7 +61,6 @@ function addAccountElement(acc,table){
 
 async function initBalance(){
     // 获取每个地址的balance
-    window.doWebLog("initBalance")
     if ( getCurrentPage() === "qianbao"){
         var table = document.getElementById("tableWallet")
         for(var i =1; i< table.rows.length;i++){
@@ -78,18 +74,13 @@ async function initBalance(){
                 return
             }
         }   
-    } else {
-        window.doWebLog("get balance conceled, page changed")
-   }
+    } 
 }
 
 async function initPage(){
-    window.doWebLog("qianbao init page")
     gLoadRes()
     window.doGetAccounts().then( (result) => {
-        window.doWebLog("get result" + result)
         var arr = JSON.parse(result)
-        window.doWebLog("go to addelement")
         addAccountElement(arr.accounts,document.getElementById("tableWallet"))
     })
     var re = await window.doCheckNode()

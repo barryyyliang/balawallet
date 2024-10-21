@@ -78,8 +78,6 @@
     var gResJson
 
     window.onload=async function() {
-        window.doWebLog("qianbao page")
-
         //async  init page
         var result = await  window.doGetComponent("rightmenu")
         var obj = JSON.parse(result)
@@ -103,8 +101,6 @@
     function checkConfig(){
         window.doCheckNode().then ( (result) => {
             var obj = JSON.parse(result)
-            window.doWebLog("checkconfig：" + result)
-            window.doWebLog(obj)
             if ( 0 != obj.Code) {
                 MYDIALOG.ShowDiv(obj.Msg)
             }
@@ -117,7 +113,6 @@
             gResJson = JSON.parse(res)
             for (var ele in gResJson) {
                 var obj = document.getElementById(ele)
-                window.doWebLog(ele+obj) 
                 if (obj != null) {
                     obj.innerText = gResJson[ele]
                 }
@@ -140,7 +135,6 @@
         var se = document.getElementById("add")
         se.options.length = 0
         for (i=0; i<acc.accounts.length; i++){
-            window.doWebLog(acc.accounts[i])
             var option = document.createElement("option")
             option.text = acc.accounts[i].address
             option.value = acc.accounts[i].address
@@ -174,8 +168,6 @@
         if(pagename === currentPage){
             return
         }
-        window.doWebLog("change page to " + pagename)
-        window.doWebLog("change menu to " + menuname)
         MYDIALOG.CloseDiv("MyDiv","fade")
         var menu = document.querySelector('#toolMenu')
         if (menu != null) {
@@ -188,7 +180,7 @@
             document.getElementById("page_" + currentPage).remove()
             }
         } catch (e) {
-            MYDIALOG.ShowDiv("删除页面失败："+e.message);
+            MYDIALOG.ShowDiv(e.message);
         }
 
         currentMenu = menuname
@@ -201,7 +193,6 @@
         document.getElementById(menuname).setAttribute("class","active")       
 
         var result = await window.doGetComponent(pagename)
-        window.doWebLog("change page to :"+ pagename)
         var obj
         try{
                 obj = JSON.parse(result)
@@ -223,17 +214,14 @@
                 var content = document.getElementById('pageContent')
                 var hasHistory = false
                 var i = 0
-                for(i = 0;i<content.children.length;i++){
-                    window.doWebLog("get a none div node:"+content.childNodes[i].id)                      
+                for(i = 0;i<content.children.length;i++){                
                     if (content.children[i].id === "page_" + pagename){
                         //content.childNodes[i].style.width = "100%"
-                        window.doWebLog("make show")
                         content.children[i].style.height = "100%"
                         content.children[i].style.display = "block"
                         hasHistory = true
                     } else {
                         //content.childNodes[i].style.width = "0px"
-                        window.doWebLog("make hide")
                         content.children[i].style.display = "none"
                         content.childNodes[i].style.height = "0px"
                     }
@@ -251,8 +239,7 @@
                 //initPage() 
             }
         catch(err){
-            window.doWebLog("get page component error:" + err.message)
-            MYDIALOG.ShowDiv("获取页面失败");
+            MYDIALOG.ShowDiv(err.message);
         }        
     }
 
@@ -261,6 +248,14 @@
         MYDIALOG.ShowDiv(objJson.Msg)
     }
 
+    async function showMsg(code,addmsg) {
+        var msg = await window.doGetMsg(code)
+        if (addmsg != ""){
+            addmsg = " : " + addmsg
+        }
+        MYDIALOG.ShowDiv(msg+addmsg)
+    } 
+
     function getCurrentAccount(){
         return  document.getElementById("add").value
     }
@@ -268,7 +263,7 @@
 </head> 
 <!--body oncontextmenu="return false" onselectstart="return false"-->
 <body style="background: rgb(230, 230, 230);"></body>
-    <div id = "menudiv" style="z-index: 100;;display: flex;background-color: #333;position: fixed;top: 0%;left: 0%;width: 100%;">
+    <div id = "menudiv" style="z-index: 100;display: flex;background-color: #333;position: fixed;top: 0%;left: 0%;width: 100%;">
         <div style="margin-right: auto;">
             <ul>
                 <li><a id="qianbao" class="active" onmouseover="onMenuOver('qianbao')" onclick="changePage('qianbao','qianbao')">钱包</a></li>                    
@@ -284,7 +279,7 @@
             <select id="add" name="add" onchange="accountChange()" style="font-size: 14px;height: 25px;width: 300px;border-radius: 0px;"></select>
         </div>      
     </div>   
-    <div style="width: 100%;top: 60px;position: absolute;display: flex;flex-direction: column;text-align: center;"> 
+    <div style="width: 98%;top: 60px;position: absolute;display: flex;flex-direction: column;text-align: center;"> 
         <div style="margin: 0 auto;text-align: center;">
             <div id="pageContent" style="margin: 0 auto;text-align: center;"></div>   
         </div>        

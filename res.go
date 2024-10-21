@@ -160,4 +160,103 @@ func initRes() {
 	G_Res["en"]["/querytx.html"]["querytx_txhash"] = "TX Hash"
 	G_Res["en"]["/querytx.html"]["querytx_query"] = "Query"
 
+	//signature
+	G_Res["zh-CN"]["/signature.html"] = make(map[string]string)
+	G_Res["zh-CN"]["/signature.html"]["signature_infomation"] = "待签名信息"
+	G_Res["zh-CN"]["/signature.html"]["signature_acc"] = "账户密码"
+	G_Res["zh-CN"]["/signature.html"]["signature_sign"] = "签名"
+	
+
+	G_Res["en"]["/signature.html"] = make(map[string]string)
+	G_Res["en"]["/signature.html"]["signature_infomation"] = "Information to be signed"
+	G_Res["en"]["/signature.html"]["signature_acc"] = "Password"
+	G_Res["en"]["/signature.html"]["signature_sign"] = "Sign"
+
+	//signature
+	G_Res["zh-CN"]["/newaccount.html"] = make(map[string]string)
+	G_Res["zh-CN"]["/newaccount.html"]["newaccount_name"] = "账户别名" 
+	G_Res["zh-CN"]["/newaccount.html"]["newaccount_acc"] = "输入密码" 
+	G_Res["zh-CN"]["/newaccount.html"]["newaccount_reacc"] = "重输密码" 
+	G_Res["zh-CN"]["/newaccount.html"]["newaccount_create"] = "生成账户" 
+
+	G_Res["en"]["/newaccount.html"] = make(map[string]string)
+	G_Res["en"]["/newaccount.html"]["newaccount_name"] = "Name" 
+	G_Res["en"]["/newaccount.html"]["newaccount_acc"] = "Password" 
+	G_Res["en"]["/newaccount.html"]["newaccount_reacc"] = "Re-enter password" 
+	G_Res["en"]["/newaccount.html"]["newaccount_create"] = "Create" 
+
+	//export
+	G_Res["zh-CN"]["/export.html"] = make(map[string]string)
+	G_Res["zh-CN"]["/export.html"]["export_hint"] = "提示：将导出明文私钥，请妥善保管，秘钥丢失，会导致秘钥管理的数字资产丢失，如果想要备份加密的钱包文件，请在钱包的account目录下直接获取"
+	G_Res["zh-CN"]["/export.html"]["export_account"] = "账户"
+	G_Res["zh-CN"]["/export.html"]["export_acc"] = "账户密码"
+	G_Res["zh-CN"]["/export.html"]["export_export"] = "导出"
+
+	G_Res["en"]["/export.html"] = make(map[string]string)
+	G_Res["en"]["/export.html"]["export_hint"] = "Tip: The plain text private key will be exported, please keep it properly. Loss of the secret key will result in the loss of the digital assets managed by the secret key. If you want to back up the encrypted wallet file, please obtain it directly from the account directory of the wallet."
+	G_Res["en"]["/export.html"]["export_account"] = "Account"
+	G_Res["en"]["/export.html"]["export_acc"] = "Password"
+	G_Res["en"]["/export.html"]["export_export"] = "Export"
+
+	//import
+	G_Res["zh-CN"]["/import.html"] = make(map[string]string)
+	G_Res["zh-CN"]["/import.html"]["import_private"] = "私钥"
+	G_Res["zh-CN"]["/import.html"]["import_name"] = "账户别名"
+	G_Res["zh-CN"]["/import.html"]["import_acc"] = "输入密码"
+	G_Res["zh-CN"]["/import.html"]["import_reacc"] = "重输密码"
+	G_Res["zh-CN"]["/import.html"]["import_import"] = "导入账户"
+
+	G_Res["en"]["/import.html"] = make(map[string]string)
+	G_Res["en"]["/import.html"]["import_private"] = "Private Key"
+	G_Res["en"]["/import.html"]["import_name"] = "Name"
+	G_Res["en"]["/import.html"]["import_acc"] = "Password"
+	G_Res["en"]["/import.html"]["import_reacc"] = "Re-enter password"
+	G_Res["en"]["/import.html"]["import_import"] = "Import"
+
+	//import
+	G_Res["zh-CN"]["/config.html"] = make(map[string]string)
+	G_Res["zh-CN"]["/config.html"]["config_address"] = "节点地址"
+	G_Res["zh-CN"]["/config.html"]["config_contractdir"] = "合约文件目录"
+	G_Res["zh-CN"]["/config.html"]["config_language"] = "系统语言"
+	G_Res["zh-CN"]["/config.html"]["config_save"] = "保存"
+
+	G_Res["en"]["/config.html"] = make(map[string]string)
+	G_Res["en"]["/config.html"]["config_address"] = "Node Address"
+	G_Res["en"]["/config.html"]["config_contractdir"] = "Contract File Dir"
+	G_Res["en"]["/config.html"]["config_language"] = "Language"
+	G_Res["en"]["/config.html"]["config_save"] = "Save"
+
+	//about
+	G_Res["zh-CN"]["/about.html"] = make(map[string]string)
+	G_Res["zh-CN"]["/about.html"]["about_about"] = `web3wallet 提供数字资产管理，智能合约调用。
+	
+    本软件暂不提供节点服务，要连接到区块链网络，用户可以连接第三方区块链节点或者 RPC 服务
+
+    RPC厂商注册后，可提供一定量的免费服务,如：
+    https://www.infura.io/zh/networks/ethereum
+	https://etherscan.io/apis
+
+    使用的的第三方开源项目：    
+    https://github.com/ethereum/go-ethereum.git
+    https://github.com/webview/webview_go.git
+
+    使用建议和问题反馈：
+    barryyyliang@163.com`
+
+	G_Res["en"]["/about.html"] = make(map[string]string)
+	G_Res["en"]["/about.html"]["about_about"] = `web3wallet provides digital asset management and smart contract calling。
+    
+	This software does not currently provide node services. To connect to the blockchain network, users can connect to third-party blockchain nodes or RPC services.
+	
+	After RPC vendors register, they can provide a certain amount of free services, such as:
+    https://www.infura.io/zh/networks/ethereum
+	https://etherscan.io/apis
+    
+	Third-party open source projects used:    
+    https://github.com/ethereum/go-ethereum.git
+    https://github.com/webview/webview_go.git
+    
+	Usage suggestions and problem feedback:
+    barryyyliang@163.com`
+
 }
