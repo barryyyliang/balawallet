@@ -36,7 +36,7 @@ import (
 // 	win.SetHtml(string(content))
 // }
 
-//新创建一个账号
+// 新创建一个账号
 func doNewAccount(pass string, walletName string) string {
 	re := getResult(Msg_success, "")
 	//scryptN := keystore.StandardScryptN
@@ -68,12 +68,12 @@ func doNewAccount(pass string, walletName string) string {
 
 }
 
-//日志接口
+// 日志接口
 func doWebLog(para string) {
 	fmt.Println(para)
 }
 
-//获取账号列表
+// 获取账号列表
 func doGetAccounts() string {
 	type account struct {
 		Type    string `json:"type"`
@@ -122,8 +122,6 @@ func doChangeAccountName(address string, name string) string {
 		err = db.Put([]byte(address), []byte(name), nil)
 		if err != nil {
 			re = getResult(Msg_writedb_fail, err.Error())
-		} else {
-			fmt.Println("put name:" + address + ":" + name)
 		}
 	} else {
 		re = getResult(Msg_changename_nameexists, "")
@@ -135,7 +133,6 @@ func doGetAccountName(address string) string {
 	db, err := leveldb.OpenFile(datadir+"db", nil)
 	defer db.Close()
 	if err == nil {
-		fmt.Println(address)
 		name, err := db.Get([]byte(address), nil)
 		if err == nil {
 			return string(name)
@@ -149,10 +146,9 @@ func doGetAccountName(address string) string {
 	}
 }
 
-//通过私钥导入账号
+// 通过私钥导入账号
 func doImportAccount(pa string, name string, kk string) string {
 	re := getResult(Msg_success, "")
-	fmt.Println("importAccount")
 	key := new(ecdsa.PrivateKey)
 	key.PublicKey.Curve = crypto.S256()
 	pp, err := hex.DecodeString(kk)
@@ -167,7 +163,7 @@ func doImportAccount(pa string, name string, kk string) string {
 	return string(re)
 }
 
-//导出私钥
+// 导出私钥
 func doExportAccount(add string, pa string) string {
 	re := getResult(Msg_success, "")
 	selectAccountFile := ""
@@ -224,7 +220,6 @@ func doTransfer(from string, to string, value string, pass string) string {
 	ctx := context.Background()
 	acc := ks.Accounts()
 	for i := 0; i < len(acc); i++ {
-		fmt.Printf("get account: %s : \r\n", acc[i].Address.String())
 		if from == acc[i].Address.String() {
 			bigvalue, err := etherTowei(value)
 			if err != nil {
@@ -247,7 +242,6 @@ func doTransfer(from string, to string, value string, pass string) string {
 					fmt.Println("transfer err:" + err.Error())
 					re = getResult(Msg_sendtransaction_fail, err.Error())
 				} else {
-					fmt.Println("transfer success")
 					re = getResult(Msg_success, "")
 				}
 			} else {
@@ -260,10 +254,9 @@ func doTransfer(from string, to string, value string, pass string) string {
 	return string(re)
 }
 
-//获取账户余额
+// 获取账户余额
 func doGetBalance(add string) string {
 	var re []byte
-	fmt.Println("doGetBalance: address is " + add)
 	connect := getConnection()
 	if connect == nil {
 		re = getResult(Msg_connectnode_fail, "")
@@ -307,13 +300,11 @@ func doGetFee() string {
 		fmt.Println("get price error:" + err.Error())
 		return ""
 	}
-	fmt.Println("price:" + weiToether(price.String()))
 	tips, err := connect.SuggestGasTipCap(ctx)
 	if err != nil {
 		fmt.Println("get tips error:" + err.Error())
 		return ""
 	}
-	fmt.Println("tips:" + weiToether(tips.String()))
 	gas := big.NewInt(21000)
 	fee := big.NewInt(0)
 	fee = fee.Add(price, tips)
@@ -385,15 +376,14 @@ func doGetFee() string {
 // }
 
 func doGetComponent(com string) string {
-	fmt.Println("enter get" + com)
 	type pagejson struct {
-		Css string `json:"css"`
+		Css  string `json:"css"`
 		Html string `json:"html"`
 		Js   string `json:"js"`
 		Res  string `json:"res"`
 	}
 
-	result := pagejson{"", "", "",""}
+	result := pagejson{"", "", "", ""}
 	var cssfile, htmlfile, jsfile string
 
 	if com == "rightmenu" {
@@ -401,9 +391,9 @@ func doGetComponent(com string) string {
 		htmlfile = "/common/rightmenu.html"
 		jsfile = "/common/rightmenu.js"
 	} else {
-		cssfile = "/"+com+".css"
-		jsfile = "/"+com+".js"
-		htmlfile = "/"+com+".html"
+		cssfile = "/" + com + ".css"
+		jsfile = "/" + com + ".js"
+		htmlfile = "/" + com + ".html"
 	}
 
 	result.Css = string(G_Files[cssfile])
@@ -429,7 +419,7 @@ func doGetComponent(com string) string {
 
 func doGetRes(com string) string {
 	var re string = ""
-	htmlfile := "/"+com+".html"
+	htmlfile := "/" + com + ".html"
 	language := G_Config["language"]
 	if language == "" {
 		language = "zh-CN"
@@ -439,17 +429,14 @@ func doGetRes(com string) string {
 		tmp, _ := json.Marshal(res)
 		re = string(tmp)
 	}
-	fmt.Println("doGetRes:" + re)
 	return re
 }
 
 func doConfig(configs string) string {
-	fmt.Println("enter doConfig")
 	re := getResult(Msg_success, "")
 	var config = make(map[string]string)
 
 	json.Unmarshal([]byte(configs), &config)
-	fmt.Println(config)
 
 	for key, value := range config {
 		G_Config[key] = value
@@ -457,19 +444,19 @@ func doConfig(configs string) string {
 
 	db, _ := leveldb.OpenFile(datadir+"db", nil)
 	defer db.Close()
-	tmp,_ := json.Marshal(G_Config)
-	db.Put([]byte("config"),tmp,nil)
+	tmp, _ := json.Marshal(G_Config)
+	db.Put([]byte("config"), tmp, nil)
 
 	/*
-	for key, value := range G_Config {
-		err = db.Put([]byte(key), []byte(value), nil)
-		if err != nil {
-			fmt.Println("put config error")
-			re = getResult(Msg_writedb_fail, err.Error())
-		} else {
-			fmt.Println("put config:" + key + ":" + value)
+		for key, value := range G_Config {
+			err = db.Put([]byte(key), []byte(value), nil)
+			if err != nil {
+				fmt.Println("put config error")
+				re = getResult(Msg_writedb_fail, err.Error())
+			} else {
+				fmt.Println("put config:" + key + ":" + value)
+			}
 		}
-	}
 	*/
 	// 配置更新后刷新链接
 	G_Etherclient = nil
@@ -477,7 +464,6 @@ func doConfig(configs string) string {
 }
 
 func doGetConfig(configs string) string {
-	fmt.Println(configs)
 	var re string
 	db, err := leveldb.OpenFile(datadir+"db", nil)
 	if err != nil {
@@ -487,20 +473,20 @@ func doGetConfig(configs string) string {
 
 	defer db.Close()
 
-	data, err := db.Get([]byte("config"),nil)
+	data, err := db.Get([]byte("config"), nil)
 	json.Unmarshal(data, &G_Config)
-	
+
 	if configs != "" {
 		var configName []string
 		json.Unmarshal([]byte(configs), &configName)
-		var result = make(map[string]string) 
-		for _,value := range configName {
+		var result = make(map[string]string)
+		for _, value := range configName {
 			result[value] = G_Config[value]
 		}
 		tmp, _ := json.Marshal(result)
 		re = string(tmp)
 	} else {
-		tmp,_ := json.Marshal(G_Config)
+		tmp, _ := json.Marshal(G_Config)
 		re = string(tmp)
 	}
 	return string(re)
@@ -561,7 +547,6 @@ func doDeployContract(from string, file string, pass string) string {
 
 			gasLimit, err := connect.EstimateGas(ctx, msg)
 			if err != nil {
-				fmt.Println("get gaslimit:" + strconv.FormatInt(int64(gasLimit), 10))
 				re = getResult(Msg_getgaslimit_fail, err.Error())
 				break
 			}
@@ -575,7 +560,6 @@ func doDeployContract(from string, file string, pass string) string {
 				if err != nil {
 					re = getResult(Msg_sendtransaction_fail, err.Error())
 				} else {
-					fmt.Println("deploy success")
 					re, _ = json.Marshal(ErrorResult{0, tx.Hash().Hex()})
 					//connect.TransactionReceipt(ctx,tx.Hash())
 				}
@@ -609,7 +593,6 @@ func doGetContract() string {
 			var aa contract
 			json.Unmarshal(it.Value(), &aa)
 			res.Contracts = append(res.Contracts, aa)
-			fmt.Println("contract:" + string(it.Value()))
 		}
 	}
 
@@ -624,7 +607,6 @@ func doGetContract() string {
 
 func doImportContract(cons string) string {
 	re := getResult(Msg_success, "")
-	fmt.Println("doImportContract:" + cons)
 	type contract struct {
 		Type    string `json:"type"`
 		Address string `json:"address"`
@@ -643,7 +625,6 @@ func doImportContract(cons string) string {
 				transferFnSignature := []byte("name()")
 				hash := crypto.Keccak256(transferFnSignature)
 				methodID := hash[:4]
-				fmt.Println(string(methodID))
 				var data []byte
 				data = append(data, methodID...)
 				msg := ethereum.CallMsg{
@@ -662,8 +643,6 @@ func doImportContract(cons string) string {
 				}
 				sresult := string(result)
 				sresult = strings.ReplaceAll(sresult, string([]byte{0x00}), "")
-				fmt.Println("get contract name:" + string(sresult))
-				fmt.Println(data)
 				jcons.Name = sresult
 			}
 		}
@@ -672,17 +651,15 @@ func doImportContract(cons string) string {
 		jvalue, _ := json.Marshal(jcons)
 		if err2 == nil {
 			if db.Put([]byte(jcons.Address), jvalue, nil) != nil {
-				fmt.Println("write db error:" + string(jvalue))
-				re = getResult(Msg_writedb_fail,"") 
+				re = getResult(Msg_writedb_fail, "")
 			}
 		} else {
 			fmt.Println("open contract db error:" + err2.Error())
-			re = getResult(Msg_opendb_fail,err2.Error())
+			re = getResult(Msg_opendb_fail, err2.Error())
 		}
 
 	} else {
-		fmt.Println("get wrong parameter:" + cons)
-		re = getResult(Msg_param_error,"")
+		re = getResult(Msg_param_error, "")
 	}
 
 	return string(re)
@@ -691,9 +668,9 @@ func doImportContract(cons string) string {
 func doCheckNode() string {
 	var re []byte
 	if G_Config["nodeAddress"] != "" {
-		re = getResult(Msg_success,"")
+		re = getResult(Msg_success, "")
 	} else {
-		re = getResult(Msg_nodeconfig_null,"")
+		re = getResult(Msg_nodeconfig_null, "")
 	}
 	return string(re)
 }
@@ -703,13 +680,13 @@ func doLoadABI(file string) string {
 	filepath := G_Config["contractDir"]
 	filepath = filepath + "/" + file
 	if filepath == "" {
-		re = getResult(Msg_param_error,"")
+		re = getResult(Msg_param_error, "")
 		return string(re)
 	}
 
 	abiContent, err := os.ReadFile(filepath)
 	if err != nil {
-		re = getResult(Msg_openfile_fail,err.Error())
+		re = getResult(Msg_openfile_fail, err.Error())
 		return string(re)
 	}
 
@@ -718,13 +695,10 @@ func doLoadABI(file string) string {
 }
 
 func doReadContract(from string, to string, funcAbi string, paremters string) string {
-	fmt.Println("doReadContract")
-	fmt.Println(funcAbi)
-	fmt.Println(paremters)
 	var toAdd common.Address = common.HexToAddress(to)
 	contractAbi, err := abi.JSON(strings.NewReader(funcAbi))
 	var parems []interface{}
-	var re = getResult(Msg_success,"")
+	var re = getResult(Msg_success, "")
 	var data []byte
 	var outs []string
 	if err == nil {
@@ -733,11 +707,10 @@ func doReadContract(from string, to string, funcAbi string, paremters string) st
 			json.Unmarshal([]byte(paremters), &parStrings)
 			for i, pType := range method.Inputs {
 				parems = append(parems, stringToValue(pType.Type.GetType(), parStrings[i]))
-				fmt.Println(parStrings[i])
 			}
 			data, err = contractAbi.Pack(method.RawName, parems...)
 			if err != nil {
-				re = getResult(Msg_packabiparam_error,err.Error())
+				re = getResult(Msg_packabiparam_error, err.Error())
 				return string(re)
 			}
 			connect := getConnection()
@@ -760,18 +733,17 @@ func doReadContract(from string, to string, funcAbi string, paremters string) st
 					for _, a := range ret {
 						aa := valueToString(a)
 						outs = append(outs, aa)
-						fmt.Println(aa)
 					}
 					bouts, _ := json.Marshal(outs)
-					re,_ = json.Marshal(ErrorResult{0,string(bouts)})
+					re, _ = json.Marshal(ErrorResult{0, string(bouts)})
 				} else {
-					re = getResult(Msg_callcontract_fail,err5.Error())
+					re = getResult(Msg_callcontract_fail, err5.Error())
 				}
 			}
 			break
 		}
 	} else {
-		re = getResult(Msg_parseabi_fail,err.Error())
+		re = getResult(Msg_parseabi_fail, err.Error())
 	}
 	return string(re)
 }
@@ -779,14 +751,14 @@ func doReadContract(from string, to string, funcAbi string, paremters string) st
 func doInvokeContract(from string, conAddr string, funcAbi string, param string, pass string) string {
 	var re []byte
 	if from == "" || pass == "" || conAddr == "" {
-		re = getResult(Msg_param_error,"")
+		re = getResult(Msg_param_error, "")
 		return string(re)
 	}
 	connect := getConnection()
 	var toAdd common.Address = common.HexToAddress(conAddr)
 
 	if connect == nil {
-		re = getResult(Msg_connectnode_fail,"")
+		re = getResult(Msg_connectnode_fail, "")
 		return string(re)
 	}
 	ctx := context.Background()
@@ -802,14 +774,14 @@ func doInvokeContract(from string, conAddr string, funcAbi string, param string,
 		}
 	}
 	if isExist == false {
-		re = getResult(Msg_findaccount_fail,from)
+		re = getResult(Msg_findaccount_fail, from)
 		return string(re)
 	}
 
 	bigvalue, err := etherTowei("0")
 	nounce, gasPrice, tipsPrice, chainId, err := getChainInfo(connect, from)
 	if err != nil {
-		re = getResult(Msg_getchaininfo_fail,err.Error())
+		re = getResult(Msg_getchaininfo_fail, err.Error())
 	}
 
 	contractAbi, err := abi.JSON(strings.NewReader(funcAbi))
@@ -824,7 +796,7 @@ func doInvokeContract(from string, conAddr string, funcAbi string, param string,
 			}
 			data, err = contractAbi.Pack(method.RawName, parems...)
 			if err != nil {
-				re = getResult(Msg_packabiparam_error,err.Error()) 
+				re = getResult(Msg_packabiparam_error, err.Error())
 				return string(re)
 			}
 		}
@@ -843,8 +815,7 @@ func doInvokeContract(from string, conAddr string, funcAbi string, param string,
 
 	gasLimit, err := connect.EstimateGas(ctx, msg)
 	if err != nil {
-		fmt.Println("get gaslimit:" + strconv.FormatInt(int64(gasLimit), 10))
-		re = getResult(Msg_getgaslimit_fail,err.Error())
+		re = getResult(Msg_getgaslimit_fail, err.Error())
 	}
 
 	tx := newCallContractTx(nounce, toAdd, &bigvalue, gasLimit, gasPrice, tipsPrice, chainId, data)
@@ -859,7 +830,7 @@ func doInvokeContract(from string, conAddr string, funcAbi string, param string,
 		}
 
 	} else {
-		re = getResult(Msg_signtransaction_fail,err.Error())
+		re = getResult(Msg_signtransaction_fail, err.Error())
 	}
 
 	return string(re)
@@ -870,7 +841,6 @@ func doQueryTx(hs string) string {
 		Transaction        *types.Transaction
 		TransactionReceipt *types.Receipt
 	}
-	fmt.Println("doQueryTx:" + hs)
 	var re []byte
 	var info txinfo
 	txhash := common.HexToHash(hs)
@@ -893,25 +863,19 @@ func doQueryTx(hs string) string {
 }
 
 func doSignature(info string) string {
-	fmt.Println("server: doSignature :" + info)
 	var re []byte
 	var param = make(map[string]string)
 	err := json.Unmarshal([]byte(info), &param)
-	fmt.Println("server: doSignature 0:" + info)
 	if err == nil {
-		fmt.Println("server: doSignature :1")
 		acc := ks.Accounts()
 		var i = 0
 		for i = 0; i < len(acc); i++ {
-			fmt.Println("server: doSignature :2")
 			if acc[i].Address.String() == param["Address"] {
-				fmt.Println("server: doSignature :3.1")
 				signature, err2 := ks.SignHashWithPassphrase(acc[i], param["Ass"], crypto.Keccak256([]byte(param["Info"])))
 				if err2 == nil {
-					fmt.Println("server: doSignature :3")
 					re, _ = json.Marshal(ErrorResult{0, common.Bytes2Hex(signature)})
 				} else {
-					re = getResult(Msg_fail,err2.Error())
+					re = getResult(Msg_fail, err2.Error())
 				}
 				break
 			}
@@ -924,7 +888,7 @@ func doSignature(info string) string {
 }
 
 func doGetAbiFile() string {
-	re := getResult(Msg_success,"")
+	re := getResult(Msg_success, "")
 	var conf = [1]string{"contractDir"}
 	par, _ := json.Marshal(conf)
 	doGetConfig(string(par))
@@ -933,18 +897,18 @@ func doGetAbiFile() string {
 		names, err := getFiles(dir, ".abi")
 		if err == nil {
 			tmp, _ := json.Marshal(names)
-			re,_ = json.Marshal(ErrorResult{0,string(tmp)})
+			re, _ = json.Marshal(ErrorResult{0, string(tmp)})
 		} else {
-			re = getResult(Msg_openfile_fail,err.Error())
+			re = getResult(Msg_openfile_fail, err.Error())
 		}
 	} else {
-		re = getResult(Msg_contractdirconfig_null,"")
+		re = getResult(Msg_contractdirconfig_null, "")
 	}
 	return string(re)
 }
 
 func doGetBinFile() string {
-	re := getResult(Msg_success,"")
+	re := getResult(Msg_success, "")
 	var conf = [1]string{"contractDir"}
 	par, _ := json.Marshal(conf)
 	doGetConfig(string(par))
@@ -953,22 +917,22 @@ func doGetBinFile() string {
 		names, err := getFiles(dir, ".bin")
 		if err == nil {
 			tmp, _ := json.Marshal(names)
-			re,_ = json.Marshal(ErrorResult{0,string(tmp)})
+			re, _ = json.Marshal(ErrorResult{0, string(tmp)})
 		} else {
-			re = getResult(Msg_openfile_fail,err.Error())
+			re = getResult(Msg_openfile_fail, err.Error())
 		}
 	} else {
-		re = getResult(Msg_contractdirconfig_null,"")
+		re = getResult(Msg_contractdirconfig_null, "")
 	}
 	return string(re)
 }
 
 func doGetMsg(code string) string {
-	n,_ := strconv.Atoi(code)
+	n, _ := strconv.Atoi(code)
 	lang := G_Config["language"]
 	if lang == "" {
 		lang = "zh-CN"
-	} 
+	}
 	msg := G_Msg[lang][uint(n)]
 	if msg == "" {
 		msg = "null"

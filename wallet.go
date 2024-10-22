@@ -31,7 +31,7 @@ func main() {
 	initRes()
 	win = webview.New(true)
 	defer win.Destroy()
-	win.SetTitle("我的钱包")
+	win.SetTitle("Web3Wallet")
 	win.SetSize(1024, 640, webview.HintNone)
 
 	//注册全局函数
@@ -60,8 +60,8 @@ func main() {
 	win.Bind("doGetAbiFile", doGetAbiFile)
 	win.Bind("doGetBinFile", doGetBinFile)
 	win.Bind("doInvokeContract", doInvokeContract)
-	win.Bind("doGetRes",doGetRes)
-	win.Bind("doGetMsg",doGetMsg)
+	win.Bind("doGetRes", doGetRes)
+	win.Bind("doGetMsg", doGetMsg)
 
 	path, _ := filepath.Abs(filepath.Dir(os.Args[0]))
 	dir = strings.Replace(path, "\\", "/", -1)

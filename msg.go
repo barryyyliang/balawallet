@@ -38,7 +38,6 @@ const (
 	Msg_result_mismatch            uint = 32
 	Msg_password_null              uint = 33
 	Msg_transaction_info           uint = 34
-	Msg_getfee_error               uint = 35
 )
 
 func initMsg() {
@@ -73,15 +72,11 @@ func initMsg() {
 	G_Msg["zh-CN"][Msg_findaccount_fail] = "找不到指定的账户"
 	G_Msg["zh-CN"][Msg_contractdirconfig_null] = "还没有配置合约文件目录，可在系统->系统配置中设置"
 	G_Msg["zh-CN"][Msg_param_null] = "参数为空"
-	G_Msg["zh-CN"][Msg_password_mismatch] = "两次输入的密码不一样"	
-	G_Msg["zh-CN"][Msg_function_null] = "函数为空，先加载 ABI 文件"	
-	G_Msg["zh-CN"][Msg_result_mismatch] = "输出参数少于需要的数量"	
-	G_Msg["zh-CN"][Msg_password_null] = "密码为空"	
-	G_Msg["zh-CN"][Msg_transaction_info] = "交易发送成功，交易 id "		
-	G_Msg["zh-CN"][Msg_getfee_error] = "获取预估交易费失败"	
-	
-	
-	
+	G_Msg["zh-CN"][Msg_password_mismatch] = "两次输入的密码不一样"
+	G_Msg["zh-CN"][Msg_function_null] = "函数为空，先加载 ABI 文件"
+	G_Msg["zh-CN"][Msg_result_mismatch] = "输出参数少于需要的数量"
+	G_Msg["zh-CN"][Msg_password_null] = "密码为空"
+	G_Msg["zh-CN"][Msg_transaction_info] = "交易发送成功，交易 id "
 
 	G_Msg["en"] = make(map[uint]string)
 	G_Msg["en"][Msg_success] = "Success"
@@ -113,11 +108,47 @@ func initMsg() {
 	G_Msg["en"][Msg_parseabi_fail] = "Failed to parse ABI file"
 	G_Msg["en"][Msg_findaccount_fail] = "The account cannot be found"
 	G_Msg["en"][Msg_contractdirconfig_null] = "The contract file directory has not been configured yet. It can be set in System->System Configuration."
-	G_Msg["en"][Msg_param_null] = "Parameter is null"	
-	G_Msg["en"][Msg_password_mismatch] = "The passwords entered twice are different"	
-	G_Msg["en"][Msg_function_null] = "The function is empty, load the ABI file first"	
-	G_Msg["en"][Msg_result_mismatch] = "There are fewer output parameters than required"	
-	G_Msg["en"][Msg_password_null] = "Password is empty"	
-	G_Msg["en"][Msg_transaction_info] = "Transaction sent successfully, transaction id: "	
-	G_Msg["en"][Msg_getfee_error] = "Failed to obtain estimated transaction fee"	
+	G_Msg["en"][Msg_param_null] = "Parameter is null"
+	G_Msg["en"][Msg_password_mismatch] = "The passwords entered twice are different"
+	G_Msg["en"][Msg_function_null] = "The function is empty, load the ABI file first"
+	G_Msg["en"][Msg_result_mismatch] = "There are fewer output parameters than required"
+	G_Msg["en"][Msg_password_null] = "Password is empty"
+	G_Msg["en"][Msg_transaction_info] = "Transaction sent successfully, transaction id: "
+
+	G_Msg["zh-TW"] = make(map[uint]string)
+	G_Msg["zh-TW"][Msg_success] = "操作成功"
+	G_Msg["zh-TW"][Msg_fail] = "操作失敗"
+	G_Msg["zh-TW"][Msg_createuser_fail] = "建立帳戶失敗"
+	G_Msg["zh-TW"][Msg_writename_fail] = "建立帳戶成功，寫名稱失敗，可在錢包頁面修改名稱"
+	G_Msg["zh-TW"][Msg_createuser_nameexists] = "建立帳戶成功，名稱已存在，可在錢包頁面修改名稱"
+	G_Msg["zh-TW"][Msg_writedb_fail] = "寫數據庫失敗"
+	G_Msg["zh-TW"][Msg_changename_nameexists] = "名稱已存在"
+	G_Msg["zh-TW"][Msg_privatekey_error] = "私鑰格式錯誤，解析私鑰失敗"
+	G_Msg["zh-TW"][Msg_readaccountfile_fail] = "讀取密鑰文件失敗"
+	G_Msg["zh-TW"][Msg_decryptprivatekey_fail] = "解密密鑰文件失敗"
+	G_Msg["zh-TW"][Msg_addressprivatekey_mismatch] = "地址和私鑰不匹配"
+	G_Msg["zh-TW"][Msg_openexportfile_fail] = "打開導出文件失敗"
+	G_Msg["zh-TW"][Msg_connectnode_fail] = "連接節點失敗"
+	G_Msg["zh-TW"][Msg_weitoether_fail] = "ETH轉WEI失敗"
+	G_Msg["zh-TW"][Msg_getchaininfo_fail] = "獲取鏈信息失敗"
+	G_Msg["zh-TW"][Msg_sendtransaction_fail] = "發送交易失敗"
+	G_Msg["zh-TW"][Msg_signtransaction_fail] = "對交易進行簽名失敗"
+	G_Msg["zh-TW"][Msg_getbalance_fail] = "查詢餘額失敗"
+	G_Msg["zh-TW"][Msg_opendb_fail] = "打開數據庫失敗"
+	G_Msg["zh-TW"][Msg_param_error] = "參數錯誤"
+	G_Msg["zh-TW"][Msg_openfile_fail] = "打開文件錯誤"
+	G_Msg["zh-TW"][Msg_decodebinfile_fail] = "解碼合約BIN文件失敗"
+	G_Msg["zh-TW"][Msg_getgaslimit_fail] = "獲取預估GAS失敗"
+	G_Msg["zh-TW"][Msg_nodeconfig_null] = "還沒有配置區塊鏈節點，可在系統->系統配置中設置連接的節點地址"
+	G_Msg["zh-TW"][Msg_packabiparam_error] = "組裝ABI參數失敗"
+	G_Msg["zh-TW"][Msg_callcontract_fail] = "調用合約失敗"
+	G_Msg["zh-TW"][Msg_parseabi_fail] = "解析ABI文件失敗"
+	G_Msg["zh-TW"][Msg_findaccount_fail] = "找不到指定的帳戶"
+	G_Msg["zh-TW"][Msg_contractdirconfig_null] = "還沒有配置合約文件目錄，可在系統->系統配置中設置"
+	G_Msg["zh-TW"][Msg_param_null] = "參數為空"
+	G_Msg["zh-TW"][Msg_password_mismatch] = "兩次輸入的密碼不一樣"
+	G_Msg["zh-TW"][Msg_function_null] = "函數為空，先加載ABI文件"
+	G_Msg["zh-TW"][Msg_result_mismatch] = "輸出參數少於需要的數量"
+	G_Msg["zh-TW"][Msg_password_null] = "密碼為空"
+	G_Msg["zh-TW"][Msg_transaction_info] = "交易發送成功，交易ID "
 }

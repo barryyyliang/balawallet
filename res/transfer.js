@@ -30,7 +30,7 @@ async function accountChange(){
 function getFee(){
     window.doGetFee().then ( (result) => {
         if (result.length == 0 ) {
-            showMsg("35","")
+            showMsg("22","")
             return;
         }
         var se = document.getElementById("fee");

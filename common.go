@@ -74,14 +74,11 @@ func newCallContractTx(nonce uint64, to common.Address, amount *big.Int, gasLimi
 func weiTox(unittag int, wei string) string {
 	ballength := len(wei)
 	var balance string
-	fmt.Println("wei:" + wei)
 	if ballength > unittag {
 		var first []byte = make([]byte, ballength-unittag)
 		copy(first, []byte(wei)[0:ballength-unittag])
-		//fmt.Println("first:" + string(first))
 		var second []byte = make([]byte, unittag)
 		copy(second, []byte(wei)[ballength-unittag:])
-		//fmt.Println("second:" + string(second))
 		secondStr := strings.TrimRight(string(second), "0")
 		if secondStr != "" {
 			balance = string(first) + "." + secondStr
@@ -144,11 +141,10 @@ func etherTowei(ether string) (big.Int, error) {
 
 }
 
-//判断字符串是否为10进制数字，，每个字符必须为数字【1--9】，最多有一个小数点”.“
+// 判断字符串是否为10进制数字，，每个字符必须为数字【1--9】，最多有一个小数点”.“
 func isNumber(value string) bool {
 	//todo
-	result, err := strconv.ParseFloat(value, 64)
-	fmt.Println(result)
+	_, err := strconv.ParseFloat(value, 64)
 	if err != nil && err.(*strconv.NumError).Err == strconv.ErrSyntax {
 		fmt.Println("bad number:" + err.Error())
 		return false
@@ -193,19 +189,15 @@ func getConnection() *ethclient.Client {
 
 func stringToValue(t reflect.Type, value string) interface{} {
 
-	fmt.Println("string to value")
 	switch t.String() {
 	case "common.Address":
-		fmt.Println("common.Address")
 		add := common.HexToAddress(value)
 		return add
 	case "*big.Int":
-		fmt.Println("*big.Int")
 		ret := new(big.Int)
 		ret.SetString(value, 10)
 		return ret
 	case "string":
-		fmt.Println("string")
 		return value
 	}
 	return nil
@@ -213,19 +205,15 @@ func stringToValue(t reflect.Type, value string) interface{} {
 
 func valueToString(value interface{}) string {
 	var ret string
-	fmt.Println(reflect.TypeOf(value).String())
 	switch reflect.TypeOf(value).String() {
 	case "common.Address":
-		fmt.Println("type is common.Address")
 		add := value.(common.Address)
 		ret = add.String()
 	case "*big.Int":
-		fmt.Println("type is *big.Int")
 		v := new(big.Int)
 		v = value.(*big.Int)
 		ret = v.String()
 	case "string":
-		fmt.Println("type is string")
 		ret = value.(string)
 	case "bool":
 		v := value.(bool)
@@ -239,7 +227,6 @@ func valueToString(value interface{}) string {
 }
 
 func getFiles(dir string, suffix string) ([]string, error) {
-	fmt.Println("server:getFiles:")
 	var re []string
 	abiDir, err := os.Open(dir)
 	if err == nil {
@@ -272,7 +259,7 @@ func getResult(code uint, addMsg string) []byte {
 	lang := G_Config["language"]
 	if lang == "" {
 		lang = "zh-CN"
-	} 
+	}
 	msg := G_Msg[lang][code]
 	if msg == "" {
 		msg = "null"

@@ -6,7 +6,6 @@ function initPage() {
 async function newacnt() {
     var pa = document.getElementById("pass").value
     var repa = document.getElementById("repass").value
-     window.doWebLog(repa)
     if (pa != repa){
         var msg = await window.doGetMsg("30")
         MYDIALOG.ShowDiv(msg);
