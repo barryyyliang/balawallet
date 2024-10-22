@@ -23,7 +23,7 @@ type ErrorResult struct {
 	Msg  string
 }
 
-func isAddressExist(db *leveldb.DB, adress string, name string) bool {
+func isExist(db *leveldb.DB, name string) bool {
 	it := db.NewIterator(nil, nil)
 	defer it.Release()
 	for it.Next() {

@@ -51,17 +51,20 @@ func doNewAccount(pass string, walletName string) string {
 
 	//账户信息存库
 	db, err := leveldb.OpenFile(datadir+"db", nil)
-	defer db.Close()
-
-	if isAddressExist(db, account.Address.String(), walletName) == false {
-		err = db.Put([]byte(account.Address.String()), []byte(walletName), nil)
-		if err != nil {
-			fmt.Println("put name err")
-			re = getResult(Msg_writename_fail, err.Error())
+	if err == nil {
+		defer db.Close()
+		if isExist(db, walletName) == false {
+			err = db.Put([]byte(account.Address.String()), []byte(walletName), nil)
+			if err != nil {
+				fmt.Println("put name err")
+				re = getResult(Msg_writename_fail, err.Error())
+			}
+		} else {
+			fmt.Println("name has existed")
+			re = getResult(Msg_createuser_nameexists, "")
 		}
 	} else {
-		fmt.Println("name has existed")
-		re = getResult(Msg_createuser_nameexists, "")
+		re = getResult(Msg_writename_fail, err.Error())
 	}
 
 	return string(re)
@@ -87,8 +90,8 @@ func doGetAccounts() string {
 	//账户信息
 	addressCache := make(map[string]string)
 	db, err := leveldb.OpenFile(datadir+"db", nil)
-	defer db.Close()
 	if err == nil {
+		defer db.Close()
 		it := db.NewIterator(nil, nil)
 		defer it.Release()
 		for it.Next() {
@@ -116,23 +119,27 @@ func doChangeAccountName(address string, name string) string {
 	re := getResult(Msg_success, "")
 	//账户信息存库
 	db, err := leveldb.OpenFile(datadir+"db", nil)
-	defer db.Close()
-
-	if isAddressExist(db, address, name) == false {
-		err = db.Put([]byte(address), []byte(name), nil)
-		if err != nil {
-			re = getResult(Msg_writedb_fail, err.Error())
+	if err == nil {
+		defer db.Close()
+		if isExist(db, name) == false {
+			err = db.Put([]byte(address), []byte(name), nil)
+			if err != nil {
+				re = getResult(Msg_writedb_fail, err.Error())
+			}
+		} else {
+			re = getResult(Msg_changename_nameexists, "")
 		}
 	} else {
-		re = getResult(Msg_changename_nameexists, "")
+		re = getResult(Msg_writedb_fail, err.Error())
 	}
+
 	return string(re)
 }
 
 func doGetAccountName(address string) string {
 	db, err := leveldb.OpenFile(datadir+"db", nil)
-	defer db.Close()
 	if err == nil {
+		defer db.Close()
 		name, err := db.Get([]byte(address), nil)
 		if err == nil {
 			return string(name)
@@ -159,7 +166,32 @@ func doImportAccount(pa string, name string, kk string) string {
 	key.D = new(big.Int)
 	key.D.SetBytes(pp)
 	key.PublicKey.X, key.PublicKey.Y = key.PublicKey.Curve.ScalarBaseMult(key.D.Bytes())
+
+	add := crypto.PubkeyToAddress(key.PublicKey)
+	if ks.HasAddress(add) {
+		re = getResult(Msg_account_exist, "")
+		return string(re)
+	}
+
 	ks.ImportECDSA(key, pa)
+	//账户信息存库
+	db, err := leveldb.OpenFile(datadir+"db", nil)
+	if err == nil {
+		defer db.Close()
+		if isExist(db, name) == false {
+			err = db.Put([]byte(add.String()), []byte(name), nil)
+			if err != nil {
+				fmt.Println("put name err")
+				re = getResult(Msg_writename_fail, err.Error())
+			}
+		} else {
+			fmt.Println("name has existed")
+			re = getResult(Msg_createuser_nameexists, "")
+		}
+	} else {
+		re = getResult(Msg_writename_fail, err.Error())
+	}
+
 	return string(re)
 }
 
@@ -474,7 +506,13 @@ func doGetConfig(configs string) string {
 	defer db.Close()
 
 	data, err := db.Get([]byte("config"), nil)
-	json.Unmarshal(data, &G_Config)
+	if err != nil {
+		return ""
+	}
+	err = json.Unmarshal(data, &G_Config)
+	if err != nil {
+		return ""
+	}
 
 	if configs != "" {
 		var configName []string
@@ -647,9 +685,9 @@ func doImportContract(cons string) string {
 			}
 		}
 		db, err2 := leveldb.OpenFile(datadir+"contract", nil)
-		defer db.Close()
 		jvalue, _ := json.Marshal(jcons)
 		if err2 == nil {
+			defer db.Close()
 			if db.Put([]byte(jcons.Address), jvalue, nil) != nil {
 				re = getResult(Msg_writedb_fail, "")
 			}
@@ -778,7 +816,7 @@ func doInvokeContract(from string, conAddr string, funcAbi string, param string,
 		return string(re)
 	}
 
-	bigvalue, err := etherTowei("0")
+	bigvalue, _ := etherTowei("0")
 	nounce, gasPrice, tipsPrice, chainId, err := getChainInfo(connect, from)
 	if err != nil {
 		re = getResult(Msg_getchaininfo_fail, err.Error())

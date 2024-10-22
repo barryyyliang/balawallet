@@ -38,6 +38,7 @@ const (
 	Msg_result_mismatch            uint = 32
 	Msg_password_null              uint = 33
 	Msg_transaction_info           uint = 34
+	Msg_account_exist              uint = 35
 )
 
 func initMsg() {
@@ -77,6 +78,7 @@ func initMsg() {
 	G_Msg["zh-CN"][Msg_result_mismatch] = "输出参数少于需要的数量"
 	G_Msg["zh-CN"][Msg_password_null] = "密码为空"
 	G_Msg["zh-CN"][Msg_transaction_info] = "交易发送成功，交易 id "
+	G_Msg["zh-CN"][Msg_account_exist] = "账户已存在"
 
 	G_Msg["en"] = make(map[uint]string)
 	G_Msg["en"][Msg_success] = "Success"
@@ -114,6 +116,7 @@ func initMsg() {
 	G_Msg["en"][Msg_result_mismatch] = "There are fewer output parameters than required"
 	G_Msg["en"][Msg_password_null] = "Password is empty"
 	G_Msg["en"][Msg_transaction_info] = "Transaction sent successfully, transaction id: "
+	G_Msg["en"][Msg_account_exist] = "Account already exists"
 
 	G_Msg["zh-TW"] = make(map[uint]string)
 	G_Msg["zh-TW"][Msg_success] = "操作成功"
@@ -151,4 +154,5 @@ func initMsg() {
 	G_Msg["zh-TW"][Msg_result_mismatch] = "輸出參數少於需要的數量"
 	G_Msg["zh-TW"][Msg_password_null] = "密碼為空"
 	G_Msg["zh-TW"][Msg_transaction_info] = "交易發送成功，交易ID "
+	G_Msg["zh-TW"][Msg_account_exist] = "帳戶已存在"
 }
