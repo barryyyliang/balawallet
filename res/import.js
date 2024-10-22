@@ -19,6 +19,7 @@ async function importAct() {
     var name = document.getElementById("name").value
     var kk = document.getElementById("kk").value
     var result = await window.doImportAccount(pa,name,kk)
+    initMenu()
     showResult(result)
 }
 
