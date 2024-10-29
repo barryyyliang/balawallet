@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -20,6 +21,7 @@ var accountdir string
 var resdir string
 var exportdir string
 var currentAccount string
+var G_Timeout time.Duration = 5 * time.Second
 
 var G_Config = make(map[string]string)
 var G_Etherclient *ethclient.Client = nil

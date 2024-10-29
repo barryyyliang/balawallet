@@ -274,7 +274,7 @@ func doTransfer(from string, to string, value string, pass string) string {
 					fmt.Println("transfer err:" + err.Error())
 					re = getResult(Msg_sendtransaction_fail, err.Error())
 				} else {
-					re = getResult(Msg_success, "")
+					re = getResult(Msg_success, tx.Hash().String())
 				}
 			} else {
 				fmt.Println("sign tx err")
@@ -298,7 +298,7 @@ func doGetBalance(add string) string {
 	now := time.Now()
 	fmt.Println("start:")
 	fmt.Println(now.UnixMilli())
-	ctx, fuc := context.WithTimeout(context.Background(), 3*time.Second)
+	ctx, fuc := context.WithTimeout(context.Background(), G_Timeout)
 	defer fuc()
 	balance, err := connect.BalanceAt(ctx, common.HexToAddress(add), nil)
 	now = time.Now()
@@ -325,22 +325,26 @@ func doGetFee() string {
 		fmt.Println("doGetFee: connection is nil")
 		return ""
 	}
-	ctx, fuc := context.WithTimeout(context.Background(), 3*time.Second)
+	ctx, fuc := context.WithTimeout(context.Background(), G_Timeout)
 	defer fuc()
 	price, err := connect.SuggestGasPrice(ctx)
 	if err != nil {
 		fmt.Println("get price error:" + err.Error())
 		return ""
 	}
-	tips, err := connect.SuggestGasTipCap(ctx)
-	if err != nil {
-		fmt.Println("get tips error:" + err.Error())
-		return ""
-	}
+	//fmt.Println("doGetFee: Gas price ：" + weiTogwei(price.String()))
+	//tips, err := connect.SuggestGasTipCap(ctx)
+	//if err != nil {
+	//	fmt.Println("get tips error:" + err.Error())
+	//	return ""
+	//}
+	//fmt.Println("doGetFee: Tips  ：" + weiTogwei(tips.String()))
 	gas := big.NewInt(21000)
-	fee := big.NewInt(0)
-	fee = fee.Add(price, tips)
-	fee = fee.Mul(fee, gas)
+	//新的 1559 交易升级后，gasprice 包含了 base fee  和  tips 费 不需要两者相加，如果不希望给 tips，可以减掉
+	//fee := big.NewInt(0)
+	//fee = fee.Add(price, tips)
+	//fee = fee.Mul(fee, gas)
+	fee := price.Mul(price, gas)
 	str := weiToether(fee.String())
 	return str
 }
@@ -655,7 +659,7 @@ func doImportContract(cons string) string {
 	err := json.Unmarshal([]byte(cons), &jcons)
 	if err == nil {
 		if jcons.Name == "" {
-			ctx, fuc := context.WithTimeout(context.Background(), 3*time.Second)
+			ctx, fuc := context.WithTimeout(context.Background(), G_Timeout)
 			defer fuc()
 			connect := getConnection()
 			if connect != nil {
@@ -753,7 +757,7 @@ func doReadContract(from string, to string, funcAbi string, paremters string) st
 			}
 			connect := getConnection()
 			if connect != nil {
-				ctx, fuc := context.WithTimeout(context.Background(), 3*time.Second)
+				ctx, fuc := context.WithTimeout(context.Background(), G_Timeout)
 				defer fuc()
 				msg := ethereum.CallMsg{
 					From:      common.HexToAddress(from), // the sender of the 'transaction'
@@ -883,7 +887,7 @@ func doQueryTx(hs string) string {
 	var info txinfo
 	txhash := common.HexToHash(hs)
 	connect := getConnection()
-	ctx, fuc := context.WithTimeout(context.Background(), 3*time.Second)
+	ctx, fuc := context.WithTimeout(context.Background(), G_Timeout)
 	defer fuc()
 	tx, _, err := connect.TransactionByHash(ctx, txhash)
 	if err == nil {
