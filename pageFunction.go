@@ -24,6 +24,7 @@ import (
 	//"github.com/ethereum/go-ethereum/crypto/sha3"
 
 	"github.com/syndtr/goleveldb/leveldb"
+	"github.com/syndtr/goleveldb/leveldb/errors"
 )
 
 // //页面切换
@@ -981,4 +982,104 @@ func doGetMsg(code string) string {
 	}
 
 	return msg
+}
+
+func doSaveDataSpace(name string, content string, auth string) string {
+	re := getResult(Msg_success, "")
+	db, err := leveldb.OpenFile(datadir+"dataspace", nil)
+	if db != nil {
+		defer db.Close()
+	}
+	if err == nil {
+		value, err2 := db.Get([]byte(name), nil)
+		if (err2 == errors.ErrNotFound) || (err2 == nil && len(value) == 0) {
+			encryptData, err1 := keystore.EncryptDataV3([]byte(content), []byte(auth), keystore.StandardScryptN, keystore.StandardScryptP)
+			if err1 == nil {
+				data, _ := json.Marshal(encryptData)
+				err3 := db.Put([]byte(name), data, nil)
+				if err3 != nil {
+					re = getResult(Msg_writedb_fail, err3.Error())
+				}
+			} else {
+				re = getResult(Msg_fail, err1.Error())
+			}
+		} else if err2 == nil {
+			re = getResult(Msg_exist, string(value))
+		} else {
+			re = getResult(Msg_fail, err2.Error())
+		}
+	} else {
+		re = getResult(Msg_fail, err.Error())
+	}
+
+	return string(re)
+}
+
+func doChangeDataSpace(name string, content string, auth string) string {
+	re := getResult(Msg_success, "")
+	db, err := leveldb.OpenFile(datadir+"dataspace", nil)
+	if db != nil {
+		defer db.Close()
+	}
+	if err == nil {
+		encryptData, err1 := keystore.EncryptDataV3([]byte(content), []byte(auth), keystore.StandardScryptN, keystore.StandardScryptP)
+		if err1 == nil {
+			data, _ := json.Marshal(encryptData)
+			err2 := db.Put([]byte(name), data, nil)
+			if err2 != nil {
+				re = getResult(Msg_writedb_fail, err2.Error())
+			}
+		} else {
+			re = getResult(Msg_fail, err1.Error())
+		}
+	} else {
+		re = getResult(Msg_fail, err.Error())
+	}
+	return string(re)
+}
+
+func doDeleteDataSpace(name string) string {
+	re := getResult(Msg_success, "")
+	db, err := leveldb.OpenFile(datadir+"dataspace", nil)
+	if db != nil {
+		defer db.Close()
+	}
+	if err == nil {
+		err2 := db.Delete([]byte(name), nil)
+		if err2 != nil {
+			re = getResult(Msg_fail, err2.Error())
+		}
+	} else {
+		re = getResult(Msg_fail, err.Error())
+	}
+	return string(re)
+}
+
+func doGetDataSpace(auth string) string {
+	re := getResult(Msg_success, "")
+	data := make(map[string]string)
+	db, err := leveldb.OpenFile(datadir+"dataspace", nil)
+	if db != nil {
+		defer db.Close()
+	}
+	if err == nil {
+		it := db.NewIterator(nil, nil)
+		defer it.Release()
+		for it.Next() {
+			var tmp keystore.CryptoJSON
+			if json.Unmarshal(it.Value(), &tmp) == nil {
+				dedata, err1 := keystore.DecryptDataV3(tmp, auth)
+				if err1 == nil {
+					data[string(it.Key())] = string(dedata)
+				} else {
+					data[string(it.Key())] = err1.Error()
+				}
+			}
+		}
+		msg, _ := json.Marshal(data)
+		re, _ = json.Marshal(ErrorResult{Msg_success, string(msg)})
+	} else {
+		re = getResult(Msg_fail, err.Error())
+	}
+	return string(re)
 }

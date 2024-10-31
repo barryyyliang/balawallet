@@ -28,6 +28,7 @@ func initRes() {
 	G_Res["zh-CN"]["/main.html"]["main_exportaccount"] = "导出账户"
 	G_Res["zh-CN"]["/main.html"]["main_config"] = "系统设置"
 	G_Res["zh-CN"]["/main.html"]["main_about"] = "关于 Web3Wallet"
+	G_Res["zh-CN"]["/main.html"]["main_dataspace"] = "个人数据空间"
 
 	G_Res["en"]["/main.html"] = make(map[string]string)
 	G_Res["en"]["/main.html"]["qianbao"] = "Wallet"
@@ -49,6 +50,7 @@ func initRes() {
 	G_Res["en"]["/main.html"]["main_exportaccount"] = "Export Account"
 	G_Res["en"]["/main.html"]["main_config"] = "System Config"
 	G_Res["en"]["/main.html"]["main_about"] = "About Web3Wallet"
+	G_Res["en"]["/main.html"]["main_dataspace"] = "Personal Data Space"
 
 	G_Res["zh-TW"]["/main.html"] = make(map[string]string)
 	G_Res["zh-TW"]["/main.html"]["qianbao"] = "錢包"
@@ -70,6 +72,7 @@ func initRes() {
 	G_Res["zh-TW"]["/main.html"]["main_exportaccount"] = "導出帳戶"
 	G_Res["zh-TW"]["/main.html"]["main_config"] = "系統設定"
 	G_Res["zh-TW"]["/main.html"]["main_about"] = "關於 Web3Wallet"
+	G_Res["zh-TW"]["/main.html"]["main_dataspace"] = "個人數據空間"
 
 	//qianbao
 	G_Res["zh-CN"]["/qianbao.html"] = make(map[string]string)
@@ -370,5 +373,39 @@ func initRes() {
 
     使用建議和問題回饋：
     barryyyliang@163.com`
+
+	//dataspace
+	G_Res["zh-CN"]["/dataspace.html"] = make(map[string]string)
+	G_Res["zh-CN"]["/dataspace.html"]["dataspace_name"] = "数据名称"
+	G_Res["zh-CN"]["/dataspace.html"]["dataspace_content"] = "数据内容"
+	G_Res["zh-CN"]["/dataspace.html"]["dataspace_add"] = "添加"
+	G_Res["zh-CN"]["/dataspace.html"]["dataspace_delete"] = "删除"
+	G_Res["zh-CN"]["/dataspace.html"]["dataspace_recover"] = "还原"
+	G_Res["zh-CN"]["/dataspace.html"]["dataspace_save"] = "保存"
+	G_Res["zh-CN"]["/dataspace.html"]["dataspace_change"] = "修改"
+	G_Res["zh-CN"]["/dataspace.html"]["dataspace_auth"] = "个人空间密码"
+	G_Res["zh-CN"]["/dataspace.html"]["dataspace_load"] = "加载"
+
+	G_Res["zh-TW"]["/dataspace.html"] = make(map[string]string)
+	G_Res["zh-TW"]["/dataspace.html"]["dataspace_name"] = "數據名稱"
+	G_Res["zh-TW"]["/dataspace.html"]["dataspace_content"] = "數據內容"
+	G_Res["zh-TW"]["/dataspace.html"]["dataspace_add"] = "添加"
+	G_Res["zh-TW"]["/dataspace.html"]["dataspace_delete"] = "删除"
+	G_Res["zh-TW"]["/dataspace.html"]["dataspace_recover"] = "還原"
+	G_Res["zh-TW"]["/dataspace.html"]["dataspace_save"] = "保存"
+	G_Res["zh-TW"]["/dataspace.html"]["dataspace_change"] = "修改"
+	G_Res["zh-TW"]["/dataspace.html"]["dataspace_auth"] = "個人空間密碼"
+	G_Res["zh-TW"]["/dataspace.html"]["dataspace_load"] = "加載"
+
+	G_Res["en"]["/dataspace.html"] = make(map[string]string)
+	G_Res["en"]["/dataspace.html"]["dataspace_name"] = "Data Name"
+	G_Res["en"]["/dataspace.html"]["dataspace_content"] = "Content"
+	G_Res["en"]["/dataspace.html"]["dataspace_add"] = "Add"
+	G_Res["en"]["/dataspace.html"]["dataspace_delete"] = "Delete"
+	G_Res["en"]["/dataspace.html"]["dataspace_recover"] = "Recover"
+	G_Res["en"]["/dataspace.html"]["dataspace_save"] = "Save"
+	G_Res["en"]["/dataspace.html"]["dataspace_change"] = "Change"
+	G_Res["en"]["/dataspace.html"]["dataspace_auth"] = "Personal Data Space Password"
+	G_Res["en"]["/dataspace.html"]["dataspace_load"] = "Load"
 
 }

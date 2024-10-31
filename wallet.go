@@ -64,6 +64,10 @@ func main() {
 	win.Bind("doInvokeContract", doInvokeContract)
 	win.Bind("doGetRes", doGetRes)
 	win.Bind("doGetMsg", doGetMsg)
+	win.Bind("doSaveDataSpace", doSaveDataSpace)
+	win.Bind("doChangeDataSpace", doChangeDataSpace)
+	win.Bind("doDeleteDataSpace", doDeleteDataSpace)
+	win.Bind("doGetDataSpace", doGetDataSpace)
 
 	path, _ := filepath.Abs(filepath.Dir(os.Args[0]))
 	dir = strings.Replace(path, "\\", "/", -1)
@@ -97,9 +101,7 @@ func main() {
 	}
 
 	//打开钱包
-	scryptN := keystore.StandardScryptN
-	scryptP := keystore.StandardScryptP
-	ks = keystore.NewKeyStore(dir+"/account/", scryptN, scryptP)
+	ks = keystore.NewKeyStore(dir+"/account/", keystore.StandardScryptN, keystore.StandardScryptP)
 	//初始化配置
 	var conf = [1]string{"nodeAddress"}
 	par, _ := json.Marshal(conf)
