@@ -40,6 +40,10 @@ const (
 	Msg_transaction_info           uint = 34
 	Msg_account_exist              uint = 35
 	Msg_exist                      uint = 36
+	Msg_space_inited               uint = 37
+	Msg_space_notinited            uint = 38
+	Msg_password_limit             uint = 39
+	Msg_password_error             uint = 40
 )
 
 func initMsg() {
@@ -81,6 +85,10 @@ func initMsg() {
 	G_Msg["zh-CN"][Msg_transaction_info] = "交易发送成功，交易 id "
 	G_Msg["zh-CN"][Msg_account_exist] = "账户已存在"
 	G_Msg["zh-CN"][Msg_exist] = "已存在"
+	G_Msg["zh-CN"][Msg_space_inited] = "数据空间已经初始化，无法重新初始化"
+	G_Msg["zh-CN"][Msg_space_notinited] = "数据空间未初始化，请先设置密码进行初始化，请牢记密码，密码丢失无法找回"
+	G_Msg["zh-CN"][Msg_password_limit] = "密码不能为空，切长度不能低于 8"
+	G_Msg["zh-CN"][Msg_password_error] = "密码错误"
 
 	G_Msg["en"] = make(map[uint]string)
 	G_Msg["en"][Msg_success] = "Success"
@@ -120,6 +128,10 @@ func initMsg() {
 	G_Msg["en"][Msg_transaction_info] = "Transaction sent successfully, transaction id: "
 	G_Msg["en"][Msg_account_exist] = "Account already exists"
 	G_Msg["en"][Msg_exist] = "Already exists"
+	G_Msg["en"][Msg_space_inited] = "The data space has been initialized and cannot be re-initialized"
+	G_Msg["en"][Msg_space_notinited] = "The data space is not initialized. Please set a password to initialize it first. Remember the password as it cannot be recovered if lost"
+	G_Msg["en"][Msg_password_limit] = "The password cannot be empty, and its length must be at least 8 characters"
+	G_Msg["en"][Msg_password_error] = "Password Error"
 
 	G_Msg["zh-TW"] = make(map[uint]string)
 	G_Msg["zh-TW"][Msg_success] = "操作成功"
@@ -159,4 +171,8 @@ func initMsg() {
 	G_Msg["zh-TW"][Msg_transaction_info] = "交易發送成功，交易ID "
 	G_Msg["zh-TW"][Msg_account_exist] = "帳戶已存在"
 	G_Msg["zh-TW"][Msg_exist] = "已存在"
+	G_Msg["zh-TW"][Msg_space_inited] = "數據空間已經初始化，無法重新初始化"
+	G_Msg["zh-TW"][Msg_space_notinited] = "數據空間未初始化，請先設置密碼進行初始化，請牢記密碼，密碼遺失無法找回"
+	G_Msg["zh-TW"][Msg_password_limit] = "密碼不能為空，且長度不能低於 8"
+	G_Msg["zh-TW"][Msg_password_error] = "密碼錯誤"
 }
