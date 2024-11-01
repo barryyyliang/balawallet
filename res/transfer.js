@@ -1,9 +1,9 @@
 
 function ontransfer() {
-    var pa = document.getElementById("pass").value
-    var add = document.getElementById("add").value
-    var toAddress = document.getElementById("toAddress").value
-    var amount = document.getElementById("amount").value
+    var pa = document.getElementById("transfer_pass").value
+    var add = document.getElementById("transfer_input_selectedAdd").value
+    var toAddress = document.getElementById("transfer_input_toAddress").value
+    var amount = document.getElementById("transfer_input_amount").value
     window.doTransfer(add, toAddress,amount,pa).then((result) => {
         var obj = JSON.parse(result)
         MYDIALOG.ShowDiv(obj.Msg);
@@ -12,14 +12,14 @@ function ontransfer() {
 
 async function accountChange(){
     var address = document.getElementById("add").value 
-    document.getElementById("selectedAdd").value =  address         
+    document.getElementById("transfer_input_selectedAdd").value =  address         
     ret = await window.doGetAccountName(address)
-    document.getElementById("name").value = ret
+    document.getElementById("transfer_input_name").value = ret
     window.doGetBalance(address).then ((result) =>{
         var jsonObj = JSON.parse(result)
         if (jsonObj.Code === 0){
             var blObj = JSON.parse(jsonObj.Msg)
-            document.getElementById("balance").value = blObj.Balance
+            document.getElementById("transfer_input_balance").value = blObj.Balance
             getFee()
         } else {
             MYDIALOG.ShowDiv(jsonObj.Msg);
@@ -33,7 +33,7 @@ function getFee(){
             showMsg("22","")
             return;
         }
-        var se = document.getElementById("fee");
+        var se = document.getElementById("transfer_input_fee");
         se.value = result;
     })  
 }
