@@ -2,16 +2,14 @@
 <!--弹出层时背景层DIV-->
 <div id="fade" class= "black_overlay"></div>     
 <div id="MyDiv" class="white_content_small">
-    <div style="text-align: right; cursor: default; height: 40px;">
-        <div style="text-align: right; background: rgb(131, 174, 230);width:100%">
+    <div style="text-align: right; cursor: default;">
+        <div style="display: flex;height:35px;;align-items:center ;justify-content: right; background: rgb(131, 174, 230);width:100%;">
             <span id="main_close" style="font-size: 16px;" onclick="MYDIALOG.CloseDiv('MyDiv','fade')">关闭</span>
         </div>
     </div>
-    <div id="dialogcontent" style="text-align: left; word-wrap:break-word;">
-        一个模态对话框
+    <div id="dialogcontent" style="font-size: 16px;display: flex;flex-direction: column;text-align: left; word-wrap:break-word;flex-grow: 1;">
     </div>
 </div>   
-
 
 <!-- menu-->            
 <div id="menu">
@@ -28,7 +26,7 @@
     <div id="main_invoke" class="menu" onclick="changePage('tools','invokecontract')">调用合约</div>
     <div id="main_query" class="menu" onclick="changePage('tools','querytx')">查询交易</div>
     <div id="main_sign" class="menu" onclick="changePage('tools','signature')">数字签名</div>
-    <div id="main_dataspace" class="menu" onclick="changePage('tools','dataspace')">个人数据空间</div>
+    <!--div id="main_dataspace" class="menu" onclick="changePage('tools','dataspace')">个人数据空间</div-->
 </div> 
 
 <!-- tool menu-->            

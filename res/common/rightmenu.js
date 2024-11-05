@@ -150,10 +150,61 @@
             //$("#"+"fade").height($(document).height());
         },
 
+        ShowConfirmDiv: async function (dialog_content){
+            var showdiv = document.getElementById("MyDiv");
+            showdiv.style.display='flex';
+            var bgdiv = document.getElementById("fade");
+            bgdiv.style.display='block';
+            bgdiv.style.width = document.body.scrollWidth;
+            bgdiv.style.height = document.body.scrollHeight;
+            var contentdiv = document.getElementById("dialogcontent");
+            contentdiv.innerHTML = ""
+
+            var div1 = document.createElement("div")
+            div1.setAttribute("style","font-size: 16px;display: flex;flex-grow: 1;align-items:center ;justify-content:center;")
+            var p = document.createElement("p")
+            p.innerText = dialog_content
+            div1.append(p)
+            contentdiv.append(div1)
+
+            var div2 = document.createElement("div")
+            div2.setAttribute("style","width: 100%;text-align:center;margin-bottom: 10px;")            
+            var button1 = document.createElement("input")
+            button1.setAttribute("type","button")
+            button1.setAttribute("value",await gGetMainRes("main_ok"))
+            button1.setAttribute("class","button1")
+            button1.setAttribute("style","width:100px;")
+            div2.append(button1)
+
+            var button2 = document.createElement("input")
+            button2.setAttribute("type","button")
+            button2.setAttribute("value",await gGetMainRes("main_cancel"))
+            button2.setAttribute("class","button1")
+            button2.setAttribute("style","width:100px")
+            div2.append(button2)
+            contentdiv.append(div2)
+
+
+            return new Promise((resolve, reject) => {
+                button1.onclick = () => {
+                    MYDIALOG.CloseDiv();
+                    resolve(true);
+                };
+
+                button2.onclick = () => {
+                    MYDIALOG.CloseDiv();
+                    resolve(false)
+                }
+            });
+
+            //$("#"+"fade").height($(document).height());
+        },
+
         //关闭模态对话框
         CloseDiv:function (){
             document.getElementById("MyDiv").style.display='none';
             document.getElementById("fade").style.display='none';
         }
     }
+
 

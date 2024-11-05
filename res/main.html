@@ -76,6 +76,7 @@
     var currentMenu
     var currentPage
     var gResJson
+    var gMainRes
 
     window.onload=async function() {
         //async  init page
@@ -134,6 +135,17 @@
             return ""
         }
     }
+
+    async function gGetMainRes(res) {
+        if (gMainRes == null) {
+            var res = await window.doGetRes("main")
+            if (res != "") {
+                gMainRes = JSON.parse(res)         
+            }            
+        }
+
+        return gMainRes[res]
+    }
     
 
     async function initMenu() {
@@ -150,9 +162,12 @@
 
         var res = await window.doGetRes("main")
         if (res != "") {
-            var resjson = JSON.parse(res)
-            for (var ele in resjson) {
-                 document.getElementById(ele).innerText = resjson[ele]
+            gMainRes = JSON.parse(res)               
+            for (var ele in gMainRes) {
+                var obj = document.getElementById(ele)
+                if (obj != null) {
+                    obj.innerText = gMainRes[ele]
+                }
             }
         }
     } 
@@ -278,7 +293,7 @@
                 <li><a id="qianbao" class="active" onmouseover="onMenuOver('qianbao')" onclick="changePage('qianbao','qianbao')">钱包</a></li>                    
                 <li><a id="contractasset" onmouseover="onMenuOver('contractasset')" onclick="changePage('contractasset','contractasset')">合约资产</a></li>
                 <li><a id="transfer" onmouseover="onMenuOver('transfer')" onclick="changePage('transfer','transfer')">转账</a></li>
-                <!--li><a id="tools" onclick="changePage('tools','tools')">工具</a></li-->
+                <li><a id="dataspace" onmouseover="onMenuOver('dataspace')" onclick="changePage('dataspace','dataspace')">数据空间</a></li>
                 <li><a id="tools" onmouseover="onMenuOver('tools')" onclick="onToolsMenu()">工具</a></li>
                 <!--li><a id="system" onclick="changePage('system','system')">系统</a></li-->
                 <li><a id="system" onmouseover="onMenuOver('system')" onclick="onSystemMenu()">系统</a></li>

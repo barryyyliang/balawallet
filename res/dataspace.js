@@ -51,9 +51,13 @@
 
     async function dataspace_fun_delete(id){
         var dataname = document.getElementById(id).value
-        var result = await window.doDeleteDataSpace(dataname)
-        showResult(result)
-        dataspace_fun_load()
+        var conf = await MYDIALOG.ShowConfirmDiv(await window.doGetMsg("42"))
+        if(conf){
+            var result = await window.doDeleteDataSpace(dataname)
+            showResult(result)
+            loadDataSpace()
+        } 
+        
     }
 
     function dataspace_fun_recover(id){
@@ -70,7 +74,7 @@
         showResult(result)
         var obj = JSON.parse(result)
         if(obj.Code === 0){
-            dataspace_fun_load()
+            loadDataSpace()
         }        
     }
 
@@ -78,32 +82,43 @@
         var auth = document.getElementById("dataspace_pass").value
         var dataname = document.getElementById(name).value
         var datacontent = document.getElementById(content).value
-        var result = await window.doChangeDataSpace(dataname,datacontent,auth)
-        showResult(result)
+        var conf = await MYDIALOG.ShowConfirmDiv(await window.doGetMsg("41"))
+        if(conf){
+            var result = await window.doChangeDataSpace(dataname,datacontent,auth)
+            showResult(result)
+        } 
     }
 
     async function dataspace_fun_load(){
+        var ret = await loadDataSpace()
+        if (ret == true){
+            MYDIALOG.ShowDiv(await window.doGetMsg("0"))
+        }
+    }
+
+    async function loadDataSpace(){
         var auth = document.getElementById("dataspace_pass").value
-        window.doGetDataSpace(auth).then( (result) => {
-            if (result != ""){
-                var obj = JSON.parse(result)
-                if (obj.Code == 0 ){
-                    data = JSON.parse(obj.Msg)
-                    window.doWebLog("iniPage dataspace:" + obj.Msg)
-                    var table = document.getElementById("dataspace_table")
-                    for (var n=table.rows.length-1;n>0;n--){
-                        table.removeChild(table.rows[n])
-                    }
-                    for(var val in data)
-                    {                            
-                        var tr = initTr(val,data[val])
-                        table.append(tr)
-                    }
-                } else {
-                    showResult(result)
+        var result =await window.doGetDataSpace(auth)
+        if (result != ""){
+            var obj = JSON.parse(result)
+            if (obj.Code == 0 ){
+                data = JSON.parse(obj.Msg)
+                var table = document.getElementById("dataspace_table")
+                for (var n=table.rows.length-1;n>0;n--){
+                    table.removeChild(table.rows[n])
                 }
+                for(var val in data)
+                {                            
+                    var tr = initTr(val,data[val])
+                    table.append(tr)
+                }
+                return true
+            } else {
+                showResult(result)
+                return false
             }
-        })
+        }
+        return true
     }
 
     async function dataspace_fun_init(){
@@ -144,16 +159,6 @@
         td3.append(ipt2)
         tr.append(td3)
 
-        var td4 = document.createElement("td")               
-        var bt = document.createElement("input")
-        bt.setAttribute("type","button")
-        bt.setAttribute("class","button1")
-        bt.setAttribute("style","width:100px")
-        bt.setAttribute("value",gGetRes("dataspace_delete"))
-        bt.setAttribute("onclick","dataspace_fun_delete("+"'dataspace_name"+number+"')")
-        td4.append(bt) 
-        tr.append(td4)
-
         var td5 = document.createElement("td")               
         var bt2 = document.createElement("input")
         bt2.setAttribute("type","button")
@@ -173,6 +178,16 @@
         bt3.setAttribute("onclick","dataspace_fun_change("+"'dataspace_name"+number+"'" +",'dataspace_content"+number+"')")
         td6.append(bt3) 
         tr.append(td6)
+
+        var td4 = document.createElement("td")               
+        var bt = document.createElement("input")
+        bt.setAttribute("type","button")
+        bt.setAttribute("class","button1")
+        bt.setAttribute("style","width:100px")
+        bt.setAttribute("value",gGetRes("dataspace_delete"))
+        bt.setAttribute("onclick","dataspace_fun_delete("+"'dataspace_name"+number+"')")
+        td4.append(bt) 
+        tr.append(td4)
         
         number++
         return tr

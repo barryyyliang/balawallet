@@ -44,6 +44,8 @@ const (
 	Msg_space_notinited            uint = 38
 	Msg_password_limit             uint = 39
 	Msg_password_error             uint = 40
+	Msg_modify_confirm             uint = 41
+	Msg_delete_confirm             uint = 42
 )
 
 func initMsg() {
@@ -89,6 +91,8 @@ func initMsg() {
 	G_Msg["zh-CN"][Msg_space_notinited] = "数据空间未初始化，请先设置密码进行初始化，请牢记密码，密码丢失无法找回"
 	G_Msg["zh-CN"][Msg_password_limit] = "密码不能为空，切长度不能低于 8"
 	G_Msg["zh-CN"][Msg_password_error] = "密码错误"
+	G_Msg["zh-CN"][Msg_modify_confirm] = "修改不可撤销，请确认是否修改"
+	G_Msg["zh-CN"][Msg_delete_confirm] = "删除不可恢复，请确认是否删除"
 
 	G_Msg["en"] = make(map[uint]string)
 	G_Msg["en"][Msg_success] = "Success"
@@ -132,6 +136,8 @@ func initMsg() {
 	G_Msg["en"][Msg_space_notinited] = "The data space is not initialized. Please set a password to initialize it first. Remember the password as it cannot be recovered if lost"
 	G_Msg["en"][Msg_password_limit] = "The password cannot be empty, and its length must be at least 8 characters"
 	G_Msg["en"][Msg_password_error] = "Password Error"
+	G_Msg["en"][Msg_modify_confirm] = "Modify irreversible, please confirm whether to modify"
+	G_Msg["en"][Msg_delete_confirm] = "Deletion is irreversible, please confirm whether to delete"
 
 	G_Msg["zh-TW"] = make(map[uint]string)
 	G_Msg["zh-TW"][Msg_success] = "操作成功"
@@ -175,4 +181,6 @@ func initMsg() {
 	G_Msg["zh-TW"][Msg_space_notinited] = "數據空間未初始化，請先設置密碼進行初始化，請牢記密碼，密碼遺失無法找回"
 	G_Msg["zh-TW"][Msg_password_limit] = "密碼不能為空，且長度不能低於 8"
 	G_Msg["zh-TW"][Msg_password_error] = "密碼錯誤"
+	G_Msg["zh-TW"][Msg_modify_confirm] = "修改不可撤銷，請確認是否修改"
+	G_Msg["zh-TW"][Msg_delete_confirm] = "刪除不可恢復，請確認是否刪除"
 }
