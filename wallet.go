@@ -31,7 +31,7 @@ func main() {
 	InitHtmlFile()
 	initMsg()
 	initRes()
-	win = webview.New(true)
+	win = webview.New(false)
 	defer win.Destroy()
 	win.SetTitle("Web3Wallet")
 	win.SetSize(1024, 640, webview.HintNone)
