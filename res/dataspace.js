@@ -50,12 +50,16 @@
 
 
     async function dataspace_fun_delete(id){
+        var auth = document.getElementById("dataspace_pass").value
         var dataname = document.getElementById(id).value
         var conf = await MYDIALOG.ShowConfirmDiv(await window.doGetMsg("42"))
         if(conf){
-            var result = await window.doDeleteDataSpace(dataname)
-            showResult(result)
-            loadDataSpace()
+            var result = await window.doDeleteDataSpace(dataname,auth)
+            var obj = JSON.parse(result)
+            MYDIALOG.ShowDiv(obj.Msg)  
+            if (obj.Code === 0){
+                loadDataSpace()
+            }                     
         } 
         
     }
@@ -71,11 +75,12 @@
         var dataname = document.getElementById(name).value
         var datacontent = document.getElementById(content).value
         var result = await window.doSaveDataSpace(dataname,datacontent,auth)
-        showResult(result)
         var obj = JSON.parse(result)
+        MYDIALOG.ShowDiv(obj.Msg)
         if(obj.Code === 0){
             loadDataSpace()
-        }        
+        }
+        
     }
 
     async function dataspace_fun_change(name,content){

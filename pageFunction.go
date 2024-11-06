@@ -1048,8 +1048,13 @@ func doChangeDataSpace(name string, content string, auth string) string {
 	return string(re)
 }
 
-func doDeleteDataSpace(name string) string {
+func doDeleteDataSpace(name string, auth string) string {
 	re := getResult(Msg_success, "")
+	check := checkDataSpaceAuth(auth)
+	if check != nil {
+		re = getResult(Msg_fail, check.Error())
+		return string(re)
+	}
 	db, err := leveldb.OpenFile(datadir+"dataspace", nil)
 	if db != nil {
 		defer db.Close()
