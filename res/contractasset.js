@@ -17,8 +17,8 @@
         option.value = "ERC20"
         ipt0.add(option)
         var option2 = document.createElement("option")
-        option2.text = "NFT"
-        option2.value = "NFT"
+        option2.text = "ERC721"
+        option2.value = "ERC721"
         ipt0.add(option2)
         
         var td1 = document.createElement("td")
@@ -59,8 +59,13 @@
     async function importContract(address,type){
         var add = document.getElementById(address).value
         var ty = document.getElementById(type).value
-        var obj = {type:ty,address:add,name:''}
+        var fromadd = document.getElementById("add").value
+        var obj = {type:ty,address:add,name:'',from:fromadd}
         var result = await window.doImportContract(JSON.stringify(obj))
+        var reobj = JSON.parse(result)
+        if(reobj.Code === 0){
+            initData()
+        } 
         showResult(result)
     }
 
@@ -100,19 +105,26 @@
         return tr
     }
 
-    function initPage(){
-        gLoadRes()
+    function initData(){
         window.doGetContract().then( (result) => {
             if (result != ""){
                 var obj = JSON.parse(result)
+                var table = document.getElementById("assetTable")
+                for (var n=table.rows.length-1;n>0;n--){
+                    table.removeChild(table.rows[n])
+                }
                 for(var i = 0; i < obj.contracts.length;i++)
-                {
-                    var table = document.getElementById("assetTable")
+                {                    
                     var tr = initTr(obj.contracts[i])
                     table.append(tr)
                 }
             }
         })
+    }
+
+    function initPage(){
+        gLoadRes()
+        initData()
     }
 
 

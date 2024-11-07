@@ -28,7 +28,8 @@ var G_Etherclient *ethclient.Client = nil
 var G_BlockchainConfig bool = true
 
 func main() {
-	InitHtmlFile()
+	InitHtmlFile() //generate by tool
+	InitAbiFile()  //generate by tool
 	initMsg()
 	initRes()
 	win = webview.New(false)
