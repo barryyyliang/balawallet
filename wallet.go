@@ -71,6 +71,7 @@ func main() {
 	win.Bind("doGetDataSpace", doGetDataSpace)
 	win.Bind("doCheckDataSpace", doCheckDataSpace)
 	win.Bind("doInitDataSpace", doInitDataSpace)
+	win.Bind("doDeleteContract", doDeleteContract)
 
 	path, _ := filepath.Abs(filepath.Dir(os.Args[0]))
 	dir = strings.Replace(path, "\\", "/", -1)

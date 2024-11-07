@@ -69,6 +69,19 @@
         showResult(result)
     }
 
+    async function deleteContract(address){        
+        var conf = await MYDIALOG.ShowConfirmDiv(await window.doGetMsg("42"))
+        if(conf){
+            var add = document.getElementById(address).value
+            var result = await window.doDeleteContract(add)
+            var reobj = JSON.parse(result)
+            if(reobj.Code === 0){
+                initData()
+            } 
+            showResult(result)
+        } 
+    }
+
     function initTr(obj){
         var tr = document.createElement("tr")
 
@@ -101,6 +114,16 @@
         ipt0.setAttribute("value",obj.type) 
         ipt.setAttribute("value",obj.address) 
         ipt2.setAttribute("value",obj.name) 
+
+        var td4 = document.createElement("td")               
+        var bt = document.createElement("input")
+        //bt.setAttribute("style","width:50px")
+        bt.setAttribute("type","button")
+        bt.setAttribute("class","button1")
+        bt.setAttribute("value",gGetRes("contractasset_delete"))
+        bt.setAttribute("onclick","deleteContract("+"'address"+number+"')")
+        td4.append(bt) 
+        tr.append(td4)
         number++
         return tr
     }

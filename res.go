@@ -109,6 +109,7 @@ func initRes() {
 	G_Res["zh-CN"]["/contractasset.html"]["contractasset_name"] = "资产名称"
 	G_Res["zh-CN"]["/contractasset.html"]["contractasset_add"] = "添加"
 	G_Res["zh-CN"]["/contractasset.html"]["contractasset_import"] = "导入"
+	G_Res["zh-CN"]["/contractasset.html"]["contractasset_delete"] = "删除"
 
 	G_Res["en"]["/contractasset.html"] = make(map[string]string)
 	G_Res["en"]["/contractasset.html"]["contractasset_type"] = "Type"
@@ -116,6 +117,7 @@ func initRes() {
 	G_Res["en"]["/contractasset.html"]["contractasset_name"] = "Name"
 	G_Res["en"]["/contractasset.html"]["contractasset_add"] = "Add"
 	G_Res["en"]["/contractasset.html"]["contractasset_import"] = "Import"
+	G_Res["en"]["/contractasset.html"]["contractasset_delete"] = "Delete"
 
 	G_Res["zh-TW"]["/contractasset.html"] = make(map[string]string)
 	G_Res["zh-TW"]["/contractasset.html"]["contractasset_type"] = "合约類型"
@@ -123,6 +125,7 @@ func initRes() {
 	G_Res["zh-TW"]["/contractasset.html"]["contractasset_name"] = "資產名稱"
 	G_Res["zh-TW"]["/contractasset.html"]["contractasset_add"] = "添加"
 	G_Res["zh-TW"]["/contractasset.html"]["contractasset_import"] = "導入"
+	G_Res["zh-TW"]["/contractasset.html"]["contractasset_delete"] = "删除"
 
 	//contractasset
 	G_Res["zh-CN"]["/transfer.html"] = make(map[string]string)

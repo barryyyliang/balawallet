@@ -461,6 +461,21 @@ func doGetContract() string {
 	return ""
 }
 
+func doDeleteContract(address string) string {
+	re := getResult(Msg_success, "")
+	db, err := leveldb.OpenFile(datadir+"contract", nil)
+	if err == nil {
+		defer db.Close()
+		if db.Delete([]byte(address), nil) != nil {
+			re = getResult(Msg_writedb_fail, "")
+		}
+	} else {
+		fmt.Println("open contract db error:" + err.Error())
+		re = getResult(Msg_opendb_fail, err.Error())
+	}
+	return string(re)
+}
+
 func doImportContract(cons string) string {
 	re := getResult(Msg_success, "")
 	type contract struct {
