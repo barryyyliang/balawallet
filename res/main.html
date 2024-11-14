@@ -150,19 +150,24 @@
 
     async function initMenu() {
         var result = await window.doGetAccounts()
-        var acc = JSON.parse(result)
-        var se = document.getElementById("add")
-        se.options.length = 0
-        for (i=0; i<acc.accounts.length; i++){
-            var option = document.createElement("option")
-            option.text = acc.accounts[i].address
-            option.value = acc.accounts[i].address
-            se.add(option)
+        if (result != ""){
+            var acc = JSON.parse(result)
+            if (acc != ""){
+                window.doWebLog(acc)
+                var se = document.getElementById("add")
+                se.options.length = 0
+                for (i=0; i<acc.accounts.length; i++){
+                    var option = document.createElement("option")
+                    option.text = acc.accounts[i].address
+                    option.value = acc.accounts[i].address
+                    se.add(option)
+                }
+            }
         }
 
         var res = await window.doGetRes("main")
         if (res != "") {
-            gMainRes = JSON.parse(res)               
+            gMainRes = JSON.parse(res)         
             for (var ele in gMainRes) {
                 var obj = document.getElementById(ele)
                 if (obj != null) {

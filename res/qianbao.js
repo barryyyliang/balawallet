@@ -80,8 +80,10 @@ async function initBalance(){
 async function initPage(){
     gLoadRes()
     window.doGetAccounts().then( (result) => {
-        var arr = JSON.parse(result)
-        addAccountElement(arr.accounts,document.getElementById("tableWallet"))
+        if (result != ""){
+            var arr = JSON.parse(result)
+            addAccountElement(arr.accounts,document.getElementById("tableWallet"))
+        }
     })
     var re = await window.doCheckNode()
     var obj = JSON.parse(re)

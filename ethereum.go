@@ -90,12 +90,15 @@ func doGetAccounts() string {
 		acclist.Accounts = append(acclist.Accounts, account{"eth", add, addressCache[add]})
 	}
 
-	result, err2 := json.Marshal(acclist)
-	if err2 == nil {
-		return string(result)
-	} else {
-		fmt.Println(err2.Error())
+	if len(acclist.Accounts) > 0 {
+		result, err2 := json.Marshal(acclist)
+		if err2 == nil {
+			return string(result)
+		} else {
+			fmt.Println(err2.Error())
+		}
 	}
+
 	return ""
 }
 

@@ -9,13 +9,16 @@
 function initPage(){
     gLoadRes()
     window.doGetAccounts().then( (result) => {
-        var acc = JSON.parse(result)
-        var se = document.getElementById("export_select_acc")
-        for (i=0; i<acc.accounts.length; i++){
-            var option = document.createElement("option")
-            option.text = acc.accounts[i].address
-            option.value = acc.accounts[i].address
-            se.add(option)
-        }            
+        if (result != ""){
+            var acc = JSON.parse(result)
+            var se = document.getElementById("export_select_acc")
+            for (i=0; i<acc.accounts.length; i++){
+                var option = document.createElement("option")
+                option.text = acc.accounts[i].address
+                option.value = acc.accounts[i].address
+                se.add(option)
+            } 
+        }
+           
     })
 }
