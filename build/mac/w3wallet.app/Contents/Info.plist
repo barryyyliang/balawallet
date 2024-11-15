@@ -3,10 +3,12 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleExecutable</key>
-	<string>web3wallet</string>
+	<string>w3wallet</string>
 	<key>CFBundleIdentifier</key>
-	<string>WalletApp</string>
+	<string>com.barry.w3wallet</string>
 	<key>NSHighResolutionCapable</key>
 	<true/>
+	<key>CFBundleIconFile</key>
+	<string>icons.icns</string>
 </dict>
 </plist>

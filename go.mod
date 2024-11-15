@@ -1,4 +1,4 @@
-module Web3Wallet
+module w3wallet
 
 go 1.22
 
