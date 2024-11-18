@@ -5,7 +5,6 @@ function initPage() {
 
 
 async function signature(){
-    infosign
     document.getElementById("infosign").value = ""
     var param={}
     var info = document.getElementById("info").value
@@ -30,6 +29,26 @@ async function signature(){
     } else {
         MYDIALOG.ShowDiv(objJson.Msg)
     }
+}
+
+async function verify(){
+    var param={}
+    var info = document.getElementById("info").value
+    var ass = document.getElementById("sigAss").value
+    var sig = document.getElementById("infosign").value
+    param.Address = getCurrentAccount()
+    if(info == "" || ass == "" || sig == "") {        
+        showMsg("29","")
+        return
+    } else {
+        param.Info = info
+        param.Ass = ass
+        param.Sign = sig
+    }
+
+    var result = await window.doSignatureVerify(JSON.stringify(param))
+    window.doWebLog(result)
+    showResult(result)    
 }
 
 

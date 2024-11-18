@@ -15,7 +15,6 @@ import (
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/accounts/abi"
-	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -185,44 +184,24 @@ func doImportAccount(pa string, name string, kk string) string {
 // 导出私钥
 func doExportAccount(add string, pa string) string {
 	re := getResult(Msg_success, "")
-	selectAccountFile := ""
-	acc := ks.Accounts()
-	for i := 0; i < len(acc); i++ {
-		if acc[i].Address.String() == add {
-			selectAccountFile = acc[i].URL.Path
-		}
-	}
-
-	if selectAccountFile != "" {
-		keyjson, err := os.ReadFile(selectAccountFile)
-		if err != nil {
-			re = getResult(Msg_readaccountfile_fail, err.Error())
-			return string(re)
-		}
-		key, err := keystore.DecryptKey(keyjson, pa)
-		if err != nil {
-			re = getResult(Msg_decryptprivatekey_fail, err.Error())
-			return string(re)
-		}
-		// 确保导出的是需要私钥
-		if key.Address.String() != add {
-			fmt.Errorf("key content mismatch: have account %x, want %s", key.Address, add)
-			re = getResult(Msg_addressprivatekey_mismatch, key.Address.String()+"-"+add)
-			return string(re)
-		}
-
-		file, err := os.OpenFile(exportdir+add, os.O_RDWR|os.O_CREATE, 0666)
-		if err != nil {
-			fmt.Println("can not open file in export:" + err.Error())
-			re = getResult(Msg_openexportfile_fail, err.Error())
+	key, err := getKey(add, pa)
+	if err == nil {
+		defer zeroKey(key)
+		file, err1 := os.OpenFile(exportdir+add, os.O_RDWR|os.O_CREATE, 0666)
+		if err1 != nil {
+			fmt.Println("can not open file in export:" + err1.Error())
+			re = getResult(Msg_openexportfile_fail, err1.Error())
 			return string(re)
 		}
 		defer file.Close()
 
-		value := hex.EncodeToString(key.PrivateKey.D.Bytes())
+		value := hex.EncodeToString(key.D.Bytes())
+		fmt.Println("do export account:" + value)
 		writer := bufio.NewWriter(file)
 		writer.WriteString(value)
 		writer.Flush()
+	} else {
+		re = getResult(Msg_fail, err.Error())
 	}
 	return string(re)
 }
@@ -762,6 +741,44 @@ func doSignature(info string) string {
 				}
 				break
 			}
+		}
+	} else {
+		re = getResult(Msg_param_error, err.Error())
+	}
+
+	return string(re)
+}
+
+func doSignatureVerify(info string) string {
+	fmt.Println("doSignatureVerify")
+	var re []byte
+	var param = make(map[string]string)
+	err := json.Unmarshal([]byte(info), &param)
+	if err == nil {
+		key, err1 := getKey(param["Address"], param["Ass"])
+		if key != nil {
+			defer zeroKey(key)
+		}
+		if err1 == nil {
+			pub := crypto.CompressPubkey(&key.PublicKey)
+			sig, err2 := hex.DecodeString(param["Sign"])
+			if err2 == nil {
+				//check just need [r|S] 64 byte
+				isok := crypto.VerifySignature(pub, crypto.Keccak256([]byte(param["Info"])), sig[:64])
+				if isok {
+					re = getResult(Msg_success, "")
+				} else {
+					fmt.Println("doSignatureVerify pub:" + string(pub))
+					fmt.Println("doSignatureVerify Info:" + param["Info"])
+					fmt.Println("doSignatureVerify sig:" + param["Sign"])
+					re = getResult(Msg_fail, "")
+				}
+			} else {
+				re = getResult(Msg_fail, err2.Error())
+			}
+
+		} else {
+			re = getResult(Msg_fail, err1.Error())
 		}
 	} else {
 		re = getResult(Msg_param_error, err.Error())

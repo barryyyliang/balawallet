@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"crypto/ecdsa"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"math/big"
 	"os"
@@ -10,6 +12,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 
@@ -269,4 +272,47 @@ func getResult(code uint, addMsg string) []byte {
 	}
 	re, _ = json.Marshal(ErrorResult{code, msg})
 	return re
+}
+
+func getMsg(code uint) string {
+	lang := G_Config["language"]
+	if lang == "" {
+		lang = "zh-CN"
+	}
+	msg := G_Msg[lang][code]
+	return msg
+}
+func zeroKey(key *ecdsa.PrivateKey) {
+	b := key.D.Bits()
+	clear(b)
+}
+
+func getKey(add string, pa string) (*ecdsa.PrivateKey, error) {
+	selectAccountFile := ""
+	acc := ks.Accounts()
+	for i := 0; i < len(acc); i++ {
+		if acc[i].Address.String() == add {
+			selectAccountFile = acc[i].URL.Path
+		}
+	}
+	if selectAccountFile != "" {
+		keyjson, err := os.ReadFile(selectAccountFile)
+		if err != nil {
+			return nil, err
+		}
+		key, err := keystore.DecryptKey(keyjson, pa)
+		if err != nil {
+			return nil, err
+		}
+		// 确保导出的是需要私钥
+		if key.Address.String() != add {
+			fmt.Errorf("key content mismatch: have account %x, want %s", key.Address, add)
+			return nil, errors.New(getMsg(Msg_addressprivatekey_mismatch))
+		} else {
+			return key.PrivateKey, nil
+		}
+	} else {
+		fmt.Println("can not find account:" + add)
+	}
+	return nil, errors.New(getMsg(Msg_addressprivatekey_mismatch))
 }
