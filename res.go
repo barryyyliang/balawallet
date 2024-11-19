@@ -244,16 +244,19 @@ func initRes() {
 	G_Res["zh-CN"]["/signature.html"]["signature_infomation"] = "待签名信息"
 	G_Res["zh-CN"]["/signature.html"]["signature_acc"] = "账户密码"
 	G_Res["zh-CN"]["/signature.html"]["signature_sign"] = "签名"
+	G_Res["zh-CN"]["/signature.html"]["signature_verify"] = "验证签名"
 
 	G_Res["en"]["/signature.html"] = make(map[string]string)
 	G_Res["en"]["/signature.html"]["signature_infomation"] = "Information to be signed"
 	G_Res["en"]["/signature.html"]["signature_acc"] = "Password"
 	G_Res["en"]["/signature.html"]["signature_sign"] = "Sign"
+	G_Res["en"]["/signature.html"]["signature_verify"] = "Verify"
 
 	G_Res["zh-TW"]["/signature.html"] = make(map[string]string)
 	G_Res["zh-TW"]["/signature.html"]["signature_infomation"] = "待簽名訊息"
 	G_Res["zh-TW"]["/signature.html"]["signature_acc"] = "帳號密碼"
 	G_Res["zh-TW"]["/signature.html"]["signature_sign"] = "簽名"
+	G_Res["zh-TW"]["/signature.html"]["signature_verify"] = "驗證簽名"
 
 	//newaccount
 	G_Res["zh-CN"]["/newaccount.html"] = make(map[string]string)

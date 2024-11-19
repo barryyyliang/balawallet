@@ -149,6 +149,7 @@ func doImportAccount(pa string, name string, kk string) string {
 		re = getResult(Msg_privatekey_error, err.Error())
 		return string(re)
 	}
+	defer clear(pp)
 	key.D = new(big.Int)
 	key.D.SetBytes(pp)
 	key.PublicKey.X, key.PublicKey.Y = key.PublicKey.Curve.ScalarBaseMult(key.D.Bytes())
@@ -164,7 +165,7 @@ func doImportAccount(pa string, name string, kk string) string {
 	db, err := leveldb.OpenFile(datadir+"db", nil)
 	if err == nil {
 		defer db.Close()
-		if isExist(db, name) == false {
+		if !isExist(db, name) {
 			err = db.Put([]byte(add.String()), []byte(name), nil)
 			if err != nil {
 				fmt.Println("put name err")
@@ -750,7 +751,6 @@ func doSignature(info string) string {
 }
 
 func doSignatureVerify(info string) string {
-	fmt.Println("doSignatureVerify")
 	var re []byte
 	var param = make(map[string]string)
 	err := json.Unmarshal([]byte(info), &param)
@@ -766,9 +766,6 @@ func doSignatureVerify(info string) string {
 				if adress.String() == param["Address"] {
 					re = getResult(Msg_success, "")
 				} else {
-					fmt.Println("doSignatureVerify address:" + adress.String())
-					fmt.Println("doSignatureVerify Info:" + param["Info"])
-					fmt.Println("doSignatureVerify sig:" + param["Sign"])
 					re = getResult(Msg_fail, "")
 				}
 			} else {
