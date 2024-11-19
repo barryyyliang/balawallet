@@ -34,15 +34,13 @@ async function signature(){
 async function verify(){
     var param={}
     var info = document.getElementById("info").value
-    var ass = document.getElementById("sigAss").value
     var sig = document.getElementById("infosign").value
     param.Address = getCurrentAccount()
-    if(info == "" || ass == "" || sig == "") {        
+    if(info == "" || sig == "") {        
         showMsg("29","")
         return
     } else {
         param.Info = info
-        param.Ass = ass
         param.Sign = sig
     }
 

@@ -755,20 +755,18 @@ func doSignatureVerify(info string) string {
 	var param = make(map[string]string)
 	err := json.Unmarshal([]byte(info), &param)
 	if err == nil {
-		key, err1 := getKey(param["Address"], param["Ass"])
-		if key != nil {
-			defer zeroKey(key)
-		}
+		//key, err1 := getKey(param["Address"], param["Ass"])
+		sig, err1 := hex.DecodeString(param["Sign"])
+
 		if err1 == nil {
-			pub := crypto.CompressPubkey(&key.PublicKey)
-			sig, err2 := hex.DecodeString(param["Sign"])
+			key, err2 := crypto.SigToPub(crypto.Keccak256([]byte(param["Info"])), sig)
 			if err2 == nil {
 				//check just need [r|S] 64 byte
-				isok := crypto.VerifySignature(pub, crypto.Keccak256([]byte(param["Info"])), sig[:64])
-				if isok {
+				adress := crypto.PubkeyToAddress(*key)
+				if adress.String() == param["Address"] {
 					re = getResult(Msg_success, "")
 				} else {
-					fmt.Println("doSignatureVerify pub:" + string(pub))
+					fmt.Println("doSignatureVerify address:" + adress.String())
 					fmt.Println("doSignatureVerify Info:" + param["Info"])
 					fmt.Println("doSignatureVerify sig:" + param["Sign"])
 					re = getResult(Msg_fail, "")
