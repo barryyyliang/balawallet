@@ -1,4 +1,4 @@
-module w3wallet
+module BalaWallet
 
 go 1.22
 

@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleExecutable</key>
-	<string>w3wallet</string>
+	<string>BalaWallet</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.barry.w3wallet</string>
+	<string>com.barry.W3Wallet</string>
 	<key>NSHighResolutionCapable</key>
 	<true/>
 	<key>CFBundleIconFile</key>

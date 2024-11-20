@@ -27,7 +27,7 @@ func initRes() {
 	G_Res["zh-CN"]["/main.html"]["main_importaccount"] = "导入账户"
 	G_Res["zh-CN"]["/main.html"]["main_exportaccount"] = "导出账户"
 	G_Res["zh-CN"]["/main.html"]["main_config"] = "系统设置"
-	G_Res["zh-CN"]["/main.html"]["main_about"] = "关于 Web3Wallet"
+	G_Res["zh-CN"]["/main.html"]["main_about"] = "关于 BalaWallet"
 	G_Res["zh-CN"]["/main.html"]["dataspace"] = "数据空间"
 	G_Res["zh-CN"]["/main.html"]["main_ok"] = "确定"
 	G_Res["zh-CN"]["/main.html"]["main_cancel"] = "取消"
@@ -51,7 +51,7 @@ func initRes() {
 	G_Res["en"]["/main.html"]["main_importaccount"] = "Import Account"
 	G_Res["en"]["/main.html"]["main_exportaccount"] = "Export Account"
 	G_Res["en"]["/main.html"]["main_config"] = "System Config"
-	G_Res["en"]["/main.html"]["main_about"] = "About Web3Wallet"
+	G_Res["en"]["/main.html"]["main_about"] = "About BalaWallet"
 	G_Res["en"]["/main.html"]["dataspace"] = "Data Space"
 	G_Res["en"]["/main.html"]["main_ok"] = "Ok"
 	G_Res["en"]["/main.html"]["main_cancel"] = "Cancel"
@@ -75,7 +75,7 @@ func initRes() {
 	G_Res["zh-TW"]["/main.html"]["main_importaccount"] = "導入帳戶"
 	G_Res["zh-TW"]["/main.html"]["main_exportaccount"] = "導出帳戶"
 	G_Res["zh-TW"]["/main.html"]["main_config"] = "系統設定"
-	G_Res["zh-TW"]["/main.html"]["main_about"] = "關於 Web3Wallet"
+	G_Res["zh-TW"]["/main.html"]["main_about"] = "關於 BalaWallet"
 	G_Res["zh-TW"]["/main.html"]["dataspace"] = "數據空間"
 	G_Res["zh-TW"]["/main.html"]["main_ok"] = "確定"
 	G_Res["zh-TW"]["/main.html"]["main_cancel"] = "取消"
@@ -339,7 +339,7 @@ func initRes() {
 
 	//about
 	G_Res["zh-CN"]["/about.html"] = make(map[string]string)
-	G_Res["zh-CN"]["/about.html"]["about_about"] = `web3wallet 提供数字资产管理，智能合约调用。
+	G_Res["zh-CN"]["/about.html"]["about_about"] = `BalaWallet 提供数字资产管理，智能合约调用。
 	
     本软件暂不提供节点服务，要连接到区块链网络，用户可以连接第三方区块链节点或者 RPC 服务
 
@@ -355,7 +355,7 @@ func initRes() {
     barryyyliang@163.com`
 
 	G_Res["en"]["/about.html"] = make(map[string]string)
-	G_Res["en"]["/about.html"]["about_about"] = `web3wallet provides digital asset management and smart contract calling functions。
+	G_Res["en"]["/about.html"]["about_about"] = `BalaWallet provides digital asset management and smart contract calling functions。
     
 	This software does not currently provide node services. To connect to the blockchain network, users can connect to third-party blockchain nodes or RPC services.
 	
@@ -371,7 +371,7 @@ func initRes() {
     barryyyliang@163.com`
 
 	G_Res["zh-TW"]["/about.html"] = make(map[string]string)
-	G_Res["zh-TW"]["/about.html"]["about_about"] = `web3wallet 提供數位資產管理，智慧合約呼叫功能。
+	G_Res["zh-TW"]["/about.html"]["about_about"] = `BalaWallet 提供數位資產管理，智慧合約呼叫功能。
 	
     本軟體暫不提供節點服務，要連接到區塊鏈網絡，用戶可以連接第三方區塊鏈節點或 RPC 服務
 
