@@ -346,13 +346,14 @@ func initRes() {
     RPC厂商注册后，可提供一定量的免费服务,如下 RPC 厂商可提供相关服务：
     https://www.infura.io/zh/networks/ethereum
 	https://etherscan.io/apis
+	https://zan.top/home/node-service
 
     使用的的第三方开源项目：    
     https://github.com/ethereum/go-ethereum.git
     https://github.com/webview/webview_go.git
 
     使用建议和问题反馈：
-    barryyyliang@163.com`
+    balawallet@163.com`
 
 	G_Res["en"]["/about.html"] = make(map[string]string)
 	G_Res["en"]["/about.html"]["about_about"] = `BalaWallet provides digital asset management and smart contract calling functions。
@@ -362,13 +363,14 @@ func initRes() {
 	After RPC vendors register, they can provide a certain amount of free services, The following RPC vendors can provide related services:
     https://www.infura.io/zh/networks/ethereum
 	https://etherscan.io/apis
+	https://zan.top/home/node-service
     
 	Third-party open source projects used:    
     https://github.com/ethereum/go-ethereum.git
     https://github.com/webview/webview_go.git
     
 	Usage suggestions and problem feedback:
-    barryyyliang@163.com`
+    balawallet@163.com`
 
 	G_Res["zh-TW"]["/about.html"] = make(map[string]string)
 	G_Res["zh-TW"]["/about.html"]["about_about"] = `BalaWallet 提供數位資產管理，智慧合約呼叫功能。
@@ -378,13 +380,14 @@ func initRes() {
     RPC廠商註冊後，可提供一定量的免費服務,如下 RPC 廠商可提供相關服務：
     https://www.infura.io/zh/networks/ethereum
 	https://etherscan.io/apis
+	https://zan.top/home/node-service
 
     使用的第三方開源專案：    
     https://github.com/ethereum/go-ethereum.git
     https://github.com/webview/webview_go.git
 
     使用建議和問題回饋：
-    barryyyliang@163.com`
+    balawallet@163.com`
 
 	//dataspace
 	G_Res["zh-CN"]["/dataspace.html"] = make(map[string]string)
