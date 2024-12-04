@@ -6,7 +6,6 @@
         table.append(tr)
     }
 
-
     function addNewTr(){
         var tr = document.createElement("tr")
         var ipt0 = document.createElement("select")
@@ -50,7 +49,7 @@
         bt.setAttribute("onclick","importContract("+"'address"+number +"'" +",'type"+number+"')")
         td4.append(bt) 
         tr.append(td4)
-        
+
         number++
         return tr
     }
@@ -81,6 +80,14 @@
             showResult(result)
         } 
     }
+
+    function contractasset_func_invoke(address){
+        gParam = {}
+        gParam.invokeContract = {}
+        gParam.invokeContract.address = document.getElementById(address).value
+        changePage("tools","invokecontract")
+    }
+
 
     function initTr(obj){
         var tr = document.createElement("tr")
@@ -124,6 +131,17 @@
         bt.setAttribute("onclick","deleteContract("+"'address"+number+"')")
         td4.append(bt) 
         tr.append(td4)
+
+        var td5 = document.createElement("td")               
+        var bt2 = document.createElement("input")
+        //bt.setAttribute("style","width:50px")
+        bt2.setAttribute("type","button")
+        bt2.setAttribute("class","button1")
+        bt2.setAttribute("value",gGetRes("contractasset_invoke"))
+        bt2.setAttribute("onclick","contractasset_func_invoke("+"'address"+number+"')")
+        td5.append(bt2) 
+        tr.append(td5)
+
         number++
         return tr
     }

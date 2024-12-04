@@ -46,6 +46,7 @@ const (
 	Msg_password_error             uint = 40
 	Msg_modify_confirm             uint = 41
 	Msg_delete_confirm             uint = 42
+	Msg_account_noexist            uint = 43
 )
 
 func initMsg() {
@@ -93,6 +94,7 @@ func initMsg() {
 	G_Msg["zh-CN"][Msg_password_error] = "密码错误"
 	G_Msg["zh-CN"][Msg_modify_confirm] = "修改不可撤销，请确认是否修改"
 	G_Msg["zh-CN"][Msg_delete_confirm] = "删除不可恢复，请确认是否删除"
+	G_Msg["zh-CN"][Msg_account_noexist] = "账户不存在"
 
 	G_Msg["en"] = make(map[uint]string)
 	G_Msg["en"][Msg_success] = "Success"
@@ -138,6 +140,7 @@ func initMsg() {
 	G_Msg["en"][Msg_password_error] = "Password Error"
 	G_Msg["en"][Msg_modify_confirm] = "Modify irreversible, please confirm whether to modify"
 	G_Msg["en"][Msg_delete_confirm] = "Deletion is irreversible, please confirm whether to delete"
+	G_Msg["en"][Msg_account_noexist] = "Account is not exist"
 
 	G_Msg["zh-TW"] = make(map[uint]string)
 	G_Msg["zh-TW"][Msg_success] = "操作成功"
@@ -183,4 +186,5 @@ func initMsg() {
 	G_Msg["zh-TW"][Msg_password_error] = "密碼錯誤"
 	G_Msg["zh-TW"][Msg_modify_confirm] = "修改不可撤銷，請確認是否修改"
 	G_Msg["zh-TW"][Msg_delete_confirm] = "刪除不可恢復，請確認是否刪除"
+	G_Msg["zh-TW"][Msg_account_noexist] = "賬戶不存在"
 }

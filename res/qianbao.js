@@ -4,6 +4,15 @@ async function changeName(address,name){
     var result = await window.doChangeAccountName(addressvalue,namevalue)
     showResult(result)
 }
+
+async function changePass(address,name){
+    gParam = {}
+    gParam.type="eth"
+    gParam.address=document.getElementById(address).value
+    gParam.name=document.getElementById(name).value
+    changePage("qianbao","changepass")
+}
+
 function management(address,name){
     window.doWebLog("enter management")
 }
@@ -53,6 +62,17 @@ function addAccountElement(acc,table){
         bt.setAttribute("onclick","changeName("+"'address"+i +"'" +",'name"+i+"')")
         td4.append(bt) 
         tr.append(td4)
+
+        var td5 = document.createElement("td")               
+        var bt2 = document.createElement("input")
+        bt2.setAttribute("class","button1")
+        //bt.setAttribute("style","width:100px")
+        bt2.setAttribute("type","button")
+        bt2.setAttribute("value",gGetRes("qianbao_changepass"))
+        bt2.setAttribute("onclick","changePass("+"'address"+i +"'" +",'name"+i+"')")
+        td5.append(bt2) 
+        tr.append(td5)
+
 
         table.append(tr)
     }

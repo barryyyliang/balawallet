@@ -77,6 +77,7 @@
     var currentPage
     var gResJson
     var gMainRes
+    var gParam
 
     window.onload=async function() {
         //async  init page
@@ -199,8 +200,7 @@
         var menu = document.querySelector('#toolMenu')
         if (menu != null) {
             menu.style.height=0;
-        }
-        
+        }        
 
         try{
             if (currentPage != ""  && currentPage != null && currentPage != "invokecontract" && pagename != "querytx"){
@@ -263,6 +263,10 @@
                     initPage() 
                 } else {
                     gReloadRes()
+                    try{
+                        reInit()
+                    } catch (e) {
+                    }
                 }
                 //document.getElementById('pageContent').innerHTML = obj.html                
                 //initPage() 

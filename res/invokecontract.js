@@ -153,8 +153,20 @@
         }
     }
 
+    function reInit(){
+        try{
+            document.getElementById("caddress").value = gParam.invokeContract.address
+        } catch (e) {
+        }
+    }
+
     async function initPage(){
         gLoadRes()
+        try{
+            document.getElementById("caddress").value = gParam.invokeContract.address
+        } catch (e) {
+        }
+        
         var result = await window.doGetAbiFile()
         var jsonObj = JSON.parse(result)
         if (jsonObj.Code === 0 ){

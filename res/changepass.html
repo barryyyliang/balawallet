@@ -1,0 +1,32 @@
+<div id="changepass_hint" style="margin: 10px auto;text-align: center;font-size: 16px">
+    提示：请妥善保管密码，忘记密码，无法恢复，会导致秘钥管理的数字资产丢失，请备份账户私钥
+</div>
+<table id="changepass_table" style="margin: 0 auto;font-size: 16px;text-align: center;">
+    <tr>        
+        <td id="changepass_type">账户类型:</td>
+        <td><input type="text" id="changepass_input_type" readonly></td>        
+    </tr>  
+    <tr>
+        <td id="changepass_address">账户地址:</td>
+        <td><input type="text" id="changepass_input_address" readonly></td>
+    </tr> 
+    <tr>
+        <td id="changepass_name">账户名称:</td>
+        <td><input type="text" id="changepass_input_name" readonly></td>
+    </tr> 
+    <tr>
+        <td id="changepass_old">旧密码:</td>
+        <td><input type="password" id="changepass_input_old" ></td>
+    </tr> 
+    <tr>
+        <td id="changepass_new">新密码:</td>
+        <td><input type="password" id="changepass_input_new" ></td>
+    </tr> 
+    <tr>
+        <td id="changepass_confirm">确认密码:</td>
+        <td><input type="password" id="changepass_input_confirm" ></td>
+    </tr> 
+</table>
+<div style="margin: 0 auto;text-align: center;">
+    <button id="changepass_change" class="button1" onclick="changepass_func_change()">修改</button>
+</div>

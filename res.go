@@ -87,6 +87,7 @@ func initRes() {
 	G_Res["zh-CN"]["/qianbao.html"]["qianbao_name"] = "别名"
 	G_Res["zh-CN"]["/qianbao.html"]["qianbao_balance"] = "余额"
 	G_Res["zh-CN"]["/qianbao.html"]["qianbao_changebutton"] = "修改别名"
+	G_Res["zh-CN"]["/qianbao.html"]["qianbao_changepass"] = "修改密码"
 
 	G_Res["en"]["/qianbao.html"] = make(map[string]string)
 	G_Res["en"]["/qianbao.html"]["qianbao_type"] = "Type"
@@ -94,6 +95,7 @@ func initRes() {
 	G_Res["en"]["/qianbao.html"]["qianbao_name"] = "Name"
 	G_Res["en"]["/qianbao.html"]["qianbao_balance"] = "Balance"
 	G_Res["en"]["/qianbao.html"]["qianbao_changebutton"] = "Change Name"
+	G_Res["en"]["/qianbao.html"]["qianbao_changepass"] = "Change Password"
 
 	G_Res["zh-TW"]["/qianbao.html"] = make(map[string]string)
 	G_Res["zh-TW"]["/qianbao.html"]["qianbao_type"] = "類型"
@@ -101,6 +103,7 @@ func initRes() {
 	G_Res["zh-TW"]["/qianbao.html"]["qianbao_name"] = "別名"
 	G_Res["zh-TW"]["/qianbao.html"]["qianbao_balance"] = "餘額"
 	G_Res["zh-TW"]["/qianbao.html"]["qianbao_changebutton"] = "修改別名"
+	G_Res["zh-TW"]["/qianbao.html"]["qianbao_changepass"] = "修改密码"
 
 	//contractasset
 	G_Res["zh-CN"]["/contractasset.html"] = make(map[string]string)
@@ -110,6 +113,7 @@ func initRes() {
 	G_Res["zh-CN"]["/contractasset.html"]["contractasset_add"] = "添加"
 	G_Res["zh-CN"]["/contractasset.html"]["contractasset_import"] = "导入"
 	G_Res["zh-CN"]["/contractasset.html"]["contractasset_delete"] = "删除"
+	G_Res["zh-CN"]["/contractasset.html"]["contractasset_invoke"] = "调用"
 
 	G_Res["en"]["/contractasset.html"] = make(map[string]string)
 	G_Res["en"]["/contractasset.html"]["contractasset_type"] = "Type"
@@ -118,6 +122,7 @@ func initRes() {
 	G_Res["en"]["/contractasset.html"]["contractasset_add"] = "Add"
 	G_Res["en"]["/contractasset.html"]["contractasset_import"] = "Import"
 	G_Res["en"]["/contractasset.html"]["contractasset_delete"] = "Delete"
+	G_Res["en"]["/contractasset.html"]["contractasset_invoke"] = "Inovke"
 
 	G_Res["zh-TW"]["/contractasset.html"] = make(map[string]string)
 	G_Res["zh-TW"]["/contractasset.html"]["contractasset_type"] = "合约類型"
@@ -126,6 +131,7 @@ func initRes() {
 	G_Res["zh-TW"]["/contractasset.html"]["contractasset_add"] = "添加"
 	G_Res["zh-TW"]["/contractasset.html"]["contractasset_import"] = "導入"
 	G_Res["zh-TW"]["/contractasset.html"]["contractasset_delete"] = "删除"
+	G_Res["zh-TW"]["/contractasset.html"]["contractasset_invoke"] = "調用"
 
 	//contractasset
 	G_Res["zh-CN"]["/transfer.html"] = make(map[string]string)
@@ -426,4 +432,34 @@ func initRes() {
 	G_Res["en"]["/dataspace.html"]["dataspace_load"] = "Load"
 	G_Res["en"]["/dataspace.html"]["dataspace_init"] = "Initialize Password"
 
+	//changepass
+	G_Res["zh-CN"]["/changepass.html"] = make(map[string]string)
+	G_Res["zh-CN"]["/changepass.html"]["changepass_type"] = "账户类型"
+	G_Res["zh-CN"]["/changepass.html"]["changepass_address"] = "账户地址"
+	G_Res["zh-CN"]["/changepass.html"]["changepass_name"] = "账户名称"
+	G_Res["zh-CN"]["/changepass.html"]["changepass_old"] = "旧密码"
+	G_Res["zh-CN"]["/changepass.html"]["changepass_new"] = "新密码"
+	G_Res["zh-CN"]["/changepass.html"]["changepass_confirm"] = "确认密码"
+	G_Res["zh-CN"]["/changepass.html"]["changepass_change"] = "修改"
+	G_Res["zh-CN"]["/changepass.html"]["changepass_hint"] = "提示：请妥善保管密码，忘记密码，无法恢复，会导致秘钥管理的数字资产丢失，请备份账户私钥"
+
+	G_Res["zh-TW"]["/changepass.html"] = make(map[string]string)
+	G_Res["zh-TW"]["/changepass.html"]["changepass_type"] = "賬戶類型"
+	G_Res["zh-TW"]["/changepass.html"]["changepass_address"] = "賬戶地址"
+	G_Res["zh-TW"]["/changepass.html"]["changepass_name"] = "名稱"
+	G_Res["zh-TW"]["/changepass.html"]["changepass_old"] = "舊密碼"
+	G_Res["zh-TW"]["/changepass.html"]["changepass_new"] = "新密碼"
+	G_Res["zh-TW"]["/changepass.html"]["changepass_confirm"] = "確認密碼"
+	G_Res["zh-TW"]["/changepass.html"]["changepass_change"] = "修改"
+	G_Res["zh-TW"]["/changepass.html"]["changepass_hint"] = "提示：請妥善保管密碼，忘記密碼將無法恢復，這將導致密鑰管理的數字資產丟失，請備份賬戶私鑰。"
+
+	G_Res["en"]["/changepass.html"] = make(map[string]string)
+	G_Res["en"]["/changepass.html"]["changepass_type"] = "Type"
+	G_Res["en"]["/changepass.html"]["changepass_address"] = "Address"
+	G_Res["en"]["/changepass.html"]["changepass_name"] = "Name"
+	G_Res["en"]["/changepass.html"]["changepass_old"] = "Old Password"
+	G_Res["en"]["/changepass.html"]["changepass_new"] = "New Password"
+	G_Res["en"]["/changepass.html"]["changepass_confirm"] = "Confirm Password"
+	G_Res["en"]["/changepass.html"]["changepass_change"] = "Change"
+	G_Res["en"]["/changepass.html"]["changepass_hint"] = "Note: Please keep your password safe. Forgetting your password cannot be recovered, which will lead to the loss of digital assets in key management. Please back up your account private key."
 }

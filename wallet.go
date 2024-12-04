@@ -73,6 +73,7 @@ func main() {
 	win.Bind("doInitDataSpace", doInitDataSpace)
 	win.Bind("doDeleteContract", doDeleteContract)
 	win.Bind("doSignatureVerify", doSignatureVerify)
+	win.Bind("doChangeAccountPass", doChangeAccountPass)
 
 	path, _ := filepath.Abs(filepath.Dir(os.Args[0]))
 	dir = strings.Replace(path, "\\", "/", -1)

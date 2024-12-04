@@ -6,7 +6,9 @@ security find-identity -p codesigning
 
 
 codesign -f -s "Developer ID Application: Yongfu Liang (H9WT49L44K)" -v "/Users/barry/code/app/app/BalaWallet.app" 
+
 hdiutil create -srcFolder /Users/barry/code/app/app -o BalaWallet
+
 codesign -f -s "Developer ID Application: Yongfu Liang (H9WT49L44K)" -v "/Users/barry/code/app/BalaWallet.dmg" 
 
 
@@ -17,8 +19,6 @@ codesign -f -s "Developer ID Application: Yongfu Liang (H9WT49L44K)" -v "/Users/
 xattr -r -d com.apple.FinderInfo w3wallet.dmg 
 
 
-
-hdiutil create -srcFolder /Users/barry/code/app/app -o w3wallet
 
 
 

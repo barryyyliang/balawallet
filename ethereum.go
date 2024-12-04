@@ -821,3 +821,22 @@ func doGetBinFile() string {
 	}
 	return string(re)
 }
+
+func doChangeAccountPass(atype, address, old, new string) string {
+	re := getResult(Msg_success, "")
+	acc := ks.Accounts()
+	var i = 0
+	for i = 0; i < len(acc); i++ {
+		if acc[i].Address.String() == address {
+			err2 := ks.Update(acc[i], old, new)
+			if err2 != nil {
+				re = getResult(Msg_fail, err2.Error())
+			}
+			break
+		}
+	}
+	if i == len(acc) {
+		re = getResult(Msg_account_noexist, "")
+	}
+	return string(re)
+}

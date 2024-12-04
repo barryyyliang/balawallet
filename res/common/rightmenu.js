@@ -56,8 +56,8 @@
          //根据事件对象中鼠标点击的位置，进行定位
         var a = document.getElementById("tools")
         rec = a.getBoundingClientRect()
-        menu.style.left=rec.left+'px';
-        menu.style.top=rec.bottom+'px';
+        menu.style.left=(rec.left+window.scrollX)+'px';
+        menu.style.top=(rec.bottom+window.scrollY)+'px';
         //改变自定义菜单的宽，让它显示出来
         menu.style.width='auto';
         menu.style.height='auto';
@@ -68,8 +68,8 @@
          //根据事件对象中鼠标点击的位置，进行定位
         var a = document.getElementById("system")
         rec = a.getBoundingClientRect()
-        menu.style.left=rec.left+'px';
-        menu.style.top=rec.bottom+'px';
+        menu.style.left=(rec.left+window.scrollX)+'px';
+        menu.style.top=(rec.bottom+window.scrollY)+'px';
         //改变自定义菜单的宽，让它显示出来
         menu.style.width='auto';
         menu.style.height='auto';
