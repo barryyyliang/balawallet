@@ -9,6 +9,7 @@
         var tr = document.createElement("tr")
 
         var td1 = document.createElement("td")
+        td1.setAttribute("style","width:100px;")
         td1.innerText = obj.name
         tr.append(td1)
 
@@ -25,7 +26,39 @@
     }
 
     async function loadABI(){
+        var seFile = document.getElementById("abiFile")
+        seFile.options.length = 0
+        var result = await window.doGetAbiFile()
+        var jsonObj = JSON.parse(result)
+        if (jsonObj.Code === 0 ){
+            var names = JSON.parse(jsonObj.Msg)
+            var seFile = document.getElementById("abiFile")
+
+            var option = document.createElement("option")
+            option.text = ""
+            option.value = ""
+            seFile.add(option)
+
+            for(var i=0;i<names.length;i++){
+                var option = document.createElement("option")
+                option.text = names[i]
+                option.value = names[i]
+                seFile.add(option)
+            }
+        } else {
+            MYDIALOG.ShowDiv(jsonObj.Msg)
+        }
+        changeAbi()
+    }
+
+    async function changeAbi(){
         var filepath = document.getElementById("abiFile").value
+        if (filepath === ""){
+            var se = document.getElementById("contractFunc")
+            se.options.length = 0
+            changeFunc()  
+            return
+        }
         var strjson = await window.doLoadABI(filepath)
         var obj =  JSON.parse(strjson)
         if (obj.Code === 0){
@@ -44,32 +77,38 @@
                     option.value = abijson[i].name
                     se.add(option)
                 }                
-            }
-            changeFunc()            
+            }                      
         } else {
             MYDIALOG.ShowDiv(obj.Msg);
         }
+        changeFunc()  
     }
 
     function changeFunc(){
         var func = document.getElementById("contractFunc").value
+        var inputTable = document.getElementById("paramterTable")
+        for (var n=inputTable.rows.length-1;n>1;n--){
+            inputTable.removeChild(inputTable.rows[n])
+        }
+        var outputTable = document.getElementById("outTable")
+        for (var n=outputTable.rows.length-1;n>1;n--){
+            outputTable.removeChild(outputTable.rows[n])
+        }
+        if (func === ""){
+            document.getElementById("invokecontract_invoke").innerHTML = gGetRes("invokecontract_query")
+            document.getElementById("outTableDiv").style.visibility =  "hidden"
+            document.getElementById("assDiv").style.visibility = "hidden"
+            document.getElementById("assDiv").style.height = "0px"
+            return
+        }
         for (var i=0; i<abijson.length;i++){
             if (abijson[i].type === "function" && abijson[i].name === func){
-                var inputTable = document.getElementById("paramterTable")
-                for (var n=inputTable.rows.length-1;n>1;n--){
-                    inputTable.removeChild(inputTable.rows[n])
-                }
                 for (var n=0; n<abijson[i].inputs.length;n++){
                     addNew(inputTable,abijson[i].inputs[n])
                 } 
-                var outputTable = document.getElementById("outTable")
-                for (var n=outputTable.rows.length-1;n>1;n--){
-                    outputTable.removeChild(outputTable.rows[n])
-                }
                 for (var n=0; n<abijson[i].outputs.length;n++){
                     addNew(outputTable,abijson[i].outputs[n])
                 }
-
                 if (abijson[i].stateMutability === "view"){                    
                     document.getElementById("invokecontract_invoke").innerHTML = gGetRes("invokecontract_query")
                     document.getElementById("outTableDiv").style.visibility =  "visible"
@@ -167,20 +206,7 @@
         } catch (e) {
         }
         
-        var result = await window.doGetAbiFile()
-        var jsonObj = JSON.parse(result)
-        if (jsonObj.Code === 0 ){
-            var names = JSON.parse(jsonObj.Msg)
-            var seFile = document.getElementById("abiFile")
-            for(var i=0;i<names.length;i++){
-                var option = document.createElement("option")
-                option.text = names[i]
-                option.value = names[i]
-                seFile.add(option)
-            }
-        } else {
-            MYDIALOG.ShowDiv(jsonObj.Msg)
-        }
+        loadABI()
     }
 
 

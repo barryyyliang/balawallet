@@ -22,6 +22,8 @@ th {
     font-size: 16px;
     text-align: center;
     margin:auto;
+    width: 500px;
+    border: 1px solid black;
 }
 
 
@@ -31,8 +33,13 @@ th {
     text-align: center;
     border: 1px solid black;
     margin:auto;
+    width: 500px;
 }
 
 .trth{
     height:30px;
+}
+
+.firstTd{
+    width: 150px;
 }

@@ -180,7 +180,7 @@ func initRes() {
 	G_Res["zh-TW"]["/deploycontract.html"]["deploycontract_acc"] = "帳戶密碼"
 	G_Res["zh-TW"]["/deploycontract.html"]["deploycontract_deploy"] = "部署"
 
-	//deploycontract
+	//invokecontract
 	G_Res["zh-CN"]["/invokecontract.html"] = make(map[string]string)
 	G_Res["zh-CN"]["/invokecontract.html"]["invokecontract_contractaddress"] = "合约地址"
 	G_Res["zh-CN"]["/invokecontract.html"]["invokecontract_contractabi"] = "合约ABI"
@@ -197,6 +197,8 @@ func initRes() {
 	G_Res["zh-CN"]["/invokecontract.html"]["invokecontract_returnname"] = "返回值"
 	G_Res["zh-CN"]["/invokecontract.html"]["invokecontract_returnvalue"] = "值"
 	G_Res["zh-CN"]["/invokecontract.html"]["invokecontract_returntype"] = "类型"
+	G_Res["zh-CN"]["/invokecontract.html"]["invokecontract_fee"] = "预估费用"
+	G_Res["zh-CN"]["/invokecontract.html"]["invokecontract_estimate"] = "预估"
 
 	G_Res["en"]["/invokecontract.html"] = make(map[string]string)
 	G_Res["en"]["/invokecontract.html"]["invokecontract_contractaddress"] = "Contract Address"
@@ -214,6 +216,8 @@ func initRes() {
 	G_Res["en"]["/invokecontract.html"]["invokecontract_returnname"] = "Return Name"
 	G_Res["en"]["/invokecontract.html"]["invokecontract_returnvalue"] = "Value"
 	G_Res["en"]["/invokecontract.html"]["invokecontract_returntype"] = "Type"
+	G_Res["en"]["/invokecontract.html"]["invokecontract_fee"] = "Estimate Fee"
+	G_Res["en"]["/invokecontract.html"]["invokecontract_estimate"] = "Estimate"
 
 	G_Res["zh-TW"]["/invokecontract.html"] = make(map[string]string)
 	G_Res["zh-TW"]["/invokecontract.html"]["invokecontract_contractaddress"] = "合約地址"
@@ -231,6 +235,8 @@ func initRes() {
 	G_Res["zh-TW"]["/invokecontract.html"]["invokecontract_returnname"] = "傳回值"
 	G_Res["zh-TW"]["/invokecontract.html"]["invokecontract_returnvalue"] = "值"
 	G_Res["zh-TW"]["/invokecontract.html"]["invokecontract_returntype"] = "類型"
+	G_Res["zh-TW"]["/invokecontract.html"]["invokecontract_fee"] = "預估費用"
+	G_Res["zh-TW"]["/invokecontract.html"]["invokecontract_estimate"] = "預估"
 
 	//deploycontract
 	G_Res["zh-CN"]["/querytx.html"] = make(map[string]string)
