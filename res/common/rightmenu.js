@@ -14,6 +14,7 @@
         //改变自定义菜单的宽，让它显示出来
         menu.style.width='100px';
         menu.style.height='auto';
+        menu.style.visibility = "visible"
     }
     //支持 ctrl c  和 ctrl v 快捷键
     document.onkeydown = function(event) {
@@ -30,7 +31,10 @@
     //鼠标左键任意位置单击, 关闭右键菜单
     window.onclick=function(e){
         //用户触发click事件就可以关闭了，因为绑定在window上，按事件冒泡处理，不会影响菜单的功能
-        document.querySelector('#menu').style.height=0;
+        var menu = document.querySelector('#menu');
+        menu.style.height=0
+        menu.style.visibility = "hidden"
+
         var rec = document.getElementById("tools").getBoundingClientRect()
         if(e.clientX>rec.left && e.clientX <rec.right && e.clientY >rec.top && e.clientY < rec.bottom) {
 

@@ -666,19 +666,17 @@ func doInvokeContract(from string, conAddr string, funcAbi string, param string,
 	}
 
 	msg := ethereum.CallMsg{
-		From:      current.Address, // the sender of the 'transaction'
-		To:        &toAdd,          // the destination contract (nil for contract creation)
-		Gas:       0,               // if 0, the call executes with near-infinite gas
-		GasPrice:  gasPrice,        // wei <-> gas exchange ratio
-		GasFeeCap: tipsPrice,       // EIP-1559 fee cap per gas.
-		GasTipCap: tipsPrice,       // EIP-1559 tip per gas.
-		Value:     big.NewInt(0),   // amount of wei sent along with the call
-		Data:      data,            // input data, usually an ABI-encoded contract method invocation
+		From:  current.Address, // the sender of the 'transaction'
+		To:    &toAdd,          // the destination contract (nil for contract creation)
+		Gas:   0,               // if 0, the call executes with near-infinite gas
+		Value: big.NewInt(0),   // amount of wei sent along with the call
+		Data:  data,            // input data, usually an ABI-encoded contract method invocation
 	}
 
 	gasLimit, err := connect.EstimateGas(ctx, msg)
 	if err != nil {
 		re = getResult(Msg_getgaslimit_fail, err.Error())
+		return string(re)
 	}
 
 	tx := newCallContractTx(nounce, toAdd, &bigvalue, gasLimit, gasPrice, tipsPrice, chainId, data)
@@ -697,6 +695,82 @@ func doInvokeContract(from string, conAddr string, funcAbi string, param string,
 	}
 
 	return string(re)
+}
+
+func doInvokeEstimate(from string, conAddr string, funcAbi string, param string) string {
+	var re []byte
+	if from == "" || conAddr == "" {
+		re = getResult(Msg_param_error, "")
+		return string(re)
+	}
+	connect := getConnection()
+	var toAdd common.Address = common.HexToAddress(conAddr)
+
+	if connect == nil {
+		re = getResult(Msg_connectnode_fail, "")
+		return string(re)
+	}
+	ctx := context.Background()
+	acc := ks.Accounts()
+	var current accounts.Account
+	var isExist bool = false
+	for i := 0; i < len(acc); i++ {
+		fmt.Printf("get account: %s : \r\n", acc[i].Address.String())
+		if from == acc[i].Address.String() {
+			current = acc[i]
+			isExist = true
+			break
+		}
+	}
+	if isExist == false {
+		re = getResult(Msg_findaccount_fail, from)
+		return string(re)
+	}
+
+	contractAbi, err := abi.JSON(strings.NewReader(funcAbi))
+	var parems []interface{}
+	var parStrings []string
+	var data []byte
+	if err == nil {
+		for _, method := range contractAbi.Methods {
+			json.Unmarshal([]byte(param), &parStrings)
+			for i, pType := range method.Inputs {
+				parems = append(parems, stringToValue(pType.Type.GetType(), parStrings[i]))
+			}
+			data, err = contractAbi.Pack(method.RawName, parems...)
+			if err != nil {
+				re = getResult(Msg_packabiparam_error, err.Error())
+				return string(re)
+			}
+		}
+	}
+
+	msg := ethereum.CallMsg{
+		From:  current.Address, // the sender of the 'transaction'
+		To:    &toAdd,          // the destination contract (nil for contract creation)
+		Gas:   0,               // if 0, the call executes with near-infinite gas
+		Value: big.NewInt(0),   // amount of wei sent along with the call
+		Data:  data,            // input data, usually an ABI-encoded contract method invocation
+	}
+
+	gasLimit, err := connect.EstimateGas(ctx, msg)
+	if err != nil {
+		re = getResult(Msg_getgaslimit_fail, err.Error())
+		return string(re)
+	}
+
+	var gas = new(big.Int)
+	gas.SetUint64(gasLimit)
+	gasPrice, err := connect.SuggestGasPrice(ctx)
+	if err != nil {
+		re = getResult(Msg_getchaininfo_fail, err.Error())
+		return string(re)
+	}
+	fee := gasPrice.Mul(gasPrice, gas)
+	str := weiToether(fee.String())
+	re, _ = json.Marshal(ErrorResult{0, str})
+	return string(re)
+
 }
 
 func doQueryTx(hs string) string {

@@ -192,6 +192,47 @@
         }
     }
 
+    async function invokecontract_fun_estimate(){
+        var funcName = document.getElementById("contractFunc").value
+        var caddress = document.getElementById("caddress").value
+        var from = document.getElementById("add").value
+        if(caddress === ""){
+            var msg = await window.doGetMsg("29")
+            MYDIALOG.ShowDiv(msg)
+            return
+        }
+        if(funcName === ""){
+            var msg = await window.doGetMsg("31")
+            MYDIALOG.ShowDiv(msg)
+            return
+        }
+        var i = 0
+        for ( ; i<abijson.length;i++){
+            if (abijson[i].type === "function" && abijson[i].name === funcName){
+                break               
+            } 
+        } 
+        var tmp = new Array()
+        tmp.push(abijson[i])
+        var func = JSON.stringify(tmp)
+        var parems = new Array()
+        var inputTable = document.getElementById("paramterTable")
+
+        for (var n=2;n<inputTable.rows.length;n++){
+            parems.push(inputTable.rows[n].cells[1].childNodes[0].value)
+        }
+
+        var paremsString = JSON.stringify(parems)  
+
+        var result = await window.doInvokeEstimate(from,caddress,func, paremsString)
+        var obj = JSON.parse(result)
+        if(obj.Code === 0){
+            document.getElementById("invokecontract_input_fee").value = obj.Msg
+        } else {
+            MYDIALOG.ShowDiv(obj.Msg)
+        }
+    }
+
     function reInit(){
         try{
             document.getElementById("caddress").value = gParam.invokeContract.address
