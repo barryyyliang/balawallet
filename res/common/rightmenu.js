@@ -9,8 +9,8 @@
         //获取我们自定义的右键菜单
         var menu=document.querySelector("#menu");
         //根据事件对象中鼠标点击的位置，进行定位
-        menu.style.left=(e.clientX+2)+'px';
-        menu.style.top=(e.clientY+2)+'px';
+        menu.style.left=(e.clientX+2+window.scrollX)+'px';
+        menu.style.top=(e.clientY+2+window.scrollY)+'px';
         //改变自定义菜单的宽，让它显示出来
         menu.style.width='100px';
         menu.style.height='auto';
