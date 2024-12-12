@@ -350,7 +350,6 @@ func doDeployContract(from string, file string, pass string) string {
 	ctx := context.Background()
 	acc := ks.Accounts()
 	for i := 0; i < len(acc); i++ {
-		fmt.Printf("get account: %s : \r\n", acc[i].Address.String())
 		if from == acc[i].Address.String() {
 			bigvalue, err := etherTowei("0")
 			if err != nil {
@@ -530,7 +529,7 @@ func doImportContract(cons string) string {
 
 func doCheckNode() string {
 	var re []byte
-	if G_Config["nodeAddress"] != "" {
+	if G_Config["ethAddress"] != "" {
 		re = getResult(Msg_success, "")
 	} else {
 		re = getResult(Msg_nodeconfig_null, "")
@@ -629,7 +628,6 @@ func doInvokeContract(from string, conAddr string, funcAbi string, param string,
 	var current accounts.Account
 	var isExist bool = false
 	for i := 0; i < len(acc); i++ {
-		fmt.Printf("get account: %s : \r\n", acc[i].Address.String())
 		if from == acc[i].Address.String() {
 			current = acc[i]
 			isExist = true
@@ -715,7 +713,6 @@ func doInvokeEstimate(from string, conAddr string, funcAbi string, param string)
 	var current accounts.Account
 	var isExist bool = false
 	for i := 0; i < len(acc); i++ {
-		fmt.Printf("get account: %s : \r\n", acc[i].Address.String())
 		if from == acc[i].Address.String() {
 			current = acc[i]
 			isExist = true

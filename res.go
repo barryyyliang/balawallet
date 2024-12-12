@@ -332,22 +332,28 @@ func initRes() {
 
 	//config
 	G_Res["zh-CN"]["/config.html"] = make(map[string]string)
-	G_Res["zh-CN"]["/config.html"]["config_address"] = "节点地址"
+	G_Res["zh-CN"]["/config.html"]["config_eth_address"] = "以太坊地址"
 	G_Res["zh-CN"]["/config.html"]["config_contractdir"] = "合约文件目录"
 	G_Res["zh-CN"]["/config.html"]["config_language"] = "系统语言"
 	G_Res["zh-CN"]["/config.html"]["config_save"] = "保存"
+	G_Res["zh-CN"]["/config.html"]["config_pol_address"] = "Polygon 地址"
+	G_Res["zh-CN"]["/config.html"]["config_sol_address"] = "Solana 地址"
 
 	G_Res["en"]["/config.html"] = make(map[string]string)
-	G_Res["en"]["/config.html"]["config_address"] = "Node Address"
+	G_Res["en"]["/config.html"]["config_eth_address"] = "Eth Address"
 	G_Res["en"]["/config.html"]["config_contractdir"] = "Contract File Dir"
 	G_Res["en"]["/config.html"]["config_language"] = "Language"
 	G_Res["en"]["/config.html"]["config_save"] = "Save"
+	G_Res["en"]["/config.html"]["config_pol_address"] = "Polygon Address"
+	G_Res["en"]["/config.html"]["config_sol_address"] = "Solana Address"
 
 	G_Res["zh-TW"]["/config.html"] = make(map[string]string)
-	G_Res["zh-TW"]["/config.html"]["config_address"] = "節點位址"
+	G_Res["zh-TW"]["/config.html"]["config_eth_address"] = "以太坊位址"
 	G_Res["zh-TW"]["/config.html"]["config_contractdir"] = "合約檔案目錄"
 	G_Res["zh-TW"]["/config.html"]["config_language"] = "系統語言"
 	G_Res["zh-TW"]["/config.html"]["config_save"] = "儲存"
+	G_Res["zh-TW"]["/config.html"]["config_pol_address"] = "Polygon 位址"
+	G_Res["zh-TW"]["/config.html"]["config_sol_address"] = "Solana 位址"
 
 	//about
 	G_Res["zh-CN"]["/about.html"] = make(map[string]string)
