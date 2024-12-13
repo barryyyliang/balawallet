@@ -1,4 +1,4 @@
-package main
+package common
 
 var G_Msg = make(map[string]map[uint]string)
 
@@ -49,7 +49,7 @@ const (
 	Msg_account_noexist            uint = 43
 )
 
-func initMsg() {
+func InitMsg() {
 	G_Msg["zh-CN"] = make(map[uint]string)
 	G_Msg["zh-CN"][Msg_success] = "操作成功"
 	G_Msg["zh-CN"][Msg_fail] = "操作失败"

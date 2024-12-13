@@ -99,6 +99,7 @@ async function initBalance(){
 
 async function initPage(){
     gLoadRes()
+    window.doWebLog("test init")
     window.doGetAccounts().then( (result) => {
         if (result != ""){
             var arr = JSON.parse(result)

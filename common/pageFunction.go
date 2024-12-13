@@ -1,4 +1,4 @@
-package main
+package common
 
 import (
 	"encoding/json"
@@ -21,7 +21,7 @@ import (
 // }
 
 // 日志接口
-func doWebLog(para string) {
+func DoWebLog(para string) {
 	fmt.Println(para)
 }
 
@@ -87,7 +87,7 @@ func doWebLog(para string) {
 // 	}
 // }
 
-func doGetComponent(com string) string {
+func DoGetComponent(com string) string {
 	type pagejson struct {
 		Css  string `json:"css"`
 		Html string `json:"html"`
@@ -129,8 +129,8 @@ func doGetComponent(com string) string {
 	return string(re)
 }
 
-func doConfig(configs string) string {
-	re := getResult(Msg_success, "")
+func DoConfig(configs string) string {
+	re := GetResult(Msg_success, "")
 	var config = make(map[string]string)
 
 	json.Unmarshal([]byte(configs), &config)
@@ -139,7 +139,7 @@ func doConfig(configs string) string {
 		G_Config[key] = value
 	}
 
-	db, _ := leveldb.OpenFile(datadir+"db", nil)
+	db, _ := leveldb.OpenFile(G_DataDir+"db", nil)
 	defer db.Close()
 	tmp, _ := json.Marshal(G_Config)
 	db.Put([]byte("config"), tmp, nil)
@@ -160,9 +160,9 @@ func doConfig(configs string) string {
 	return string(re)
 }
 
-func doGetConfig(configs string) string {
+func DoGetConfig(configs string) string {
 	var re string
-	db, err := leveldb.OpenFile(datadir+"db", nil)
+	db, err := leveldb.OpenFile(G_DataDir+"db", nil)
 	if err != nil {
 		fmt.Println("open db error:" + err.Error())
 		return ""
@@ -195,7 +195,7 @@ func doGetConfig(configs string) string {
 	return string(re)
 }
 
-func doGetMsg(code string) string {
+func DoGetMsg(code string) string {
 	n, _ := strconv.Atoi(code)
 	lang := G_Config["language"]
 	if lang == "" {
@@ -207,4 +207,19 @@ func doGetMsg(code string) string {
 	}
 
 	return msg
+}
+
+func DoGetRes(com string) string {
+	var re string = ""
+	htmlfile := "/" + com + ".html"
+	language := G_Config["language"]
+	if language == "" {
+		language = "zh-CN"
+	}
+	res := G_Res[language][htmlfile]
+	if len(res) != 0 {
+		tmp, _ := json.Marshal(res)
+		re = string(tmp)
+	}
+	return re
 }

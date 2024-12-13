@@ -1,4 +1,4 @@
-module BalaWallet
+module balawallet
 
 go 1.22
 

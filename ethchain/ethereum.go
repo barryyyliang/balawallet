@@ -1,6 +1,7 @@
-package main
+package ethchain
 
 import (
+	. "balawallet/common"
 	"bufio"
 	"context"
 	"crypto/ecdsa"
@@ -15,6 +16,7 @@ import (
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/accounts/abi"
+	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -24,35 +26,90 @@ import (
 	"github.com/syndtr/goleveldb/leveldb"
 )
 
+var ks *keystore.KeyStore
+
+var exportdir string
+var accountdir string
+
+func Init(dir string) {
+
+	var accountsRoot = dir + "/account/"
+	accountdir = accountsRoot + "eth/"
+	exportdir = dir + "/export/"
+
+	//创建必要的目录
+	_, err := os.Stat(accountsRoot)
+	if err != nil {
+		if !os.IsExist(err) {
+			err = os.Mkdir(accountsRoot, os.ModePerm)
+			if err != nil {
+				fmt.Println("create accountsRoot dir error:" + err.Error())
+				return
+			}
+		}
+	}
+
+	_, err = os.Stat(accountdir)
+	if err != nil {
+		if !os.IsExist(err) {
+			err = os.Mkdir(accountdir, os.ModePerm)
+			if err != nil {
+				fmt.Println("create eth account dir error:" + err.Error())
+				return
+			}
+		}
+	}
+	_, err = os.Stat(exportdir)
+	if err != nil {
+		if !os.IsExist(err) {
+			err = os.Mkdir(exportdir, os.ModePerm)
+			if err != nil {
+				fmt.Println("create export dir error:" + err.Error())
+			}
+		}
+	}
+
+	//打开钱包
+	ks = keystore.NewKeyStore(accountdir, keystore.StandardScryptN, keystore.StandardScryptP)
+
+}
+
+func GetEthChain() *EthChain {
+	return &EthChain{}
+}
+
+type EthChain struct {
+}
+
 // 新创建一个账号
-func doNewAccount(pass string, walletName string) string {
-	re := getResult(Msg_success, "")
+func (c *EthChain) NewAccount(pass string, walletName string) string {
+	re := GetResult(Msg_success, "")
 	//scryptN := keystore.StandardScryptN
 	//scryptP := keystore.StandardScryptP
 	//account, err := keystore.StoreKey(accountdir, pass, scryptN, scryptP)
 	account, err := ks.NewAccount(pass)
 	if err != nil {
 		fmt.Println("failed to generate new account")
-		re = getResult(Msg_createuser_fail, err.Error())
+		re = GetResult(Msg_createuser_fail, err.Error())
 		return string(re)
 	}
 
 	//账户信息存库
-	db, err := leveldb.OpenFile(datadir+"db", nil)
+	db, err := leveldb.OpenFile(G_DataDir+"db", nil)
 	if err == nil {
 		defer db.Close()
-		if isExist(db, walletName) == false {
+		if IsExist(db, walletName) == false {
 			err = db.Put([]byte(account.Address.String()), []byte(walletName), nil)
 			if err != nil {
 				fmt.Println("put name err")
-				re = getResult(Msg_writename_fail, err.Error())
+				re = GetResult(Msg_writename_fail, err.Error())
 			}
 		} else {
 			fmt.Println("name has existed")
-			re = getResult(Msg_createuser_nameexists, "")
+			re = GetResult(Msg_createuser_nameexists, "")
 		}
 	} else {
-		re = getResult(Msg_writename_fail, err.Error())
+		re = GetResult(Msg_writename_fail, err.Error())
 	}
 
 	return string(re)
@@ -60,7 +117,7 @@ func doNewAccount(pass string, walletName string) string {
 }
 
 // 获取账号列表
-func doGetAccounts() string {
+func (c *EthChain) GetAccounts() string {
 	type account struct {
 		Type    string `json:"type"`
 		Address string `json:"address"`
@@ -72,7 +129,7 @@ func doGetAccounts() string {
 
 	//账户信息
 	addressCache := make(map[string]string)
-	db, err := leveldb.OpenFile(datadir+"db", nil)
+	db, err := leveldb.OpenFile(G_DataDir+"db", nil)
 	if err == nil {
 		defer db.Close()
 		it := db.NewIterator(nil, nil)
@@ -101,29 +158,29 @@ func doGetAccounts() string {
 	return ""
 }
 
-func doChangeAccountName(address string, name string) string {
-	re := getResult(Msg_success, "")
+func (c *EthChain) ChangeAccountName(address string, name string) string {
+	re := GetResult(Msg_success, "")
 	//账户信息存库
-	db, err := leveldb.OpenFile(datadir+"db", nil)
+	db, err := leveldb.OpenFile(G_DataDir+"db", nil)
 	if err == nil {
 		defer db.Close()
-		if isExist(db, name) == false {
+		if IsExist(db, name) == false {
 			err = db.Put([]byte(address), []byte(name), nil)
 			if err != nil {
-				re = getResult(Msg_writedb_fail, err.Error())
+				re = GetResult(Msg_writedb_fail, err.Error())
 			}
 		} else {
-			re = getResult(Msg_changename_nameexists, "")
+			re = GetResult(Msg_changename_nameexists, "")
 		}
 	} else {
-		re = getResult(Msg_writedb_fail, err.Error())
+		re = GetResult(Msg_writedb_fail, err.Error())
 	}
 
 	return string(re)
 }
 
-func doGetAccountName(address string) string {
-	db, err := leveldb.OpenFile(datadir+"db", nil)
+func (c *EthChain) GetAccountName(address string) string {
+	db, err := leveldb.OpenFile(G_DataDir+"db", nil)
 	if err == nil {
 		defer db.Close()
 		name, err := db.Get([]byte(address), nil)
@@ -140,13 +197,13 @@ func doGetAccountName(address string) string {
 }
 
 // 通过私钥导入账号
-func doImportAccount(pa string, name string, kk string) string {
-	re := getResult(Msg_success, "")
+func (c *EthChain) ImportAccount(pa string, name string, kk string) string {
+	re := GetResult(Msg_success, "")
 	key := new(ecdsa.PrivateKey)
 	key.PublicKey.Curve = crypto.S256()
 	pp, err := hex.DecodeString(kk)
 	if err != nil {
-		re = getResult(Msg_privatekey_error, err.Error())
+		re = GetResult(Msg_privatekey_error, err.Error())
 		return string(re)
 	}
 	defer clear(pp)
@@ -156,42 +213,42 @@ func doImportAccount(pa string, name string, kk string) string {
 
 	add := crypto.PubkeyToAddress(key.PublicKey)
 	if ks.HasAddress(add) {
-		re = getResult(Msg_account_exist, "")
+		re = GetResult(Msg_account_exist, "")
 		return string(re)
 	}
 
 	ks.ImportECDSA(key, pa)
 	//账户信息存库
-	db, err := leveldb.OpenFile(datadir+"db", nil)
+	db, err := leveldb.OpenFile(G_DataDir+"db", nil)
 	if err == nil {
 		defer db.Close()
-		if !isExist(db, name) {
+		if !IsExist(db, name) {
 			err = db.Put([]byte(add.String()), []byte(name), nil)
 			if err != nil {
 				fmt.Println("put name err")
-				re = getResult(Msg_writename_fail, err.Error())
+				re = GetResult(Msg_writename_fail, err.Error())
 			}
 		} else {
 			fmt.Println("name has existed")
-			re = getResult(Msg_createuser_nameexists, "")
+			re = GetResult(Msg_createuser_nameexists, "")
 		}
 	} else {
-		re = getResult(Msg_writename_fail, err.Error())
+		re = GetResult(Msg_writename_fail, err.Error())
 	}
 
 	return string(re)
 }
 
 // 导出私钥
-func doExportAccount(add string, pa string) string {
-	re := getResult(Msg_success, "")
+func (c *EthChain) ExportAccount(add string, pa string) string {
+	re := GetResult(Msg_success, "")
 	key, err := getKey(add, pa)
 	if err == nil {
 		defer zeroKey(key)
 		file, err1 := os.OpenFile(exportdir+add, os.O_RDWR|os.O_CREATE, 0666)
 		if err1 != nil {
 			fmt.Println("can not open file in export:" + err1.Error())
-			re = getResult(Msg_openexportfile_fail, err1.Error())
+			re = GetResult(Msg_openexportfile_fail, err1.Error())
 			return string(re)
 		}
 		defer file.Close()
@@ -202,17 +259,17 @@ func doExportAccount(add string, pa string) string {
 		writer.WriteString(value)
 		writer.Flush()
 	} else {
-		re = getResult(Msg_fail, err.Error())
+		re = GetResult(Msg_fail, err.Error())
 	}
 	return string(re)
 }
 
-func doTransfer(from string, to string, value string, pass string) string {
+func (c *EthChain) Transfer(from string, to string, value string, pass string) string {
 	var re []byte
 	connect := getConnection()
 	if connect == nil {
 		fmt.Println("doTransfer: connection is nil")
-		re = getResult(Msg_connectnode_fail, "")
+		re = GetResult(Msg_connectnode_fail, "")
 		return string(re)
 	}
 
@@ -222,13 +279,13 @@ func doTransfer(from string, to string, value string, pass string) string {
 		if from == acc[i].Address.String() {
 			bigvalue, err := etherTowei(value)
 			if err != nil {
-				re = getResult(Msg_weitoether_fail, err.Error())
+				re = GetResult(Msg_weitoether_fail, err.Error())
 				break
 			}
 			var gasLimit uint64 = 21000
 			nounce, gasPrice, tipsPrice, chainId, err := getChainInfo(connect, from)
 			if err != nil {
-				re = getResult(Msg_getchaininfo_fail, err.Error())
+				re = GetResult(Msg_getchaininfo_fail, err.Error())
 				break
 			}
 			//后续可以改为可设置消费的交易
@@ -239,13 +296,13 @@ func doTransfer(from string, to string, value string, pass string) string {
 				err := connect.SendTransaction(ctx, tx)
 				if err != nil {
 					fmt.Println("transfer err:" + err.Error())
-					re = getResult(Msg_sendtransaction_fail, err.Error())
+					re = GetResult(Msg_sendtransaction_fail, err.Error())
 				} else {
-					re = getResult(Msg_success, tx.Hash().String())
+					re = GetResult(Msg_success, tx.Hash().String())
 				}
 			} else {
 				fmt.Println("sign tx err")
-				re = getResult(Msg_signtransaction_fail, err.Error())
+				re = GetResult(Msg_signtransaction_fail, err.Error())
 			}
 			break
 		}
@@ -254,11 +311,11 @@ func doTransfer(from string, to string, value string, pass string) string {
 }
 
 // 获取账户余额
-func doGetBalance(add string) string {
+func (c *EthChain) GetBalance(add string) string {
 	var re []byte
 	connect := getConnection()
 	if connect == nil {
-		re = getResult(Msg_connectnode_fail, "")
+		re = GetResult(Msg_connectnode_fail, "")
 		return string(re)
 	}
 
@@ -281,12 +338,12 @@ func doGetBalance(add string) string {
 		re, _ = json.Marshal(ErrorResult{0, string(tmp)})
 		return string(re)
 	} else {
-		re = getResult(Msg_getbalance_fail, err.Error())
+		re = GetResult(Msg_getbalance_fail, err.Error())
 		return string(re)
 	}
 }
 
-func doGetFee() string {
+func (c *EthChain) GetFee() string {
 	connect := getConnection()
 	if connect == nil {
 		fmt.Println("doGetFee: connection is nil")
@@ -316,26 +373,11 @@ func doGetFee() string {
 	return str
 }
 
-func doGetRes(com string) string {
-	var re string = ""
-	htmlfile := "/" + com + ".html"
-	language := G_Config["language"]
-	if language == "" {
-		language = "zh-CN"
-	}
-	res := G_Res[language][htmlfile]
-	if len(res) != 0 {
-		tmp, _ := json.Marshal(res)
-		re = string(tmp)
-	}
-	return re
-}
-
-func doDeployContract(from string, file string, pass string) string {
+func (c *EthChain) DeployContract(from string, file string, pass string) string {
 	var re []byte
 	if from == "" || file == "" || pass == "" {
 		fmt.Println("parameter error")
-		re = getResult(Msg_param_error, "")
+		re = GetResult(Msg_param_error, "")
 		return string(re)
 	}
 	filepath := G_Config["contractDir"]
@@ -344,7 +386,7 @@ func doDeployContract(from string, file string, pass string) string {
 
 	if connect == nil {
 		fmt.Println("can not connect to node:")
-		re = getResult(Msg_connectnode_fail, "")
+		re = GetResult(Msg_connectnode_fail, "")
 		return string(re)
 	}
 	ctx := context.Background()
@@ -353,23 +395,23 @@ func doDeployContract(from string, file string, pass string) string {
 		if from == acc[i].Address.String() {
 			bigvalue, err := etherTowei("0")
 			if err != nil {
-				re = getResult(Msg_weitoether_fail, err.Error())
+				re = GetResult(Msg_weitoether_fail, err.Error())
 				break
 			}
 
 			nounce, gasPrice, tipsPrice, chainId, err := getChainInfo(connect, from)
 			if err != nil {
-				re = getResult(Msg_getchaininfo_fail, err.Error())
+				re = GetResult(Msg_getchaininfo_fail, err.Error())
 				break
 			}
 			bin, err := os.ReadFile(filepath)
 			if err != nil {
-				re = getResult(Msg_openfile_fail, err.Error())
+				re = GetResult(Msg_openfile_fail, err.Error())
 				break
 			}
 			bytecode, err := hex.DecodeString(string(bin))
 			if err != nil {
-				re = getResult(Msg_decodebinfile_fail, err.Error())
+				re = GetResult(Msg_decodebinfile_fail, err.Error())
 				break
 			}
 			msg := ethereum.CallMsg{
@@ -385,7 +427,7 @@ func doDeployContract(from string, file string, pass string) string {
 
 			gasLimit, err := connect.EstimateGas(ctx, msg)
 			if err != nil {
-				re = getResult(Msg_getgaslimit_fail, err.Error())
+				re = GetResult(Msg_getgaslimit_fail, err.Error())
 				break
 			}
 
@@ -396,7 +438,7 @@ func doDeployContract(from string, file string, pass string) string {
 			if err == nil {
 				err := connect.SendTransaction(ctx, tx)
 				if err != nil {
-					re = getResult(Msg_sendtransaction_fail, err.Error())
+					re = GetResult(Msg_sendtransaction_fail, err.Error())
 				} else {
 					re, _ = json.Marshal(ErrorResult{0, tx.Hash().Hex()})
 					//connect.TransactionReceipt(ctx,tx.Hash())
@@ -411,7 +453,7 @@ func doDeployContract(from string, file string, pass string) string {
 	return string(re)
 }
 
-func doGetContract() string {
+func (c *EthChain) GetContract() string {
 	type contract struct {
 		Type    string `json:"type"`
 		Address string `json:"address"`
@@ -422,7 +464,7 @@ func doGetContract() string {
 	}
 	var res contracts
 	//账户信息
-	db, err := leveldb.OpenFile(datadir+"contract", nil)
+	db, err := leveldb.OpenFile(G_DataDir+"contract", nil)
 	defer db.Close()
 	if err == nil {
 		it := db.NewIterator(nil, nil)
@@ -443,23 +485,23 @@ func doGetContract() string {
 	return ""
 }
 
-func doDeleteContract(address string) string {
-	re := getResult(Msg_success, "")
-	db, err := leveldb.OpenFile(datadir+"contract", nil)
+func (c *EthChain) DeleteContract(address string) string {
+	re := GetResult(Msg_success, "")
+	db, err := leveldb.OpenFile(G_DataDir+"contract", nil)
 	if err == nil {
 		defer db.Close()
 		if db.Delete([]byte(address), nil) != nil {
-			re = getResult(Msg_writedb_fail, "")
+			re = GetResult(Msg_writedb_fail, "")
 		}
 	} else {
 		fmt.Println("open contract db error:" + err.Error())
-		re = getResult(Msg_opendb_fail, err.Error())
+		re = GetResult(Msg_opendb_fail, err.Error())
 	}
 	return string(re)
 }
 
-func doImportContract(cons string) string {
-	re := getResult(Msg_success, "")
+func (c *EthChain) ImportContract(cons string) string {
+	re := GetResult(Msg_success, "")
 	type contract struct {
 		Type    string `json:"type"`
 		Address string `json:"address"`
@@ -508,47 +550,47 @@ func doImportContract(cons string) string {
 				}
 			}
 		}
-		db, err2 := leveldb.OpenFile(datadir+"contract", nil)
+		db, err2 := leveldb.OpenFile(G_DataDir+"contract", nil)
 		jvalue, _ := json.Marshal(jcons)
 		if err2 == nil {
 			defer db.Close()
 			if db.Put([]byte(jcons.Address), jvalue, nil) != nil {
-				re = getResult(Msg_writedb_fail, "")
+				re = GetResult(Msg_writedb_fail, "")
 			}
 		} else {
 			fmt.Println("open contract db error:" + err2.Error())
-			re = getResult(Msg_opendb_fail, err2.Error())
+			re = GetResult(Msg_opendb_fail, err2.Error())
 		}
 
 	} else {
-		re = getResult(Msg_param_error, "")
+		re = GetResult(Msg_param_error, "")
 	}
 
 	return string(re)
 }
 
-func doCheckNode() string {
+func (c *EthChain) CheckNode() string {
 	var re []byte
 	if G_Config["ethAddress"] != "" {
-		re = getResult(Msg_success, "")
+		re = GetResult(Msg_success, "")
 	} else {
-		re = getResult(Msg_nodeconfig_null, "")
+		re = GetResult(Msg_nodeconfig_null, "")
 	}
 	return string(re)
 }
 
-func doLoadABI(file string) string {
+func (c *EthChain) LoadABI(file string) string {
 	var re []byte
 	filepath := G_Config["contractDir"]
 	filepath = filepath + "/" + file
 	if filepath == "" {
-		re = getResult(Msg_param_error, "")
+		re = GetResult(Msg_param_error, "")
 		return string(re)
 	}
 
 	abiContent, err := os.ReadFile(filepath)
 	if err != nil {
-		re = getResult(Msg_openfile_fail, err.Error())
+		re = GetResult(Msg_openfile_fail, err.Error())
 		return string(re)
 	}
 
@@ -556,11 +598,11 @@ func doLoadABI(file string) string {
 	return string(re)
 }
 
-func doReadContract(from string, to string, funcAbi string, paremters string) string {
+func (c *EthChain) ReadContract(from, to, funcAbi, paremters string) string {
 	var toAdd common.Address = common.HexToAddress(to)
 	contractAbi, err := abi.JSON(strings.NewReader(funcAbi))
 	var parems []interface{}
-	var re = getResult(Msg_success, "")
+	var re = GetResult(Msg_success, "")
 	var data []byte
 	var outs []string
 	if err == nil {
@@ -572,7 +614,7 @@ func doReadContract(from string, to string, funcAbi string, paremters string) st
 			}
 			data, err = contractAbi.Pack(method.RawName, parems...)
 			if err != nil {
-				re = getResult(Msg_packabiparam_error, err.Error())
+				re = GetResult(Msg_packabiparam_error, err.Error())
 				return string(re)
 			}
 			connect := getConnection()
@@ -599,28 +641,28 @@ func doReadContract(from string, to string, funcAbi string, paremters string) st
 					bouts, _ := json.Marshal(outs)
 					re, _ = json.Marshal(ErrorResult{0, string(bouts)})
 				} else {
-					re = getResult(Msg_callcontract_fail, err5.Error())
+					re = GetResult(Msg_callcontract_fail, err5.Error())
 				}
 			}
 			break
 		}
 	} else {
-		re = getResult(Msg_parseabi_fail, err.Error())
+		re = GetResult(Msg_parseabi_fail, err.Error())
 	}
 	return string(re)
 }
 
-func doInvokeContract(from string, conAddr string, funcAbi string, param string, pass string) string {
+func (c *EthChain) InvokeContract(from, conAddr, funcAbi, param, pass string) string {
 	var re []byte
 	if from == "" || pass == "" || conAddr == "" {
-		re = getResult(Msg_param_error, "")
+		re = GetResult(Msg_param_error, "")
 		return string(re)
 	}
 	connect := getConnection()
 	var toAdd common.Address = common.HexToAddress(conAddr)
 
 	if connect == nil {
-		re = getResult(Msg_connectnode_fail, "")
+		re = GetResult(Msg_connectnode_fail, "")
 		return string(re)
 	}
 	ctx := context.Background()
@@ -635,14 +677,14 @@ func doInvokeContract(from string, conAddr string, funcAbi string, param string,
 		}
 	}
 	if isExist == false {
-		re = getResult(Msg_findaccount_fail, from)
+		re = GetResult(Msg_findaccount_fail, from)
 		return string(re)
 	}
 
 	bigvalue, _ := etherTowei("0")
 	nounce, gasPrice, tipsPrice, chainId, err := getChainInfo(connect, from)
 	if err != nil {
-		re = getResult(Msg_getchaininfo_fail, err.Error())
+		re = GetResult(Msg_getchaininfo_fail, err.Error())
 	}
 
 	contractAbi, err := abi.JSON(strings.NewReader(funcAbi))
@@ -657,7 +699,7 @@ func doInvokeContract(from string, conAddr string, funcAbi string, param string,
 			}
 			data, err = contractAbi.Pack(method.RawName, parems...)
 			if err != nil {
-				re = getResult(Msg_packabiparam_error, err.Error())
+				re = GetResult(Msg_packabiparam_error, err.Error())
 				return string(re)
 			}
 		}
@@ -673,7 +715,7 @@ func doInvokeContract(from string, conAddr string, funcAbi string, param string,
 
 	gasLimit, err := connect.EstimateGas(ctx, msg)
 	if err != nil {
-		re = getResult(Msg_getgaslimit_fail, err.Error())
+		re = GetResult(Msg_getgaslimit_fail, err.Error())
 		return string(re)
 	}
 
@@ -689,23 +731,23 @@ func doInvokeContract(from string, conAddr string, funcAbi string, param string,
 		}
 
 	} else {
-		re = getResult(Msg_signtransaction_fail, err.Error())
+		re = GetResult(Msg_signtransaction_fail, err.Error())
 	}
 
 	return string(re)
 }
 
-func doInvokeEstimate(from string, conAddr string, funcAbi string, param string) string {
+func (c *EthChain) InvokeEstimate(from, conAddr, funcAbi, param string) string {
 	var re []byte
 	if from == "" || conAddr == "" {
-		re = getResult(Msg_param_error, "")
+		re = GetResult(Msg_param_error, "")
 		return string(re)
 	}
 	connect := getConnection()
 	var toAdd common.Address = common.HexToAddress(conAddr)
 
 	if connect == nil {
-		re = getResult(Msg_connectnode_fail, "")
+		re = GetResult(Msg_connectnode_fail, "")
 		return string(re)
 	}
 	ctx := context.Background()
@@ -720,7 +762,7 @@ func doInvokeEstimate(from string, conAddr string, funcAbi string, param string)
 		}
 	}
 	if isExist == false {
-		re = getResult(Msg_findaccount_fail, from)
+		re = GetResult(Msg_findaccount_fail, from)
 		return string(re)
 	}
 
@@ -736,7 +778,7 @@ func doInvokeEstimate(from string, conAddr string, funcAbi string, param string)
 			}
 			data, err = contractAbi.Pack(method.RawName, parems...)
 			if err != nil {
-				re = getResult(Msg_packabiparam_error, err.Error())
+				re = GetResult(Msg_packabiparam_error, err.Error())
 				return string(re)
 			}
 		}
@@ -752,7 +794,7 @@ func doInvokeEstimate(from string, conAddr string, funcAbi string, param string)
 
 	gasLimit, err := connect.EstimateGas(ctx, msg)
 	if err != nil {
-		re = getResult(Msg_getgaslimit_fail, err.Error())
+		re = GetResult(Msg_getgaslimit_fail, err.Error())
 		return string(re)
 	}
 
@@ -760,7 +802,7 @@ func doInvokeEstimate(from string, conAddr string, funcAbi string, param string)
 	gas.SetUint64(gasLimit)
 	gasPrice, err := connect.SuggestGasPrice(ctx)
 	if err != nil {
-		re = getResult(Msg_getchaininfo_fail, err.Error())
+		re = GetResult(Msg_getchaininfo_fail, err.Error())
 		return string(re)
 	}
 	fee := gasPrice.Mul(gasPrice, gas)
@@ -770,7 +812,7 @@ func doInvokeEstimate(from string, conAddr string, funcAbi string, param string)
 
 }
 
-func doQueryTx(hs string) string {
+func (c *EthChain) QueryTx(hs string) string {
 	type txinfo struct {
 		Transaction        *types.Transaction
 		TransactionReceipt *types.Receipt
@@ -796,7 +838,7 @@ func doQueryTx(hs string) string {
 	return string(re)
 }
 
-func doSignature(info string) string {
+func (c *EthChain) Signature(info string) string {
 	var re []byte
 	var param = make(map[string]string)
 	err := json.Unmarshal([]byte(info), &param)
@@ -809,19 +851,19 @@ func doSignature(info string) string {
 				if err2 == nil {
 					re, _ = json.Marshal(ErrorResult{0, common.Bytes2Hex(signature)})
 				} else {
-					re = getResult(Msg_fail, err2.Error())
+					re = GetResult(Msg_fail, err2.Error())
 				}
 				break
 			}
 		}
 	} else {
-		re = getResult(Msg_param_error, err.Error())
+		re = GetResult(Msg_param_error, err.Error())
 	}
 
 	return string(re)
 }
 
-func doSignatureVerify(info string) string {
+func (c *EthChain) SignatureVerify(info string) string {
 	var re []byte
 	var param = make(map[string]string)
 	err := json.Unmarshal([]byte(info), &param)
@@ -835,29 +877,29 @@ func doSignatureVerify(info string) string {
 				//check just need [r|S] 64 byte
 				adress := crypto.PubkeyToAddress(*key)
 				if adress.String() == param["Address"] {
-					re = getResult(Msg_success, "")
+					re = GetResult(Msg_success, "")
 				} else {
-					re = getResult(Msg_fail, "")
+					re = GetResult(Msg_fail, "")
 				}
 			} else {
-				re = getResult(Msg_fail, err2.Error())
+				re = GetResult(Msg_fail, err2.Error())
 			}
 
 		} else {
-			re = getResult(Msg_fail, err1.Error())
+			re = GetResult(Msg_fail, err1.Error())
 		}
 	} else {
-		re = getResult(Msg_param_error, err.Error())
+		re = GetResult(Msg_param_error, err.Error())
 	}
 
 	return string(re)
 }
 
-func doGetAbiFile() string {
-	re := getResult(Msg_success, "")
+func (c EthChain) GetAbiFile() string {
+	re := GetResult(Msg_success, "")
 	var conf = [1]string{"contractDir"}
 	par, _ := json.Marshal(conf)
-	doGetConfig(string(par))
+	DoGetConfig(string(par))
 	var dir = G_Config["contractDir"]
 	if dir != "" {
 		names, err := getFiles(dir, ".abi")
@@ -865,19 +907,19 @@ func doGetAbiFile() string {
 			tmp, _ := json.Marshal(names)
 			re, _ = json.Marshal(ErrorResult{0, string(tmp)})
 		} else {
-			re = getResult(Msg_openfile_fail, err.Error())
+			re = GetResult(Msg_openfile_fail, err.Error())
 		}
 	} else {
-		re = getResult(Msg_contractdirconfig_null, "")
+		re = GetResult(Msg_contractdirconfig_null, "")
 	}
 	return string(re)
 }
 
-func doGetBinFile() string {
-	re := getResult(Msg_success, "")
+func (c *EthChain) GetBinFile() string {
+	re := GetResult(Msg_success, "")
 	var conf = [1]string{"contractDir"}
 	par, _ := json.Marshal(conf)
-	doGetConfig(string(par))
+	DoGetConfig(string(par))
 	var dir = G_Config["contractDir"]
 	if dir != "" {
 		names, err := getFiles(dir, ".bin")
@@ -885,29 +927,29 @@ func doGetBinFile() string {
 			tmp, _ := json.Marshal(names)
 			re, _ = json.Marshal(ErrorResult{0, string(tmp)})
 		} else {
-			re = getResult(Msg_openfile_fail, err.Error())
+			re = GetResult(Msg_openfile_fail, err.Error())
 		}
 	} else {
-		re = getResult(Msg_contractdirconfig_null, "")
+		re = GetResult(Msg_contractdirconfig_null, "")
 	}
 	return string(re)
 }
 
-func doChangeAccountPass(atype, address, old, new string) string {
-	re := getResult(Msg_success, "")
+func (c *EthChain) ChangeAccountPass(atype, address, old, new string) string {
+	re := GetResult(Msg_success, "")
 	acc := ks.Accounts()
 	var i = 0
 	for i = 0; i < len(acc); i++ {
 		if acc[i].Address.String() == address {
 			err2 := ks.Update(acc[i], old, new)
 			if err2 != nil {
-				re = getResult(Msg_fail, err2.Error())
+				re = GetResult(Msg_fail, err2.Error())
 			}
 			break
 		}
 	}
 	if i == len(acc) {
-		re = getResult(Msg_account_noexist, "")
+		re = GetResult(Msg_account_noexist, "")
 	}
 	return string(re)
 }

@@ -1,8 +1,8 @@
-package main
+package common
 
 var G_Res = make(map[string]map[string]map[string]string)
 
-func initRes() {
+func InitRes() {
 	G_Res["zh-CN"] = make(map[string]map[string]string)
 	G_Res["en"] = make(map[string]map[string]string)
 	G_Res["zh-TW"] = make(map[string]map[string]string)

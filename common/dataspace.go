@@ -1,4 +1,4 @@
-package main
+package common
 
 import (
 	"encoding/json"
@@ -12,14 +12,14 @@ import (
 	"github.com/syndtr/goleveldb/leveldb/errors"
 )
 
-func doSaveDataSpace(name string, content string, auth string) string {
-	re := getResult(Msg_success, "")
+func DoSaveDataSpace(name string, content string, auth string) string {
+	re := GetResult(Msg_success, "")
 	check := checkDataSpaceAuth(auth)
 	if check != nil {
-		re = getResult(Msg_fail, check.Error())
+		re = GetResult(Msg_fail, check.Error())
 		return string(re)
 	}
-	db, err := leveldb.OpenFile(datadir+"dataspace", nil)
+	db, err := leveldb.OpenFile(G_DataDir+"dataspace", nil)
 	if db != nil {
 		defer db.Close()
 	}
@@ -31,31 +31,31 @@ func doSaveDataSpace(name string, content string, auth string) string {
 				data, _ := json.Marshal(encryptData)
 				err3 := db.Put([]byte(name), data, nil)
 				if err3 != nil {
-					re = getResult(Msg_writedb_fail, err3.Error())
+					re = GetResult(Msg_writedb_fail, err3.Error())
 				}
 			} else {
-				re = getResult(Msg_fail, err1.Error())
+				re = GetResult(Msg_fail, err1.Error())
 			}
 		} else if err2 == nil {
-			re = getResult(Msg_exist, string(value))
+			re = GetResult(Msg_exist, string(value))
 		} else {
-			re = getResult(Msg_fail, err2.Error())
+			re = GetResult(Msg_fail, err2.Error())
 		}
 	} else {
-		re = getResult(Msg_fail, err.Error())
+		re = GetResult(Msg_fail, err.Error())
 	}
 
 	return string(re)
 }
 
-func doChangeDataSpace(name string, content string, auth string) string {
-	re := getResult(Msg_success, "")
+func DoChangeDataSpace(name string, content string, auth string) string {
+	re := GetResult(Msg_success, "")
 	check := checkDataSpaceAuth(auth)
 	if check != nil {
-		re = getResult(Msg_fail, check.Error())
+		re = GetResult(Msg_fail, check.Error())
 		return string(re)
 	}
-	db, err := leveldb.OpenFile(datadir+"dataspace", nil)
+	db, err := leveldb.OpenFile(G_DataDir+"dataspace", nil)
 	if db != nil {
 		defer db.Close()
 	}
@@ -65,48 +65,48 @@ func doChangeDataSpace(name string, content string, auth string) string {
 			data, _ := json.Marshal(encryptData)
 			err2 := db.Put([]byte(name), data, nil)
 			if err2 != nil {
-				re = getResult(Msg_writedb_fail, err2.Error())
+				re = GetResult(Msg_writedb_fail, err2.Error())
 			}
 		} else {
-			re = getResult(Msg_fail, err1.Error())
+			re = GetResult(Msg_fail, err1.Error())
 		}
 	} else {
-		re = getResult(Msg_fail, err.Error())
+		re = GetResult(Msg_fail, err.Error())
 	}
 	return string(re)
 }
 
-func doDeleteDataSpace(name string, auth string) string {
-	re := getResult(Msg_success, "")
+func DoDeleteDataSpace(name string, auth string) string {
+	re := GetResult(Msg_success, "")
 	check := checkDataSpaceAuth(auth)
 	if check != nil {
-		re = getResult(Msg_fail, check.Error())
+		re = GetResult(Msg_fail, check.Error())
 		return string(re)
 	}
-	db, err := leveldb.OpenFile(datadir+"dataspace", nil)
+	db, err := leveldb.OpenFile(G_DataDir+"dataspace", nil)
 	if db != nil {
 		defer db.Close()
 	}
 	if err == nil {
 		err2 := db.Delete([]byte(name), nil)
 		if err2 != nil {
-			re = getResult(Msg_fail, err2.Error())
+			re = GetResult(Msg_fail, err2.Error())
 		}
 	} else {
-		re = getResult(Msg_fail, err.Error())
+		re = GetResult(Msg_fail, err.Error())
 	}
 	return string(re)
 }
 
-func doGetDataSpace(auth string) string {
-	re := getResult(Msg_success, "")
+func DoGetDataSpace(auth string) string {
+	re := GetResult(Msg_success, "")
 	check := checkDataSpaceAuth(auth)
 	if check != nil {
-		re = getResult(Msg_fail, check.Error())
+		re = GetResult(Msg_fail, check.Error())
 		return string(re)
 	}
 	data := make(map[string]string)
-	db, err := leveldb.OpenFile(datadir+"dataspace", nil)
+	db, err := leveldb.OpenFile(G_DataDir+"dataspace", nil)
 	if db != nil {
 		defer db.Close()
 	}
@@ -130,14 +130,14 @@ func doGetDataSpace(auth string) string {
 		msg, _ := json.Marshal(data)
 		re, _ = json.Marshal(ErrorResult{Msg_success, string(msg)})
 	} else {
-		re = getResult(Msg_fail, err.Error())
+		re = GetResult(Msg_fail, err.Error())
 	}
 	return string(re)
 }
 
-func doCheckDataSpace() string {
-	re := getResult(Msg_success, "")
-	db, err := leveldb.OpenFile(datadir+"dataspace", nil)
+func DoCheckDataSpace() string {
+	re := GetResult(Msg_success, "")
+	db, err := leveldb.OpenFile(G_DataDir+"dataspace", nil)
 	if db != nil {
 		defer db.Close()
 	}
@@ -145,22 +145,22 @@ func doCheckDataSpace() string {
 		tag, err1 := db.Get([]byte("data_space_init"), nil)
 		//have not init
 		if (err1 == errors.ErrNotFound) || (err1 == nil && len(tag) == 0) {
-			re = getResult(Msg_space_notinited, "")
+			re = GetResult(Msg_space_notinited, "")
 		} else if err1 == nil { //have inited
-			re = getResult(Msg_space_inited, "")
+			re = GetResult(Msg_space_inited, "")
 		} else { //other error
-			re = getResult(Msg_fail, err1.Error())
+			re = GetResult(Msg_fail, err1.Error())
 		}
 	} else {
-		re = getResult(Msg_fail, err.Error())
+		re = GetResult(Msg_fail, err.Error())
 	}
 
 	return string(re)
 }
 
-func doInitDataSpace(auth string) string {
-	re := getResult(Msg_success, "")
-	db, err := leveldb.OpenFile(datadir+"dataspace", nil)
+func DoInitDataSpace(auth string) string {
+	re := GetResult(Msg_success, "")
+	db, err := leveldb.OpenFile(G_DataDir+"dataspace", nil)
 	if db != nil {
 		defer db.Close()
 	}
@@ -173,31 +173,31 @@ func doInitDataSpace(auth string) string {
 				data, _ := json.Marshal(encryptData)
 				err3 := db.Put([]byte("data_space_init"), data, nil)
 				if err3 != nil {
-					re = getResult(Msg_writedb_fail, err3.Error())
+					re = GetResult(Msg_writedb_fail, err3.Error())
 				}
 			} else {
-				re = getResult(Msg_fail, err2.Error())
+				re = GetResult(Msg_fail, err2.Error())
 			}
 		} else if err1 == nil { //have inited
-			re = getResult(Msg_space_inited, "")
+			re = GetResult(Msg_space_inited, "")
 		} else { //other error
-			re = getResult(Msg_fail, err1.Error())
+			re = GetResult(Msg_fail, err1.Error())
 		}
 	} else {
-		re = getResult(Msg_fail, err.Error())
+		re = GetResult(Msg_fail, err.Error())
 	}
 	return string(re)
 }
 
 func checkDataSpaceAuth(auth string) error {
-	db, err := leveldb.OpenFile(datadir+"dataspace", nil)
+	db, err := leveldb.OpenFile(G_DataDir+"dataspace", nil)
 	if db != nil {
 		defer db.Close()
 	}
 	if err == nil {
 		tag, err1 := db.Get([]byte("data_space_init"), nil)
 		if (err1 == errors.ErrNotFound) || (err1 == nil && len(tag) == 0) {
-			return errors.New(doGetMsg(strconv.Itoa(int(Msg_space_notinited))))
+			return errors.New(DoGetMsg(strconv.Itoa(int(Msg_space_notinited))))
 		} else if err1 == nil { //have inited
 			var tmp keystore.CryptoJSON
 			if json.Unmarshal(tag, &tmp) == nil {
@@ -205,7 +205,7 @@ func checkDataSpaceAuth(auth string) error {
 				if err2 == nil && string(value) == "data_space_init" {
 					return nil
 				} else {
-					return errors.New(doGetMsg(strconv.Itoa(int(Msg_password_error))))
+					return errors.New(DoGetMsg(strconv.Itoa(int(Msg_password_error))))
 				}
 			}
 		} else { //other error

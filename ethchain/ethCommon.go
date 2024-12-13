@@ -1,9 +1,9 @@
-package main
+package ethchain
 
 import (
+	. "balawallet/common"
 	"context"
 	"crypto/ecdsa"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"math/big"
@@ -17,25 +17,9 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 
 	//"github.com/ethereum/go-ethereum/crypto/sha3"
+
 	"github.com/ethereum/go-ethereum/ethclient"
-	"github.com/syndtr/goleveldb/leveldb"
 )
-
-type ErrorResult struct {
-	Code uint
-	Msg  string
-}
-
-func isExist(db *leveldb.DB, name string) bool {
-	it := db.NewIterator(nil, nil)
-	defer it.Release()
-	for it.Next() {
-		if string(it.Value()) == name {
-			return true
-		}
-	}
-	return false
-}
 
 func newDynamicTx(nonce uint64, to common.Address, amount *big.Int, gasLimit uint64, gasPrice *big.Int, tipsPrice *big.Int, chain *big.Int) *types.Transaction {
 	return types.NewTx(&types.DynamicFeeTx{
@@ -179,7 +163,7 @@ func getChainInfo(connect *ethclient.Client, from string) (uint64, *big.Int, *bi
 
 func getConnection() *ethclient.Client {
 	if G_Etherclient == nil {
-		connect, err := ethclient.Dial(G_Config["nodeAddress"])
+		connect, err := ethclient.Dial(G_Config["ethAddress"])
 		if err != nil {
 			G_Etherclient = nil
 
@@ -257,31 +241,6 @@ func getFiles(dir string, suffix string) ([]string, error) {
 	return re, nil
 }
 
-func getResult(code uint, addMsg string) []byte {
-	var re []byte
-	lang := G_Config["language"]
-	if lang == "" {
-		lang = "zh-CN"
-	}
-	msg := G_Msg[lang][code]
-	if msg == "" {
-		msg = "null"
-	}
-	if addMsg != "" {
-		msg = msg + ":" + addMsg
-	}
-	re, _ = json.Marshal(ErrorResult{code, msg})
-	return re
-}
-
-func getMsg(code uint) string {
-	lang := G_Config["language"]
-	if lang == "" {
-		lang = "zh-CN"
-	}
-	msg := G_Msg[lang][code]
-	return msg
-}
 func zeroKey(key *ecdsa.PrivateKey) {
 	b := key.D.Bits()
 	clear(b)
@@ -307,12 +266,12 @@ func getKey(add string, pa string) (*ecdsa.PrivateKey, error) {
 		// 确保导出的是需要私钥
 		if key.Address.String() != add {
 			fmt.Errorf("key content mismatch: have account %x, want %s", key.Address, add)
-			return nil, errors.New(getMsg(Msg_addressprivatekey_mismatch))
+			return nil, errors.New(GetMsg(Msg_addressprivatekey_mismatch))
 		} else {
 			return key.PrivateKey, nil
 		}
 	} else {
 		fmt.Println("can not find account:" + add)
 	}
-	return nil, errors.New(getMsg(Msg_addressprivatekey_mismatch))
+	return nil, errors.New(GetMsg(Msg_addressprivatekey_mismatch))
 }

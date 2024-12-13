@@ -1,3 +1,3 @@
 cd tool
 rm tools
-go build tools.go && ./tools && cd .. && go build && mv BalaWallet bin/
+go build tools.go && ./tools && cd .. && go build && mv balawallet bin/
