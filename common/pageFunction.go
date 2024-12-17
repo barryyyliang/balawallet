@@ -223,3 +223,28 @@ func DoGetRes(com string) string {
 	}
 	return re
 }
+
+func DoChangeNet(nettype string) string {
+	var re []byte
+	tmpType := -1
+	switch nettype {
+	case "Ethereum":
+		tmpType = Nettype_ethereum
+	case "Polygon":
+		tmpType = Nettype_polygon
+	case "Solana":
+		tmpType = Nettype_solana
+	}
+	if G_NetType != tmpType {
+		if tmpType == Nettype_solana {
+			re = GetResult(Msg_fail, "not support")
+		} else {
+			G_NetType = tmpType
+			G_Etherclient = nil
+			re = GetResult(Msg_success, "")
+		}
+	} else {
+		re = GetResult(Msg_success, "")
+	}
+	return string(re)
+}

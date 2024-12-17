@@ -163,8 +163,18 @@ func getChainInfo(connect *ethclient.Client, from string) (uint64, *big.Int, *bi
 
 func getConnection() *ethclient.Client {
 	if G_Etherclient == nil {
-		connect, err := ethclient.Dial(G_Config["ethAddress"])
+		var connect *ethclient.Client
+		var err error
+		if Nettype_ethereum == G_NetType {
+			fmt.Println("net type eth")
+			connect, err = ethclient.Dial(G_Config["ethAddress"])
+		} else if Nettype_polygon == G_NetType {
+			fmt.Println("net type sol:" + G_Config["polAddress"])
+			connect, err = ethclient.Dial(G_Config["polAddress"])
+		}
+
 		if err != nil {
+			fmt.Println("net connet fail")
 			G_Etherclient = nil
 
 		} else {

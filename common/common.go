@@ -15,8 +15,16 @@ var G_Config = make(map[string]string)
 var G_Etherclient *ethclient.Client = nil
 var G_BlockchainConfig bool = true
 var G_DataDir string
+var G_NetType int
+
+const (
+	Nettype_ethereum int = 0
+	Nettype_polygon  int = 1
+	Nettype_solana   int = 2
+)
 
 func InitGlobal(dir string) {
+	G_NetType = Nettype_ethereum
 	G_DataDir = dir + "/data/"
 	_, err := os.Stat(G_DataDir)
 	if err != nil {
