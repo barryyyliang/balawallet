@@ -19,6 +19,10 @@
         option2.text = "ERC721"
         option2.value = "ERC721"
         ipt0.add(option2)
+        var option3 = document.createElement("option")
+        option3.text = "Other"
+        option3.value = "Other"
+        ipt0.add(option3)
         
         var td1 = document.createElement("td")
         td1.append(ipt0)

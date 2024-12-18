@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"math/big"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -453,26 +454,36 @@ func (c *EthChain) DeployContract(from string, file string, pass string) string 
 	return string(re)
 }
 
+type contract struct {
+	Type    string `json:"type"`
+	Address string `json:"address"`
+	Name    string `json:"name"`
+}
+
 func (c *EthChain) GetContract() string {
-	type contract struct {
-		Type    string `json:"type"`
-		Address string `json:"address"`
-		Name    string `json:"name"`
-	}
+
 	type contracts struct {
 		Contracts []contract `json:"contracts"`
 	}
 	var res contracts
 	//账户信息
 	db, err := leveldb.OpenFile(G_DataDir+"contract", nil)
-	defer db.Close()
 	if err == nil {
+		defer db.Close()
 		it := db.NewIterator(nil, nil)
 		defer it.Release()
 		for it.Next() {
-			var aa contract
-			json.Unmarshal(it.Value(), &aa)
-			res.Contracts = append(res.Contracts, aa)
+			tmp := strings.Split(string(it.Key()), "_")
+			fmt.Println(string(it.Key()))
+			t, err := strconv.Atoi(tmp[0])
+			if err == nil {
+				if t == G_NetType {
+					var aa contract
+					json.Unmarshal(it.Value(), &aa)
+					res.Contracts = append(res.Contracts, aa)
+				}
+			}
+
 		}
 	}
 
@@ -490,7 +501,8 @@ func (c *EthChain) DeleteContract(address string) string {
 	db, err := leveldb.OpenFile(G_DataDir+"contract", nil)
 	if err == nil {
 		defer db.Close()
-		if db.Delete([]byte(address), nil) != nil {
+		key := strconv.Itoa(G_NetType) + "_" + address
+		if db.Delete([]byte(key), nil) != nil {
 			re = GetResult(Msg_writedb_fail, "")
 		}
 	} else {
@@ -502,14 +514,14 @@ func (c *EthChain) DeleteContract(address string) string {
 
 func (c *EthChain) ImportContract(cons string) string {
 	re := GetResult(Msg_success, "")
-	type contract struct {
+	type param struct {
 		Type    string `json:"type"`
 		Address string `json:"address"`
 		Name    string `json:"name"`
 		From    string `json:"from"`
 	}
 
-	var jcons contract
+	var jcons param
 	err := json.Unmarshal([]byte(cons), &jcons)
 	if err == nil {
 		if jcons.Name == "" {
@@ -539,11 +551,15 @@ func (c *EthChain) ImportContract(cons string) string {
 				result, err5 := connect.CallContract(ctx, msg, nil)
 				fmt.Println("get contract name:" + string(result))
 				if err5 == nil {
-					ret, _ := method.Outputs.Unpack(result)
-					for _, a := range ret {
-						aa := valueToString(a)
-						fmt.Println("get contract name2:" + aa)
-						jcons.Name = jcons.Name + aa
+					if method != nil {
+						ret, _ := method.Outputs.Unpack(result)
+						for _, a := range ret {
+							aa := valueToString(a)
+							fmt.Println("get contract name2:" + aa)
+							jcons.Name = jcons.Name + aa
+						}
+					} else {
+						jcons.Name = jcons.Name + string(result)
 					}
 				} else {
 					fmt.Println("get contract name error:" + err5.Error())
@@ -551,10 +567,13 @@ func (c *EthChain) ImportContract(cons string) string {
 			}
 		}
 		db, err2 := leveldb.OpenFile(G_DataDir+"contract", nil)
-		jvalue, _ := json.Marshal(jcons)
+		co := contract{Type: jcons.Type, Address: jcons.Address, Name: jcons.Name}
+		jvalue, _ := json.Marshal(co)
 		if err2 == nil {
 			defer db.Close()
-			if db.Put([]byte(jcons.Address), jvalue, nil) != nil {
+			key := strconv.Itoa(G_NetType) + "_" + jcons.Address
+			fmt.Println(key)
+			if db.Put([]byte(key), jvalue, nil) != nil {
 				re = GetResult(Msg_writedb_fail, "")
 			}
 		} else {
