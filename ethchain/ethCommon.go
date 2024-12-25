@@ -12,7 +12,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/ethereum/go-ethereum/accounts/keystore"
+	"balawallet/accounts/keystore"
+
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 
@@ -260,8 +261,8 @@ func getKey(add string, pa string) (*ecdsa.PrivateKey, error) {
 	selectAccountFile := ""
 	acc := ks.Accounts()
 	for i := 0; i < len(acc); i++ {
-		if acc[i].Address.String() == add {
-			selectAccountFile = acc[i].URL.Path
+		if acc[i].GetAddress() == add {
+			selectAccountFile = acc[i].GetUrl().Path
 		}
 	}
 	if selectAccountFile != "" {
