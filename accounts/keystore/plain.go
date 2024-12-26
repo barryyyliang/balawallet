@@ -21,15 +21,13 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-
-	"github.com/ethereum/go-ethereum/common"
 )
 
 type keyStorePlain struct {
 	keysDirPath string
 }
 
-func (ks keyStorePlain) GetKey(addr common.Address, filename, auth string) (*Key, error) {
+func (ks keyStorePlain) GetKey(addr string, filename, auth string) (*Key, error) {
 	fd, err := os.Open(filename)
 	if err != nil {
 		return nil, err
@@ -39,8 +37,8 @@ func (ks keyStorePlain) GetKey(addr common.Address, filename, auth string) (*Key
 	if err := json.NewDecoder(fd).Decode(key); err != nil {
 		return nil, err
 	}
-	if key.Address != addr {
-		return nil, fmt.Errorf("key content mismatch: have address %x, want %x", key.Address, addr)
+	if !key.Is(addr) {
+		return nil, fmt.Errorf("key content mismatch: have address %x, want %x", key.GetStringAddress(), addr)
 	}
 	return key, nil
 }

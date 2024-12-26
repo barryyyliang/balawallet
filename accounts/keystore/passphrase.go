@@ -90,8 +90,8 @@ func (ks keyStorePassphrase) GetKey(addr string, filename, auth string) (*Key, e
 		return nil, err
 	}
 	// Make sure we're really operating on the requested key (no swap attacks)
-	if key.Address.String() != addr {
-		return nil, fmt.Errorf("key content mismatch: have account %x, want %x", key.Address, addr)
+	if !key.Is(addr) {
+		return nil, fmt.Errorf("key content mismatch: have account %x, want %x", key.GetStringAddress(), addr)
 	}
 	return key, nil
 }
@@ -114,7 +114,7 @@ func (ks keyStorePassphrase) StoreKey(filename string, key *Key, auth string) er
 	}
 	if !ks.skipKeyFileVerification {
 		// Verify that we can decrypt the file with the given password.
-		_, err = ks.GetKey(key.Address.String(), tmpName, auth)
+		_, err = ks.GetKey(key.GetStringAddress(), tmpName, auth)
 		if err != nil {
 			msg := "An error was encountered when saving and verifying the keystore file. \n" +
 				"This indicates that the keystore is corrupted. \n" +
@@ -182,13 +182,13 @@ func EncryptDataV3(data, auth []byte, scryptN, scryptP int) (CryptoJSON, error) 
 // EncryptKey encrypts a key using the specified scrypt parameters into a json
 // blob that can be decrypted later on.
 func EncryptKey(key *Key, auth string, scryptN, scryptP int) ([]byte, error) {
-	keyBytes := math.PaddedBigBytes(key.PrivateKey.D, 32)
+	keyBytes := math.PaddedBigBytes(key.GetBigPrivate(), 32)
 	cryptoStruct, err := EncryptDataV3(keyBytes, []byte(auth), scryptN, scryptP)
 	if err != nil {
 		return nil, err
 	}
 	encryptedKeyJSONV3 := encryptedKeyJSONV3{
-		hex.EncodeToString(key.Address[:]),
+		hex.EncodeToString(key.GetByteAddress()),
 		cryptoStruct,
 		key.Id.String(),
 		version,
@@ -225,7 +225,8 @@ func DecryptKey(keyjson []byte, auth string) (*Key, error) {
 	if err != nil {
 		return nil, err
 	}
-	key, err := crypto.ToECDSA(keyBytes)
+	//key, err := crypto.ToECDSA(keyBytes)
+	key, err := new(ChainAdapter).BytesToPrivateKey(keyBytes)
 	if err != nil {
 		return nil, fmt.Errorf("invalid key: %w", err)
 	}
@@ -233,11 +234,12 @@ func DecryptKey(keyjson []byte, auth string) (*Key, error) {
 	if err != nil {
 		return nil, fmt.Errorf("invalid UUID: %w", err)
 	}
-	return &Key{
-		Id:         id,
-		Address:    crypto.PubkeyToAddress(key.PublicKey),
-		PrivateKey: key,
-	}, nil
+	return new(ChainAdapter).NewKey(id, key), nil
+	// return &Key{
+	// 	Id:         id,
+	// 	Address:    crypto.PubkeyToAddress(key.PublicKey),
+	// 	PrivateKey: key,
+	// }, nil
 }
 
 func DecryptDataV3(cryptoJson CryptoJSON, auth string) ([]byte, error) {

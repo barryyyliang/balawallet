@@ -35,7 +35,6 @@ import (
 	"balawallet/accounts"
 
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/event"
 )
 
@@ -233,7 +232,8 @@ func (ks *KeyStore) Delete(a accounts.Account, passphrase string) error {
 	// immediately afterwards.
 	a, key, err := ks.getDecryptedKey(a, passphrase)
 	if key != nil {
-		zeroKey(key.PrivateKey)
+		//zeroKey(key.PrivateKey)
+		key.ZeroKey()
 	}
 	if err != nil {
 		return err
@@ -260,11 +260,12 @@ func (ks *KeyStore) SignHash(a accounts.Account, hash []byte) ([]byte, error) {
 		return nil, ErrLocked
 	}
 	// Sign the hash using plain ECDSA operations
-	return crypto.Sign(hash, unlockedKey.PrivateKey)
+	//return crypto.Sign(hash, unlockedKey.PrivateKey)
+	return unlockedKey.SinHash(hash)
 }
 
 // SignTx signs the given transaction with the requested account.
-func (ks *KeyStore) SignTx(a accounts.Account, tx *types.Transaction, chainID *big.Int) (*types.Transaction, error) {
+func (ks *KeyStore) SignEthTx(a accounts.Account, tx *types.Transaction, chainID *big.Int) (*types.Transaction, error) {
 	// Look up the key to sign with and abort if it cannot be found
 	ks.mu.RLock()
 	defer ks.mu.RUnlock()
@@ -275,7 +276,12 @@ func (ks *KeyStore) SignTx(a accounts.Account, tx *types.Transaction, chainID *b
 	}
 	// Depending on the presence of the chain ID, sign with 2718 or homestead
 	signer := types.LatestSignerForChainID(chainID)
-	return types.SignTx(tx, signer, unlockedKey.PrivateKey)
+	pi := unlockedKey.GetPrivateKey()
+	if prikey, ok := pi.(*ecdsa.PrivateKey); ok {
+		return types.SignTx(tx, signer, prikey)
+	}
+	return nil, errors.New("can not get private key")
+	//return types.SignTx(tx, signer, *ecdsa.PrivateKey(unlockedKey.GetPrivateKey()))
 }
 
 // SignHashWithPassphrase signs hash if the private key matching the given address
@@ -286,8 +292,8 @@ func (ks *KeyStore) SignHashWithPassphrase(a accounts.Account, passphrase string
 	if err != nil {
 		return nil, err
 	}
-	defer zeroKey(key.PrivateKey)
-	return crypto.Sign(hash, key.PrivateKey)
+	defer key.ZeroKey()
+	return key.SinHash(hash)
 }
 
 // SignTxWithPassphrase signs the transaction if the private key matching the
@@ -297,10 +303,16 @@ func (ks *KeyStore) SignTxWithPassphrase(a accounts.Account, passphrase string, 
 	if err != nil {
 		return nil, err
 	}
-	defer zeroKey(key.PrivateKey)
+	//defer zeroKey(key.PrivateKey)
+	defer key.ZeroKey()
 	// Depending on the presence of the chain ID, sign with or without replay protection.
 	signer := types.LatestSignerForChainID(chainID)
-	return types.SignTx(tx, signer, key.PrivateKey)
+	pi := key.GetPrivateKey()
+	if prikey, ok := pi.(*ecdsa.PrivateKey); ok {
+		return types.SignTx(tx, signer, prikey)
+	}
+	return nil, errors.New("can not get private key")
+	//return types.SignTx(tx, signer, key.PrivateKey)
 }
 
 // Unlock unlocks the given account indefinitely.
@@ -339,7 +351,8 @@ func (ks *KeyStore) TimedUnlock(a accounts.Account, passphrase string, timeout t
 		if u.abort == nil {
 			// The address was unlocked indefinitely, so unlocking
 			// it with a timeout would be confusing.
-			zeroKey(key.PrivateKey)
+			//zeroKey(key.PrivateKey)
+			key.ZeroKey()
 			return nil
 		}
 		// Terminate the expire goroutine and replace it below.
@@ -386,7 +399,8 @@ func (ks *KeyStore) expire(addr string, u *unlocked, timeout time.Duration) {
 		// because the map stores a new pointer every time the key is
 		// unlocked.
 		if ks.unlocked[addr] == u {
-			zeroKey(u.PrivateKey)
+			//zeroKey(u.PrivateKey)
+			u.ZeroKey()
 			delete(ks.unlocked, addr)
 		}
 		ks.mu.Unlock()
@@ -425,8 +439,8 @@ func (ks *KeyStore) Export(a accounts.Account, passphrase, newPassphrase string)
 // Import stores the given encrypted JSON key into the key directory.
 func (ks *KeyStore) ImportEth(keyJSON []byte, passphrase, newPassphrase string) (accounts.Account, error) {
 	key, err := DecryptKey(keyJSON, passphrase)
-	if key != nil && key.PrivateKey != nil {
-		defer zeroKey(key.PrivateKey)
+	if key != nil {
+		defer key.ZeroKey()
 	}
 	if err != nil {
 		return accounts.Account{}, err
@@ -434,8 +448,8 @@ func (ks *KeyStore) ImportEth(keyJSON []byte, passphrase, newPassphrase string) 
 	ks.importMu.Lock()
 	defer ks.importMu.Unlock()
 
-	if ks.cache.hasAddress(key.Address.String()) {
-		a := ks.cache.byAddr[key.Address.String()]
+	if ks.cache.hasAddress(key.GetStringAddress()) {
+		a := ks.cache.byAddr[key.GetStringAddress()]
 		var re accounts.Account
 		if len(a) == 1 {
 			re = a[0]
@@ -453,8 +467,8 @@ func (ks *KeyStore) ImportECDSA(priv *ecdsa.PrivateKey, passphrase string) (acco
 	defer ks.importMu.Unlock()
 
 	key := newKeyFromECDSA(priv)
-	if ks.cache.hasAddress(key.Address.String()) {
-		a := ks.cache.byAddr[key.Address.String()]
+	if ks.cache.hasAddress(key.GetStringAddress()) {
+		a := ks.cache.byAddr[key.GetStringAddress()]
 		var re accounts.Account
 		if len(a) == 1 {
 			re = a[0]
@@ -468,7 +482,7 @@ func (ks *KeyStore) ImportECDSA(priv *ecdsa.PrivateKey, passphrase string) (acco
 
 func (ks *KeyStore) importKey(key *Key, passphrase string) (accounts.Account, error) {
 	//a := accounts.Account{Address: key.Address, URL: accounts.URL{Scheme: KeyStoreScheme, Path: ks.storage.JoinPath(keyFileName(key.Address))}}
-	a := accounts.NewAccount(key.Address.String(), accounts.URL{Scheme: KeyStoreScheme, Path: ks.storage.JoinPath(keyFileName(key.Address))})
+	a := new(ChainAdapter).NewAccount(key.GetStringAddress(), accounts.URL{Scheme: KeyStoreScheme, Path: ks.storage.JoinPath(keyFileName(key.GetByteAddress()))})
 	if err := ks.storage.StoreKey(a.GetUrl().Path, key, passphrase); err != nil {
 		return accounts.Account{}, err
 	}

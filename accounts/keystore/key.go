@@ -23,6 +23,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"math/big"
 	"os"
 	"path/filepath"
 	"strings"
@@ -39,16 +40,48 @@ const (
 	version = 3
 )
 
+type ChainAdapter struct {
+}
+
+func (c *ChainAdapter) NewAccount(ad string, url accounts.URL) accounts.Account {
+	re := accounts.Account{}
+	re.Init(ad, url)
+	return re
+}
+func (c *ChainAdapter) NewKey(id uuid.UUID, pik interface{}) *Key {
+
+	if privatekey, ok := pik.(*ecdsa.PrivateKey); ok {
+		return &Key{
+			Id:         id,
+			address:    crypto.PubkeyToAddress(privatekey.PublicKey),
+			privateKey: privatekey,
+		}
+	}
+	return nil
+}
+func (c *ChainAdapter) BytesToPrivateKey(b []byte) (interface{}, error) {
+	return crypto.ToECDSA(b)
+}
+
 type Key struct {
 	Id uuid.UUID // Version 4 "random" for unique id not derived from key data
 	// to simplify lookups we also store the address
-	Address common.Address
+	address common.Address
 	// we only store privkey as pubkey/address can be derived from it
 	// privkey in this struct is always in plaintext
-	PrivateKey *ecdsa.PrivateKey
+	privateKey *ecdsa.PrivateKey
 }
 
 type IKey interface {
+	GetByteAddress() []byte
+	GetStringAddress() string
+	MarshalJSON() (j []byte, err error)
+	UnmarshalJSON(j []byte) (err error)
+	ZeroKey()
+	SinHash(hash []byte) ([]byte, error)
+	GetPrivateKey() interface{}
+	GetBigPrivate() *big.Int
+	Is(add string) bool
 }
 
 type keyStore interface {
@@ -94,10 +127,47 @@ type cipherparamsJSON struct {
 	IV string `json:"iv"`
 }
 
+func (k *Key) Is(add string) bool {
+	tmp := common.HexToAddress(add)
+	return tmp == k.address
+}
+
+func (k *Key) GetByteAddress() []byte {
+	return k.address.Bytes()
+}
+func (k *Key) GetStringAddress() string {
+	return k.address.String()
+}
+
+func (k *Key) SinHash(hash []byte) ([]byte, error) {
+	return crypto.Sign(hash, k.privateKey)
+}
+
+// func (k *Key) GetPrivateKey() []byte {
+// 	return crypto.FromECDSA(k.privateKey)
+// }
+
+func (k *Key) ZeroKey() {
+	if k.privateKey != nil {
+		b := k.privateKey.D.Bits()
+		clear(b)
+	}
+}
+
+func (k *Key) GetPrivateKey() interface{} {
+	return k.privateKey
+}
+func (k *Key) GetBigPrivate() *big.Int {
+	if k.privateKey != nil {
+		return k.privateKey.D
+	}
+	return nil
+}
+
 func (k *Key) MarshalJSON() (j []byte, err error) {
 	jStruct := plainKeyJSON{
-		hex.EncodeToString(k.Address[:]),
-		hex.EncodeToString(crypto.FromECDSA(k.PrivateKey)),
+		hex.EncodeToString(k.address[:]),
+		hex.EncodeToString(crypto.FromECDSA(k.privateKey)),
 		k.Id.String(),
 		version,
 	}
@@ -127,8 +197,8 @@ func (k *Key) UnmarshalJSON(j []byte) (err error) {
 		return err
 	}
 
-	k.Address = common.BytesToAddress(addr)
-	k.PrivateKey = privkey
+	k.address = common.BytesToAddress(addr)
+	k.privateKey = privkey
 
 	return nil
 }
@@ -140,8 +210,8 @@ func newKeyFromECDSA(privateKeyECDSA *ecdsa.PrivateKey) *Key {
 	}
 	key := &Key{
 		Id:         id,
-		Address:    crypto.PubkeyToAddress(privateKeyECDSA.PublicKey),
-		PrivateKey: privateKeyECDSA,
+		address:    crypto.PubkeyToAddress(privateKeyECDSA.PublicKey),
+		privateKey: privateKeyECDSA,
 	}
 	return key
 }
@@ -161,7 +231,7 @@ func NewKeyForDirectICAP(rand io.Reader) *Key {
 		panic("key generation: ecdsa.GenerateKey failed: " + err.Error())
 	}
 	key := newKeyFromECDSA(privateKeyECDSA)
-	if !strings.HasPrefix(key.Address.Hex(), "0x00") {
+	if !strings.HasPrefix(key.GetStringAddress(), "0x00") {
 		return NewKeyForDirectICAP(rand)
 	}
 	return key
@@ -184,11 +254,11 @@ func storeNewKey(ks keyStore, rand io.Reader, auth string) (*Key, accounts.Accou
 	// 	Address: key.Address.Bytes(),
 	// 	URL:     accounts.URL{Scheme: KeyStoreScheme, Path: ks.JoinPath(keyFileName(key.Address))},
 	// }
-
-	a := accounts.NewAccount(key.Address.Hex(), accounts.URL{Scheme: KeyStoreScheme, Path: ks.JoinPath(keyFileName(key.Address))})
+	a := new(ChainAdapter).NewAccount(key.GetStringAddress(), accounts.URL{Scheme: KeyStoreScheme, Path: ks.JoinPath(keyFileName(key.GetByteAddress()))})
 
 	if err := ks.StoreKey(a.GetUrl().Path, key, auth); err != nil {
-		zeroKey(key.PrivateKey)
+		//zeroKey(key.PrivateKey)
+		key.ZeroKey()
 		return nil, a, err
 	}
 	return key, a, err
@@ -226,7 +296,7 @@ func writeKeyFile(file string, content []byte) error {
 
 // keyFileName implements the naming convention for keyfiles:
 // UTC--<created_at UTC ISO8601>-<address hex>
-func keyFileName(keyAddr common.Address) string {
+func keyFileName(keyAddr []byte) string {
 	ts := time.Now().UTC()
 	return fmt.Sprintf("UTC--%s--%s", toISO8601(ts), hex.EncodeToString(keyAddr[:]))
 }

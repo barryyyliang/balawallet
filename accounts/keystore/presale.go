@@ -49,7 +49,7 @@ func importPreSaleKey(keyStore keyStore, keyJSON []byte, password string) (accou
 	// 		Path:   keyStore.JoinPath(keyFileName(key.Address)),
 	// 	},
 	// }
-	a := accounts.NewAccount(key.Address.Hex(), accounts.URL{Scheme: KeyStoreScheme, Path: keyStore.JoinPath(keyFileName(key.Address))})
+	a := new(ChainAdapter).NewAccount(key.GetStringAddress(), accounts.URL{Scheme: KeyStoreScheme, Path: keyStore.JoinPath(keyFileName(key.GetByteAddress()))})
 	err = keyStore.StoreKey(a.GetUrl().Path, key, password)
 	return a, key, err
 }
@@ -90,12 +90,13 @@ func decryptPreSaleKey(fileContent []byte, password string) (key *Key, err error
 	ethPriv := crypto.Keccak256(plainText)
 	ecKey := crypto.ToECDSAUnsafe(ethPriv)
 
-	key = &Key{
-		Id:         uuid.UUID{},
-		Address:    crypto.PubkeyToAddress(ecKey.PublicKey),
-		PrivateKey: ecKey,
-	}
-	derivedAddr := hex.EncodeToString(key.Address.Bytes()) // needed because .Hex() gives leading "0x"
+	// key = &Key{
+	// 	Id:         uuid.UUID{},
+	// 	Address:    crypto.PubkeyToAddress(ecKey.PublicKey),
+	// 	PrivateKey: ecKey,
+	// }
+	key = new(ChainAdapter).NewKey(uuid.UUID{}, ecKey)
+	derivedAddr := hex.EncodeToString(key.GetByteAddress()) // needed because .Hex() gives leading "0x"
 	expectedAddr := preSaleKeyStruct.EthAddr
 	if derivedAddr != expectedAddr {
 		err = fmt.Errorf("decrypted addr '%s' not equal to expected addr '%s'", derivedAddr, expectedAddr)

@@ -275,11 +275,16 @@ func getKey(add string, pa string) (*ecdsa.PrivateKey, error) {
 			return nil, err
 		}
 		// 确保导出的是需要私钥
-		if key.Address.String() != add {
-			fmt.Errorf("key content mismatch: have account %x, want %s", key.Address, add)
+		if key.GetStringAddress() != add {
+			fmt.Errorf("key content mismatch: have account %x, want %s", key.GetStringAddress(), add)
 			return nil, errors.New(GetMsg(Msg_addressprivatekey_mismatch))
 		} else {
-			return key.PrivateKey, nil
+			pri := key.GetPrivateKey()
+			if prikey, ok := pri.(*ecdsa.PrivateKey); ok {
+				return prikey, nil
+			} else {
+				return nil, errors.New(GetMsg(Msg_readaccountfile_fail))
+			}
 		}
 	} else {
 		fmt.Println("can not find account:" + add)

@@ -270,7 +270,7 @@ func (ac *accountCache) scanAccounts() error {
 		// Parse the address.
 		key.Address = ""
 		err = json.NewDecoder(buf).Decode(&key)
-		ac := accounts.NewAccount(key.Address, accounts.URL{Scheme: KeyStoreScheme, Path: path})
+		ac := new(ChainAdapter).NewAccount(key.Address, accounts.URL{Scheme: KeyStoreScheme, Path: path})
 		//addr := common.HexToAddress(key.Address)
 		switch {
 		case err != nil:
