@@ -22,31 +22,41 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum"
-	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/event"
+	"github.com/google/uuid"
 	"golang.org/x/crypto/sha3"
 )
 
+// KeyStoreScheme is the protocol scheme prefixing account and wallet URLs.
+const KeyStoreScheme = "keystore"
+
 // Account represents an Ethereum account located at a specific location defined
 // by the optional URL field.
-type Account struct {
-	address common.Address `json:"address"` // Ethereum account address derived from the key
-	url     URL            `json:"url"`     // Optional resource locator within a backend
+
+type Account interface {
+	GetAddress() string
+	Init(ad string, ul URL)
+	GetUrl() URL
+	AddressIsNull() bool
 }
 
-func (a *Account) GetAddress() string {
-	return a.address.String()
+type IChainAdapter interface {
+	NewAccount(ad string, url accounts.URL) accounts.Account
+	NewKey(id uuid.UUID, pik interface{}) *Key
+	BytesToPrivateKey(b []byte) (interface{}, error)
 }
-func (a *Account) Init(ad string, ul URL) {
-	a.address = common.HexToAddress(ad)
-	a.url = ul
-}
-func (a *Account) GetUrl() URL {
-	return a.url
-}
-func (a *Account) AddressIsNull() bool {
-	return a.address == common.Address{}
+type Key interface {
+	GetByteAddress() []byte
+	GetStringAddress() string
+	MarshalJSON() (j []byte, err error)
+	UnmarshalJSON(j []byte) (err error)
+	ZeroKey()
+	SinHash(hash []byte) ([]byte, error)
+	GetPrivateKey() interface{}
+	GetBigPrivate() *big.Int
+	Is(add string) bool
 }
 
 const (

@@ -24,6 +24,7 @@ import (
 	"crypto/ecdsa"
 	crand "crypto/rand"
 	"errors"
+	"io"
 	"math/big"
 	"os"
 	"path/filepath"
@@ -51,15 +52,21 @@ var (
 // KeyStoreType is the reflect type of a keystore backend.
 var KeyStoreType = reflect.TypeOf(&KeyStore{})
 
-// KeyStoreScheme is the protocol scheme prefixing account and wallet URLs.
-const KeyStoreScheme = "keystore"
-
 // Maximum time between wallet refreshes (if filesystem notifications don't work).
 const walletRefreshCycle = 3 * time.Second
 
+type IkeyStore interface {
+	// Loads and decrypts the key from disk.
+	GetKey(addr string, filename string, auth string) (*Key, error)
+	// Writes and encrypts the key.
+	StoreKey(filename string, k *Key, auth string) error
+	// Joins filename with the key directory unless it is already absolute.
+	JoinPath(filename string) string
+}
+
 // KeyStore manages a key storage directory on disk.
 type KeyStore struct {
-	storage  keyStore             // Storage backend, might be cleartext or encrypted
+	storage  IkeyStore            // Storage backend, might be cleartext or encrypted
 	cache    *accountCache        // In-memory account cache over the filesystem storage
 	changes  chan struct{}        // Channel receiving change notifications from the cache
 	unlocked map[string]*unlocked // Currently unlocked account (decrypted private keys)
@@ -524,4 +531,23 @@ func (ks *KeyStore) isUpdating() bool {
 func zeroKey(k *ecdsa.PrivateKey) {
 	b := k.D.Bits()
 	clear(b)
+}
+
+func storeNewKey(ks keyStore, rand io.Reader, auth string) (*Key, accounts.Account, error) {
+	key, err := newKey(rand)
+	if err != nil {
+		return nil, nil, err
+	}
+	// a := accounts.Account{
+	// 	Address: key.Address.Bytes(),
+	// 	URL:     accounts.URL{Scheme: KeyStoreScheme, Path: ks.JoinPath(keyFileName(key.Address))},
+	// }
+	a := new(ChainAdapter).NewAccount(key.GetStringAddress(), accounts.URL{Scheme: accounts.KeyStoreScheme, Path: ks.JoinPath(keyFileName(key.GetByteAddress()))})
+
+	if err := ks.StoreKey(a.GetUrl().Path, key, auth); err != nil {
+		//zeroKey(key.PrivateKey)
+		key.ZeroKey()
+		return nil, a, err
+	}
+	return key, a, err
 }

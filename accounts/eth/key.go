@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
-package keystore
+package ethkey
 
 import (
 	"bytes"
@@ -40,18 +40,18 @@ const (
 	version = 3
 )
 
-type ChainAdapter struct {
+type EthChainAdapter struct {
 }
 
-func (c *ChainAdapter) NewAccount(ad string, url accounts.URL) accounts.Account {
-	re := accounts.Account{}
+func (c *EthChainAdapter) NewAccount(ad string, url accounts.URL) accounts.Account {
+	re := EthAccount{}
 	re.Init(ad, url)
-	return re
+	return &re
 }
-func (c *ChainAdapter) NewKey(id uuid.UUID, pik interface{}) *Key {
+func (c *EthChainAdapter) NewKey(id uuid.UUID, pik interface{}) accounts.Key {
 
 	if privatekey, ok := pik.(*ecdsa.PrivateKey); ok {
-		return &Key{
+		return &EthKey{
 			Id:         id,
 			address:    crypto.PubkeyToAddress(privatekey.PublicKey),
 			privateKey: privatekey,
@@ -59,38 +59,17 @@ func (c *ChainAdapter) NewKey(id uuid.UUID, pik interface{}) *Key {
 	}
 	return nil
 }
-func (c *ChainAdapter) BytesToPrivateKey(b []byte) (interface{}, error) {
+func (c *EthChainAdapter) BytesToPrivateKey(b []byte) (interface{}, error) {
 	return crypto.ToECDSA(b)
 }
 
-type Key struct {
+type EthKey struct {
 	Id uuid.UUID // Version 4 "random" for unique id not derived from key data
 	// to simplify lookups we also store the address
 	address common.Address
 	// we only store privkey as pubkey/address can be derived from it
 	// privkey in this struct is always in plaintext
 	privateKey *ecdsa.PrivateKey
-}
-
-type IKey interface {
-	GetByteAddress() []byte
-	GetStringAddress() string
-	MarshalJSON() (j []byte, err error)
-	UnmarshalJSON(j []byte) (err error)
-	ZeroKey()
-	SinHash(hash []byte) ([]byte, error)
-	GetPrivateKey() interface{}
-	GetBigPrivate() *big.Int
-	Is(add string) bool
-}
-
-type keyStore interface {
-	// Loads and decrypts the key from disk.
-	GetKey(addr string, filename string, auth string) (*Key, error)
-	// Writes and encrypts the key.
-	StoreKey(filename string, k *Key, auth string) error
-	// Joins filename with the key directory unless it is already absolute.
-	JoinPath(filename string) string
 }
 
 type plainKeyJSON struct {
@@ -127,19 +106,19 @@ type cipherparamsJSON struct {
 	IV string `json:"iv"`
 }
 
-func (k *Key) Is(add string) bool {
+func (k *EthKey) Is(add string) bool {
 	tmp := common.HexToAddress(add)
 	return tmp == k.address
 }
 
-func (k *Key) GetByteAddress() []byte {
+func (k *EthKey) GetByteAddress() []byte {
 	return k.address.Bytes()
 }
-func (k *Key) GetStringAddress() string {
+func (k *EthKey) GetStringAddress() string {
 	return k.address.String()
 }
 
-func (k *Key) SinHash(hash []byte) ([]byte, error) {
+func (k *EthKey) SinHash(hash []byte) ([]byte, error) {
 	return crypto.Sign(hash, k.privateKey)
 }
 
@@ -147,24 +126,24 @@ func (k *Key) SinHash(hash []byte) ([]byte, error) {
 // 	return crypto.FromECDSA(k.privateKey)
 // }
 
-func (k *Key) ZeroKey() {
+func (k *EthKey) ZeroKey() {
 	if k.privateKey != nil {
 		b := k.privateKey.D.Bits()
 		clear(b)
 	}
 }
 
-func (k *Key) GetPrivateKey() interface{} {
+func (k *EthKey) GetPrivateKey() interface{} {
 	return k.privateKey
 }
-func (k *Key) GetBigPrivate() *big.Int {
+func (k *EthKey) GetBigPrivate() *big.Int {
 	if k.privateKey != nil {
 		return k.privateKey.D
 	}
 	return nil
 }
 
-func (k *Key) MarshalJSON() (j []byte, err error) {
+func (k *EthKey) MarshalJSON() (j []byte, err error) {
 	jStruct := plainKeyJSON{
 		hex.EncodeToString(k.address[:]),
 		hex.EncodeToString(crypto.FromECDSA(k.privateKey)),
@@ -175,7 +154,7 @@ func (k *Key) MarshalJSON() (j []byte, err error) {
 	return j, err
 }
 
-func (k *Key) UnmarshalJSON(j []byte) (err error) {
+func (k *EthKey) UnmarshalJSON(j []byte) (err error) {
 	keyJSON := new(plainKeyJSON)
 	err = json.Unmarshal(j, &keyJSON)
 	if err != nil {
@@ -203,12 +182,12 @@ func (k *Key) UnmarshalJSON(j []byte) (err error) {
 	return nil
 }
 
-func newKeyFromECDSA(privateKeyECDSA *ecdsa.PrivateKey) *Key {
+func newKeyFromECDSA(privateKeyECDSA *ecdsa.PrivateKey) accounts.Key {
 	id, err := uuid.NewRandom()
 	if err != nil {
 		panic(fmt.Sprintf("Could not create random uuid: %v", err))
 	}
-	key := &Key{
+	key := &EthKey{
 		Id:         id,
 		address:    crypto.PubkeyToAddress(privateKeyECDSA.PublicKey),
 		privateKey: privateKeyECDSA,
@@ -219,7 +198,7 @@ func newKeyFromECDSA(privateKeyECDSA *ecdsa.PrivateKey) *Key {
 // NewKeyForDirectICAP generates a key whose address fits into < 155 bits so it can fit
 // into the Direct ICAP spec. for simplicity and easier compatibility with other libs, we
 // retry until the first byte is 0.
-func NewKeyForDirectICAP(rand io.Reader) *Key {
+func NewKeyForDirectICAP(rand io.Reader) accounts.Key {
 	randBytes := make([]byte, 64)
 	_, err := rand.Read(randBytes)
 	if err != nil {
@@ -237,31 +216,12 @@ func NewKeyForDirectICAP(rand io.Reader) *Key {
 	return key
 }
 
-func newKey(rand io.Reader) (*Key, error) {
+func newKey(rand io.Reader) (accounts.Key, error) {
 	privateKeyECDSA, err := ecdsa.GenerateKey(crypto.S256(), rand)
 	if err != nil {
 		return nil, err
 	}
 	return newKeyFromECDSA(privateKeyECDSA), nil
-}
-
-func storeNewKey(ks keyStore, rand io.Reader, auth string) (*Key, accounts.Account, error) {
-	key, err := newKey(rand)
-	if err != nil {
-		return nil, accounts.Account{}, err
-	}
-	// a := accounts.Account{
-	// 	Address: key.Address.Bytes(),
-	// 	URL:     accounts.URL{Scheme: KeyStoreScheme, Path: ks.JoinPath(keyFileName(key.Address))},
-	// }
-	a := new(ChainAdapter).NewAccount(key.GetStringAddress(), accounts.URL{Scheme: KeyStoreScheme, Path: ks.JoinPath(keyFileName(key.GetByteAddress()))})
-
-	if err := ks.StoreKey(a.GetUrl().Path, key, auth); err != nil {
-		//zeroKey(key.PrivateKey)
-		key.ZeroKey()
-		return nil, a, err
-	}
-	return key, a, err
 }
 
 func writeTemporaryKeyFile(file string, content []byte) (string, error) {
@@ -311,4 +271,23 @@ func toISO8601(t time.Time) string {
 	}
 	return fmt.Sprintf("%04d-%02d-%02dT%02d-%02d-%02d.%09d%s",
 		t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second(), t.Nanosecond(), tz)
+}
+
+type EthAccount struct {
+	address common.Address `json:"address"` // Ethereum account address derived from the key
+	url     accounts.URL   `json:"url"`     // Optional resource locator within a backend
+}
+
+func (a *EthAccount) GetAddress() string {
+	return a.address.String()
+}
+func (a *EthAccount) Init(ad string, ul accounts.URL) {
+	a.address = common.HexToAddress(ad)
+	a.url = ul
+}
+func (a *EthAccount) GetUrl() accounts.URL {
+	return a.url
+}
+func (a *EthAccount) AddressIsNull() bool {
+	return a.address == common.Address{}
 }
