@@ -33,15 +33,16 @@ import (
 )
 
 // creates a Key and stores that in the given KeyStore by decrypting a presale key JSON
-func importPreSaleKey(keyStore keyStore, keyJSON []byte, password string) (accounts.Account, *Key, error) {
+func importPreSaleKey(keyStore IkeyStore, keyJSON []byte, password string) (accounts.Account, accounts.Key, error) {
 	key, err := decryptPreSaleKey(keyJSON, password)
 	if err != nil {
-		return accounts.Account{}, nil, err
+		return chainAdapter.NewNullAccount(), nil, err
 	}
-	key.Id, err = uuid.NewRandom()
+	id, err := uuid.NewRandom()
 	if err != nil {
-		return accounts.Account{}, nil, err
+		return chainAdapter.NewNullAccount(), nil, err
 	}
+	key.SetID(id)
 	// a := accounts.Account{
 	// 	Address: key.Address,
 	// 	URL: accounts.URL{
@@ -49,12 +50,12 @@ func importPreSaleKey(keyStore keyStore, keyJSON []byte, password string) (accou
 	// 		Path:   keyStore.JoinPath(keyFileName(key.Address)),
 	// 	},
 	// }
-	a := new(ChainAdapter).NewAccount(key.GetStringAddress(), accounts.URL{Scheme: KeyStoreScheme, Path: keyStore.JoinPath(keyFileName(key.GetByteAddress()))})
+	a := chainAdapter.NewAccount(key.GetStringAddress(), accounts.URL{Scheme: accounts.KeyStoreScheme, Path: keyStore.JoinPath(keyFileName(key.GetByteAddress()))})
 	err = keyStore.StoreKey(a.GetUrl().Path, key, password)
 	return a, key, err
 }
 
-func decryptPreSaleKey(fileContent []byte, password string) (key *Key, err error) {
+func decryptPreSaleKey(fileContent []byte, password string) (key accounts.Key, err error) {
 	preSaleKeyStruct := struct {
 		EncSeed string
 		EthAddr string
@@ -95,7 +96,7 @@ func decryptPreSaleKey(fileContent []byte, password string) (key *Key, err error
 	// 	Address:    crypto.PubkeyToAddress(ecKey.PublicKey),
 	// 	PrivateKey: ecKey,
 	// }
-	key = new(ChainAdapter).NewKey(uuid.UUID{}, ecKey)
+	key = chainAdapter.InitKey(uuid.UUID{}, ecKey)
 	derivedAddr := hex.EncodeToString(key.GetByteAddress()) // needed because .Hex() gives leading "0x"
 	expectedAddr := preSaleKeyStruct.EthAddr
 	if derivedAddr != expectedAddr {

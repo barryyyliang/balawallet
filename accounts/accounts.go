@@ -19,10 +19,10 @@ package accounts
 
 import (
 	"fmt"
+	"io"
 	"math/big"
 
 	"github.com/ethereum/go-ethereum"
-	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/event"
 	"github.com/google/uuid"
@@ -32,6 +32,10 @@ import (
 // KeyStoreScheme is the protocol scheme prefixing account and wallet URLs.
 const KeyStoreScheme = "keystore"
 
+const (
+	Version = 3
+)
+
 // Account represents an Ethereum account located at a specific location defined
 // by the optional URL field.
 
@@ -40,12 +44,16 @@ type Account interface {
 	Init(ad string, ul URL)
 	GetUrl() URL
 	AddressIsNull() bool
+	Cmp(Account) bool
 }
 
 type IChainAdapter interface {
-	NewAccount(ad string, url accounts.URL) accounts.Account
-	NewKey(id uuid.UUID, pik interface{}) *Key
+	NewAccount(ad string, url URL) Account
+	NewKey(rand io.Reader) (Key, error)
+	InitKey(id uuid.UUID, pik interface{}) Key
+
 	BytesToPrivateKey(b []byte) (interface{}, error)
+	NewNullAccount() Account
 }
 type Key interface {
 	GetByteAddress() []byte
@@ -57,6 +65,42 @@ type Key interface {
 	GetPrivateKey() interface{}
 	GetBigPrivate() *big.Int
 	Is(add string) bool
+	GetID() string
+	SetID(id uuid.UUID)
+}
+
+type PlainKeyJSON struct {
+	Address    string `json:"address"`
+	PrivateKey string `json:"privatekey"`
+	Id         string `json:"id"`
+	Version    int    `json:"version"`
+}
+
+type EncryptedKeyJSONV3 struct {
+	Address string     `json:"address"`
+	Crypto  CryptoJSON `json:"crypto"`
+	Id      string     `json:"id"`
+	Version int        `json:"version"`
+}
+
+type EncryptedKeyJSONV1 struct {
+	Address string     `json:"address"`
+	Crypto  CryptoJSON `json:"crypto"`
+	Id      string     `json:"id"`
+	Version string     `json:"version"`
+}
+
+type CryptoJSON struct {
+	Cipher       string                 `json:"cipher"`
+	CipherText   string                 `json:"ciphertext"`
+	CipherParams CipherparamsJSON       `json:"cipherparams"`
+	KDF          string                 `json:"kdf"`
+	KDFParams    map[string]interface{} `json:"kdfparams"`
+	MAC          string                 `json:"mac"`
+}
+
+type CipherparamsJSON struct {
+	IV string `json:"iv"`
 }
 
 const (

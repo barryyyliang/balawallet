@@ -73,7 +73,7 @@ func (w *keystoreWallet) Contains(account accounts.Account) bool {
 // Derive implements accounts.Wallet, but is a noop for plain wallets since there
 // is no notion of hierarchical account derivation for plain keystore accounts.
 func (w *keystoreWallet) Derive(path accounts.DerivationPath, pin bool) (accounts.Account, error) {
-	return accounts.Account{}, accounts.ErrNotSupported
+	return chainAdapter.NewNullAccount(), accounts.ErrNotSupported
 }
 
 // SelfDerive implements accounts.Wallet, but is a noop for plain wallets since

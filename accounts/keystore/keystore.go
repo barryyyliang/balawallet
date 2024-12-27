@@ -23,7 +23,9 @@ package keystore
 import (
 	"crypto/ecdsa"
 	crand "crypto/rand"
+	"encoding/hex"
 	"errors"
+	"fmt"
 	"io"
 	"math/big"
 	"os"
@@ -34,6 +36,7 @@ import (
 	"time"
 
 	"balawallet/accounts"
+	"balawallet/accounts/eth"
 
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/event"
@@ -49,6 +52,8 @@ var (
 	ErrAccountAlreadyExists = errors.New("account already exists")
 )
 
+var chainAdapter accounts.IChainAdapter = &eth.EthChainAdapter{}
+
 // KeyStoreType is the reflect type of a keystore backend.
 var KeyStoreType = reflect.TypeOf(&KeyStore{})
 
@@ -57,9 +62,9 @@ const walletRefreshCycle = 3 * time.Second
 
 type IkeyStore interface {
 	// Loads and decrypts the key from disk.
-	GetKey(addr string, filename string, auth string) (*Key, error)
+	GetKey(addr string, filename string, auth string) (accounts.Key, error)
 	// Writes and encrypts the key.
-	StoreKey(filename string, k *Key, auth string) error
+	StoreKey(filename string, k accounts.Key, auth string) error
 	// Joins filename with the key directory unless it is already absolute.
 	JoinPath(filename string) string
 }
@@ -81,7 +86,7 @@ type KeyStore struct {
 }
 
 type unlocked struct {
-	*Key
+	ukey  accounts.Key
 	abort chan struct{}
 }
 
@@ -268,7 +273,7 @@ func (ks *KeyStore) SignHash(a accounts.Account, hash []byte) ([]byte, error) {
 	}
 	// Sign the hash using plain ECDSA operations
 	//return crypto.Sign(hash, unlockedKey.PrivateKey)
-	return unlockedKey.SinHash(hash)
+	return unlockedKey.ukey.SinHash(hash)
 }
 
 // SignTx signs the given transaction with the requested account.
@@ -283,7 +288,7 @@ func (ks *KeyStore) SignEthTx(a accounts.Account, tx *types.Transaction, chainID
 	}
 	// Depending on the presence of the chain ID, sign with 2718 or homestead
 	signer := types.LatestSignerForChainID(chainID)
-	pi := unlockedKey.GetPrivateKey()
+	pi := unlockedKey.ukey.GetPrivateKey()
 	if prikey, ok := pi.(*ecdsa.PrivateKey); ok {
 		return types.SignTx(tx, signer, prikey)
 	}
@@ -366,10 +371,10 @@ func (ks *KeyStore) TimedUnlock(a accounts.Account, passphrase string, timeout t
 		close(u.abort)
 	}
 	if timeout > 0 {
-		u = &unlocked{Key: key, abort: make(chan struct{})}
+		u = &unlocked{ukey: key, abort: make(chan struct{})}
 		go ks.expire(a.GetAddress(), u, timeout)
 	} else {
-		u = &unlocked{Key: key}
+		u = &unlocked{ukey: key}
 	}
 	ks.unlocked[a.GetAddress()] = u
 	return nil
@@ -384,7 +389,7 @@ func (ks *KeyStore) Find(a accounts.Account) (accounts.Account, error) {
 	return a, err
 }
 
-func (ks *KeyStore) getDecryptedKey(a accounts.Account, auth string) (accounts.Account, *Key, error) {
+func (ks *KeyStore) getDecryptedKey(a accounts.Account, auth string) (accounts.Account, accounts.Key, error) {
 	a, err := ks.Find(a)
 	if err != nil {
 		return a, nil, err
@@ -407,7 +412,7 @@ func (ks *KeyStore) expire(addr string, u *unlocked, timeout time.Duration) {
 		// unlocked.
 		if ks.unlocked[addr] == u {
 			//zeroKey(u.PrivateKey)
-			u.ZeroKey()
+			u.ukey.ZeroKey()
 			delete(ks.unlocked, addr)
 		}
 		ks.mu.Unlock()
@@ -419,7 +424,8 @@ func (ks *KeyStore) expire(addr string, u *unlocked, timeout time.Duration) {
 func (ks *KeyStore) NewAccount(passphrase string) (accounts.Account, error) {
 	_, account, err := storeNewKey(ks.storage, crand.Reader, passphrase)
 	if err != nil {
-		return accounts.Account{}, err
+		//return accounts.Account{}, err
+		return chainAdapter.NewNullAccount(), err
 	}
 	// Add the account to the cache immediately rather
 	// than waiting for file system notifications to pick it up.
@@ -450,7 +456,7 @@ func (ks *KeyStore) ImportEth(keyJSON []byte, passphrase, newPassphrase string) 
 		defer key.ZeroKey()
 	}
 	if err != nil {
-		return accounts.Account{}, err
+		return chainAdapter.NewNullAccount(), err
 	}
 	ks.importMu.Lock()
 	defer ks.importMu.Unlock()
@@ -461,41 +467,39 @@ func (ks *KeyStore) ImportEth(keyJSON []byte, passphrase, newPassphrase string) 
 		if len(a) == 1 {
 			re = a[0]
 		} else {
-			re = accounts.Account{}
+			re = chainAdapter.NewNullAccount()
 		}
 		return re, ErrAccountAlreadyExists
 	}
 	return ks.importKey(key, newPassphrase)
 }
 
-// ImportECDSA stores the given key into the key directory, encrypting it with the passphrase.
-func (ks *KeyStore) ImportECDSA(priv *ecdsa.PrivateKey, passphrase string) (accounts.Account, error) {
+func (ks *KeyStore) ImportKey(key accounts.Key, passphrase string) (accounts.Account, error) {
 	ks.importMu.Lock()
 	defer ks.importMu.Unlock()
-
-	key := newKeyFromECDSA(priv)
+	defer key.ZeroKey()
 	if ks.cache.hasAddress(key.GetStringAddress()) {
 		a := ks.cache.byAddr[key.GetStringAddress()]
 		var re accounts.Account
 		if len(a) == 1 {
 			re = a[0]
 		} else {
-			re = accounts.Account{}
+			re = chainAdapter.NewNullAccount()
 		}
 		return re, ErrAccountAlreadyExists
 	}
 	return ks.importKey(key, passphrase)
 }
 
-func (ks *KeyStore) importKey(key *Key, passphrase string) (accounts.Account, error) {
+func (ks *KeyStore) importKey(key accounts.Key, passphrase string) (accounts.Account, error) {
 	//a := accounts.Account{Address: key.Address, URL: accounts.URL{Scheme: KeyStoreScheme, Path: ks.storage.JoinPath(keyFileName(key.Address))}}
-	a := new(ChainAdapter).NewAccount(key.GetStringAddress(), accounts.URL{Scheme: KeyStoreScheme, Path: ks.storage.JoinPath(keyFileName(key.GetByteAddress()))})
-	if err := ks.storage.StoreKey(a.GetUrl().Path, key, passphrase); err != nil {
-		return accounts.Account{}, err
+	account := chainAdapter.NewAccount(key.GetStringAddress(), accounts.URL{Scheme: accounts.KeyStoreScheme, Path: ks.storage.JoinPath(keyFileName(key.GetByteAddress()))})
+	if err := ks.storage.StoreKey(account.GetUrl().Path, key, passphrase); err != nil {
+		return chainAdapter.NewNullAccount(), err
 	}
-	ks.cache.add(a)
+	ks.cache.add(account)
 	ks.refreshWallets()
-	return a, nil
+	return account, nil
 }
 
 // Update changes the passphrase of an existing account.
@@ -533,8 +537,8 @@ func zeroKey(k *ecdsa.PrivateKey) {
 	clear(b)
 }
 
-func storeNewKey(ks keyStore, rand io.Reader, auth string) (*Key, accounts.Account, error) {
-	key, err := newKey(rand)
+func storeNewKey(ks IkeyStore, rand io.Reader, auth string) (accounts.Key, accounts.Account, error) {
+	key, err := chainAdapter.NewKey(rand)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -542,7 +546,7 @@ func storeNewKey(ks keyStore, rand io.Reader, auth string) (*Key, accounts.Accou
 	// 	Address: key.Address.Bytes(),
 	// 	URL:     accounts.URL{Scheme: KeyStoreScheme, Path: ks.JoinPath(keyFileName(key.Address))},
 	// }
-	a := new(ChainAdapter).NewAccount(key.GetStringAddress(), accounts.URL{Scheme: accounts.KeyStoreScheme, Path: ks.JoinPath(keyFileName(key.GetByteAddress()))})
+	a := chainAdapter.NewAccount(key.GetStringAddress(), accounts.URL{Scheme: accounts.KeyStoreScheme, Path: ks.JoinPath(keyFileName(key.GetByteAddress()))})
 
 	if err := ks.StoreKey(a.GetUrl().Path, key, auth); err != nil {
 		//zeroKey(key.PrivateKey)
@@ -550,4 +554,23 @@ func storeNewKey(ks keyStore, rand io.Reader, auth string) (*Key, accounts.Accou
 		return nil, a, err
 	}
 	return key, a, err
+}
+
+// keyFileName implements the naming convention for keyfiles:
+// UTC--<created_at UTC ISO8601>-<address hex>
+func keyFileName(keyAddr []byte) string {
+	ts := time.Now().UTC()
+	return fmt.Sprintf("UTC--%s--%s", toISO8601(ts), hex.EncodeToString(keyAddr[:]))
+}
+
+func toISO8601(t time.Time) string {
+	var tz string
+	name, offset := t.Zone()
+	if name == "UTC" {
+		tz = "Z"
+	} else {
+		tz = fmt.Sprintf("%03d00", offset/3600)
+	}
+	return fmt.Sprintf("%04d-%02d-%02dT%02d-%02d-%02d.%09d%s",
+		t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second(), t.Nanosecond(), tz)
 }

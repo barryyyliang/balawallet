@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime/debug"
 	"slices"
 	"sort"
 	"strings"
@@ -102,15 +103,17 @@ func (ac *accountCache) hasAddress(addr string) bool {
 }
 
 func (ac *accountCache) add(newAccount accounts.Account) {
+	fmt.Println("add a account to cache")
+	debug.PrintStack()
 	ac.mu.Lock()
 	defer ac.mu.Unlock()
 
 	i := sort.Search(len(ac.all), func(i int) bool { return ac.all[i].GetUrl().Cmp(newAccount.GetUrl()) >= 0 })
-	if i < len(ac.all) && ac.all[i] == newAccount {
+	if i < len(ac.all) && ac.all[i].Cmp(newAccount) {
 		return
 	}
 	// newAccount is not in the cache.
-	ac.all = append(ac.all, accounts.Account{})
+	ac.all = append(ac.all, chainAdapter.NewNullAccount())
 	copy(ac.all[i+1:], ac.all[i:])
 	ac.all[i] = newAccount
 	add := newAccount.GetAddress()
@@ -187,19 +190,19 @@ func (ac *accountCache) find(a accounts.Account) (accounts.Account, error) {
 			}
 		}
 		if a.AddressIsNull() {
-			return accounts.Account{}, ErrNoMatch
+			return chainAdapter.NewNullAccount(), ErrNoMatch
 		}
 	}
 	switch len(matches) {
 	case 1:
 		return matches[0], nil
 	case 0:
-		return accounts.Account{}, ErrNoMatch
+		return chainAdapter.NewNullAccount(), ErrNoMatch
 	default:
 		err := &AmbiguousAddrError{Addr: a.GetAddress(), Matches: make([]accounts.Account, len(matches))}
 		copy(err.Matches, matches)
 		slices.SortFunc(err.Matches, byURL)
-		return accounts.Account{}, err
+		return chainAdapter.NewNullAccount(), err
 	}
 }
 
@@ -259,7 +262,7 @@ func (ac *accountCache) scanAccounts() error {
 			Address string `json:"address"`
 		}
 	)
-	readAccount := func(path string) *accounts.Account {
+	readAccount := func(path string) accounts.Account {
 		fd, err := os.Open(path)
 		if err != nil {
 			log.Trace("Failed to open keystore file", "path", path, "err", err)
@@ -270,7 +273,7 @@ func (ac *accountCache) scanAccounts() error {
 		// Parse the address.
 		key.Address = ""
 		err = json.NewDecoder(buf).Decode(&key)
-		ac := new(ChainAdapter).NewAccount(key.Address, accounts.URL{Scheme: KeyStoreScheme, Path: path})
+		ac := chainAdapter.NewAccount(key.Address, accounts.URL{Scheme: accounts.KeyStoreScheme, Path: path})
 		//addr := common.HexToAddress(key.Address)
 		switch {
 		case err != nil:
@@ -278,7 +281,7 @@ func (ac *accountCache) scanAccounts() error {
 		case ac.AddressIsNull():
 			log.Debug("Failed to decode keystore key", "path", path, "err", "missing or zero address")
 		default:
-			return &ac
+			return ac
 			// return &accounts.Account{
 			// 	Address: addr,
 			// 	URL:     accounts.URL{Scheme: KeyStoreScheme, Path: path},
@@ -291,7 +294,7 @@ func (ac *accountCache) scanAccounts() error {
 
 	for _, path := range creates.ToSlice() {
 		if a := readAccount(path); a != nil {
-			ac.add(*a)
+			ac.add(a)
 		}
 	}
 	for _, path := range deletes.ToSlice() {
@@ -300,7 +303,7 @@ func (ac *accountCache) scanAccounts() error {
 	for _, path := range updates.ToSlice() {
 		ac.deleteByFile(path)
 		if a := readAccount(path); a != nil {
-			ac.add(*a)
+			ac.add(a)
 		}
 	}
 	end := time.Now()

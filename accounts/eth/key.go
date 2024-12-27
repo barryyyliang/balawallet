@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
-package ethkey
+package eth
 
 import (
 	"bytes"
@@ -24,20 +24,13 @@ import (
 	"fmt"
 	"io"
 	"math/big"
-	"os"
-	"path/filepath"
 	"strings"
-	"time"
 
 	"balawallet/accounts"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/google/uuid"
-)
-
-const (
-	version = 3
 )
 
 type EthChainAdapter struct {
@@ -48,7 +41,11 @@ func (c *EthChainAdapter) NewAccount(ad string, url accounts.URL) accounts.Accou
 	re.Init(ad, url)
 	return &re
 }
-func (c *EthChainAdapter) NewKey(id uuid.UUID, pik interface{}) accounts.Key {
+func (c *EthChainAdapter) NewNullAccount() accounts.Account {
+	re := EthAccount{}
+	return &re
+}
+func (c *EthChainAdapter) InitKey(id uuid.UUID, pik interface{}) accounts.Key {
 
 	if privatekey, ok := pik.(*ecdsa.PrivateKey); ok {
 		return &EthKey{
@@ -59,6 +56,10 @@ func (c *EthChainAdapter) NewKey(id uuid.UUID, pik interface{}) accounts.Key {
 	}
 	return nil
 }
+func (c *EthChainAdapter) NewKey(rand io.Reader) (accounts.Key, error) {
+	return newKey(rand)
+}
+
 func (c *EthChainAdapter) BytesToPrivateKey(b []byte) (interface{}, error) {
 	return crypto.ToECDSA(b)
 }
@@ -72,38 +73,12 @@ type EthKey struct {
 	privateKey *ecdsa.PrivateKey
 }
 
-type plainKeyJSON struct {
-	Address    string `json:"address"`
-	PrivateKey string `json:"privatekey"`
-	Id         string `json:"id"`
-	Version    int    `json:"version"`
+func (k *EthKey) SetID(id uuid.UUID) {
+	k.Id = id
 }
 
-type encryptedKeyJSONV3 struct {
-	Address string     `json:"address"`
-	Crypto  CryptoJSON `json:"crypto"`
-	Id      string     `json:"id"`
-	Version int        `json:"version"`
-}
-
-type encryptedKeyJSONV1 struct {
-	Address string     `json:"address"`
-	Crypto  CryptoJSON `json:"crypto"`
-	Id      string     `json:"id"`
-	Version string     `json:"version"`
-}
-
-type CryptoJSON struct {
-	Cipher       string                 `json:"cipher"`
-	CipherText   string                 `json:"ciphertext"`
-	CipherParams cipherparamsJSON       `json:"cipherparams"`
-	KDF          string                 `json:"kdf"`
-	KDFParams    map[string]interface{} `json:"kdfparams"`
-	MAC          string                 `json:"mac"`
-}
-
-type cipherparamsJSON struct {
-	IV string `json:"iv"`
+func (k *EthKey) GetID() string {
+	return k.Id.String()
 }
 
 func (k *EthKey) Is(add string) bool {
@@ -144,18 +119,18 @@ func (k *EthKey) GetBigPrivate() *big.Int {
 }
 
 func (k *EthKey) MarshalJSON() (j []byte, err error) {
-	jStruct := plainKeyJSON{
+	jStruct := accounts.PlainKeyJSON{
 		hex.EncodeToString(k.address[:]),
 		hex.EncodeToString(crypto.FromECDSA(k.privateKey)),
 		k.Id.String(),
-		version,
+		accounts.Version,
 	}
 	j, err = json.Marshal(jStruct)
 	return j, err
 }
 
 func (k *EthKey) UnmarshalJSON(j []byte) (err error) {
-	keyJSON := new(plainKeyJSON)
+	keyJSON := new(accounts.PlainKeyJSON)
 	err = json.Unmarshal(j, &keyJSON)
 	if err != nil {
 		return err
@@ -182,7 +157,7 @@ func (k *EthKey) UnmarshalJSON(j []byte) (err error) {
 	return nil
 }
 
-func newKeyFromECDSA(privateKeyECDSA *ecdsa.PrivateKey) accounts.Key {
+func NewKeyFromECDSA(privateKeyECDSA *ecdsa.PrivateKey) accounts.Key {
 	id, err := uuid.NewRandom()
 	if err != nil {
 		panic(fmt.Sprintf("Could not create random uuid: %v", err))
@@ -209,7 +184,7 @@ func NewKeyForDirectICAP(rand io.Reader) accounts.Key {
 	if err != nil {
 		panic("key generation: ecdsa.GenerateKey failed: " + err.Error())
 	}
-	key := newKeyFromECDSA(privateKeyECDSA)
+	key := NewKeyFromECDSA(privateKeyECDSA)
 	if !strings.HasPrefix(key.GetStringAddress(), "0x00") {
 		return NewKeyForDirectICAP(rand)
 	}
@@ -221,56 +196,7 @@ func newKey(rand io.Reader) (accounts.Key, error) {
 	if err != nil {
 		return nil, err
 	}
-	return newKeyFromECDSA(privateKeyECDSA), nil
-}
-
-func writeTemporaryKeyFile(file string, content []byte) (string, error) {
-	// Create the keystore directory with appropriate permissions
-	// in case it is not present yet.
-	const dirPerm = 0700
-	if err := os.MkdirAll(filepath.Dir(file), dirPerm); err != nil {
-		return "", err
-	}
-	// Atomic write: create a temporary hidden file first
-	// then move it into place. TempFile assigns mode 0600.
-	f, err := os.CreateTemp(filepath.Dir(file), "."+filepath.Base(file)+".tmp")
-	if err != nil {
-		return "", err
-	}
-	if _, err := f.Write(content); err != nil {
-		f.Close()
-		os.Remove(f.Name())
-		return "", err
-	}
-	f.Close()
-	return f.Name(), nil
-}
-
-func writeKeyFile(file string, content []byte) error {
-	name, err := writeTemporaryKeyFile(file, content)
-	if err != nil {
-		return err
-	}
-	return os.Rename(name, file)
-}
-
-// keyFileName implements the naming convention for keyfiles:
-// UTC--<created_at UTC ISO8601>-<address hex>
-func keyFileName(keyAddr []byte) string {
-	ts := time.Now().UTC()
-	return fmt.Sprintf("UTC--%s--%s", toISO8601(ts), hex.EncodeToString(keyAddr[:]))
-}
-
-func toISO8601(t time.Time) string {
-	var tz string
-	name, offset := t.Zone()
-	if name == "UTC" {
-		tz = "Z"
-	} else {
-		tz = fmt.Sprintf("%03d00", offset/3600)
-	}
-	return fmt.Sprintf("%04d-%02d-%02dT%02d-%02d-%02d.%09d%s",
-		t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second(), t.Nanosecond(), tz)
+	return NewKeyFromECDSA(privateKeyECDSA), nil
 }
 
 type EthAccount struct {
@@ -290,4 +216,7 @@ func (a *EthAccount) GetUrl() accounts.URL {
 }
 func (a *EthAccount) AddressIsNull() bool {
 	return a.address == common.Address{}
+}
+func (a *EthAccount) Cmp(ac accounts.Account) bool {
+	return a.address.String() == ac.GetAddress()
 }

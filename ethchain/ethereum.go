@@ -18,6 +18,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
 
+	"balawallet/accounts/eth"
 	"balawallet/accounts/keystore"
 
 	"github.com/ethereum/go-ethereum"
@@ -221,7 +222,9 @@ func (c *EthChain) ImportAccount(pa string, name string, kk string) string {
 		return string(re)
 	}
 
-	ks.ImportECDSA(key, pa)
+	akey := eth.NewKeyFromECDSA(key)
+
+	ks.ImportKey(akey, pa)
 	//账户信息存库
 	db, err := leveldb.OpenFile(G_DataDir+"db", nil)
 	if err == nil {
