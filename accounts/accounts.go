@@ -44,7 +44,7 @@ type Account interface {
 	Init(ad string, ul URL)
 	GetUrl() URL
 	AddressIsNull() bool
-	Cmp(Account) bool
+	Cmp(ac Account) bool
 }
 
 type IChainAdapter interface {
