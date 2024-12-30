@@ -22,7 +22,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"runtime/debug"
 	"slices"
 	"sort"
 	"strings"
@@ -103,8 +102,6 @@ func (ac *accountCache) hasAddress(addr string) bool {
 }
 
 func (ac *accountCache) add(newAccount accounts.Account) {
-	fmt.Println("add a account to cache")
-	debug.PrintStack()
 	ac.mu.Lock()
 	defer ac.mu.Unlock()
 

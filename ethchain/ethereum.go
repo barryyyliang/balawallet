@@ -326,15 +326,11 @@ func (c *EthChain) GetBalance(add string) string {
 		return string(re)
 	}
 
-	now := time.Now()
-	fmt.Println("start:")
-	fmt.Println(now.UnixMilli())
+	fmt.Println("start: " + strconv.FormatInt(time.Now().UnixMilli(), 10))
 	ctx, fuc := context.WithTimeout(context.Background(), G_Timeout)
 	defer fuc()
 	balance, err := connect.BalanceAt(ctx, common.HexToAddress(add), nil)
-	now = time.Now()
-	fmt.Println("end:")
-	fmt.Println(now.UnixMilli())
+	fmt.Println("end  : " + strconv.FormatInt(time.Now().UnixMilli(), 10))
 
 	if err == nil {
 		type bl struct {
@@ -480,7 +476,6 @@ func (c *EthChain) GetContract() string {
 		defer it.Release()
 		for it.Next() {
 			tmp := strings.Split(string(it.Key()), "_")
-			fmt.Println(string(it.Key()))
 			t, err := strconv.Atoi(tmp[0])
 			if err == nil {
 				if t == G_NetType {
@@ -578,7 +573,6 @@ func (c *EthChain) ImportContract(cons string) string {
 		if err2 == nil {
 			defer db.Close()
 			key := strconv.Itoa(G_NetType) + "_" + jcons.Address
-			fmt.Println(key)
 			if db.Put([]byte(key), jvalue, nil) != nil {
 				re = GetResult(Msg_writedb_fail, "")
 			}
