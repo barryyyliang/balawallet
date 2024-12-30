@@ -4,7 +4,8 @@ import (
 	"encoding/json"
 	"strconv"
 
-	"github.com/ethereum/go-ethereum/accounts/keystore"
+	"balawallet/accounts"
+	"balawallet/accounts/keystore"
 
 	//"github.com/ethereum/go-ethereum/crypto/sha3"
 
@@ -117,7 +118,7 @@ func DoGetDataSpace(auth string) string {
 			if string(it.Key()) == "data_space_init" {
 				continue
 			}
-			var tmp keystore.CryptoJSON
+			var tmp accounts.CryptoJSON
 			if json.Unmarshal(it.Value(), &tmp) == nil {
 				dedata, err1 := keystore.DecryptDataV3(tmp, auth)
 				if err1 == nil {
@@ -199,7 +200,7 @@ func checkDataSpaceAuth(auth string) error {
 		if (err1 == errors.ErrNotFound) || (err1 == nil && len(tag) == 0) {
 			return errors.New(DoGetMsg(strconv.Itoa(int(Msg_space_notinited))))
 		} else if err1 == nil { //have inited
-			var tmp keystore.CryptoJSON
+			var tmp accounts.CryptoJSON
 			if json.Unmarshal(tag, &tmp) == nil {
 				value, err2 := keystore.DecryptDataV3(tmp, auth)
 				if err2 == nil && string(value) == "data_space_init" {

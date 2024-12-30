@@ -14,10 +14,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ethereum/go-ethereum"
-	"github.com/ethereum/go-ethereum/accounts"
+	"balawallet/accounts"
+
 	"github.com/ethereum/go-ethereum/accounts/abi"
-	"github.com/ethereum/go-ethereum/accounts/keystore"
+
+	"balawallet/accounts/eth"
+	"balawallet/accounts/keystore"
+
+	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -100,7 +104,7 @@ func (c *EthChain) NewAccount(pass string, walletName string) string {
 	if err == nil {
 		defer db.Close()
 		if IsExist(db, walletName) == false {
-			err = db.Put([]byte(account.Address.String()), []byte(walletName), nil)
+			err = db.Put([]byte(account.GetAddress()), []byte(walletName), nil)
 			if err != nil {
 				fmt.Println("put name err")
 				re = GetResult(Msg_writename_fail, err.Error())
@@ -143,7 +147,7 @@ func (c *EthChain) GetAccounts() string {
 	acc := ks.Accounts()
 	var acclist accounts
 	for i := 0; i < len(acc); i++ {
-		add := acc[i].Address.String()
+		add := acc[i].GetAddress()
 		acclist.Accounts = append(acclist.Accounts, account{"eth", add, addressCache[add]})
 	}
 
@@ -213,12 +217,14 @@ func (c *EthChain) ImportAccount(pa string, name string, kk string) string {
 	key.PublicKey.X, key.PublicKey.Y = key.PublicKey.Curve.ScalarBaseMult(key.D.Bytes())
 
 	add := crypto.PubkeyToAddress(key.PublicKey)
-	if ks.HasAddress(add) {
+	if ks.HasAddress(add.String()) {
 		re = GetResult(Msg_account_exist, "")
 		return string(re)
 	}
 
-	ks.ImportECDSA(key, pa)
+	akey := eth.NewKeyFromECDSA(key)
+
+	ks.ImportKey(akey, pa)
 	//账户信息存库
 	db, err := leveldb.OpenFile(G_DataDir+"db", nil)
 	if err == nil {
@@ -277,7 +283,7 @@ func (c *EthChain) Transfer(from string, to string, value string, pass string) s
 	ctx := context.Background()
 	acc := ks.Accounts()
 	for i := 0; i < len(acc); i++ {
-		if from == acc[i].Address.String() {
+		if from == acc[i].GetAddress() {
 			bigvalue, err := etherTowei(value)
 			if err != nil {
 				re = GetResult(Msg_weitoether_fail, err.Error())
@@ -320,15 +326,11 @@ func (c *EthChain) GetBalance(add string) string {
 		return string(re)
 	}
 
-	now := time.Now()
-	fmt.Println("start:")
-	fmt.Println(now.UnixMilli())
+	fmt.Println("start: " + strconv.FormatInt(time.Now().UnixMilli(), 10))
 	ctx, fuc := context.WithTimeout(context.Background(), G_Timeout)
 	defer fuc()
 	balance, err := connect.BalanceAt(ctx, common.HexToAddress(add), nil)
-	now = time.Now()
-	fmt.Println("end:")
-	fmt.Println(now.UnixMilli())
+	fmt.Println("end  : " + strconv.FormatInt(time.Now().UnixMilli(), 10))
 
 	if err == nil {
 		type bl struct {
@@ -393,7 +395,7 @@ func (c *EthChain) DeployContract(from string, file string, pass string) string 
 	ctx := context.Background()
 	acc := ks.Accounts()
 	for i := 0; i < len(acc); i++ {
-		if from == acc[i].Address.String() {
+		if from == acc[i].GetAddress() {
 			bigvalue, err := etherTowei("0")
 			if err != nil {
 				re = GetResult(Msg_weitoether_fail, err.Error())
@@ -416,14 +418,14 @@ func (c *EthChain) DeployContract(from string, file string, pass string) string 
 				break
 			}
 			msg := ethereum.CallMsg{
-				From:      acc[i].Address, // the sender of the 'transaction'
-				To:        nil,            // the destination contract (nil for contract creation)
-				Gas:       0,              // if 0, the call executes with near-infinite gas
-				GasPrice:  gasPrice,       // wei <-> gas exchange ratio
-				GasFeeCap: tipsPrice,      // EIP-1559 fee cap per gas.
-				GasTipCap: tipsPrice,      // EIP-1559 tip per gas.
-				Value:     big.NewInt(0),  // amount of wei sent along with the call
-				Data:      bytecode,       // input data, usually an ABI-encoded contract method invocation
+				From:      common.HexToAddress(acc[i].GetAddress()), // the sender of the 'transaction'
+				To:        nil,                                      // the destination contract (nil for contract creation)
+				Gas:       0,                                        // if 0, the call executes with near-infinite gas
+				GasPrice:  gasPrice,                                 // wei <-> gas exchange ratio
+				GasFeeCap: tipsPrice,                                // EIP-1559 fee cap per gas.
+				GasTipCap: tipsPrice,                                // EIP-1559 tip per gas.
+				Value:     big.NewInt(0),                            // amount of wei sent along with the call
+				Data:      bytecode,                                 // input data, usually an ABI-encoded contract method invocation
 			}
 
 			gasLimit, err := connect.EstimateGas(ctx, msg)
@@ -474,7 +476,6 @@ func (c *EthChain) GetContract() string {
 		defer it.Release()
 		for it.Next() {
 			tmp := strings.Split(string(it.Key()), "_")
-			fmt.Println(string(it.Key()))
 			t, err := strconv.Atoi(tmp[0])
 			if err == nil {
 				if t == G_NetType {
@@ -572,7 +573,6 @@ func (c *EthChain) ImportContract(cons string) string {
 		if err2 == nil {
 			defer db.Close()
 			key := strconv.Itoa(G_NetType) + "_" + jcons.Address
-			fmt.Println(key)
 			if db.Put([]byte(key), jvalue, nil) != nil {
 				re = GetResult(Msg_writedb_fail, "")
 			}
@@ -689,7 +689,7 @@ func (c *EthChain) InvokeContract(from, conAddr, funcAbi, param, pass string) st
 	var current accounts.Account
 	var isExist bool = false
 	for i := 0; i < len(acc); i++ {
-		if from == acc[i].Address.String() {
+		if from == acc[i].GetAddress() {
 			current = acc[i]
 			isExist = true
 			break
@@ -725,11 +725,11 @@ func (c *EthChain) InvokeContract(from, conAddr, funcAbi, param, pass string) st
 	}
 
 	msg := ethereum.CallMsg{
-		From:  current.Address, // the sender of the 'transaction'
-		To:    &toAdd,          // the destination contract (nil for contract creation)
-		Gas:   0,               // if 0, the call executes with near-infinite gas
-		Value: big.NewInt(0),   // amount of wei sent along with the call
-		Data:  data,            // input data, usually an ABI-encoded contract method invocation
+		From:  common.HexToAddress(current.GetAddress()), // the sender of the 'transaction'
+		To:    &toAdd,                                    // the destination contract (nil for contract creation)
+		Gas:   0,                                         // if 0, the call executes with near-infinite gas
+		Value: big.NewInt(0),                             // amount of wei sent along with the call
+		Data:  data,                                      // input data, usually an ABI-encoded contract method invocation
 	}
 
 	gasLimit, err := connect.EstimateGas(ctx, msg)
@@ -774,7 +774,7 @@ func (c *EthChain) InvokeEstimate(from, conAddr, funcAbi, param string) string {
 	var current accounts.Account
 	var isExist bool = false
 	for i := 0; i < len(acc); i++ {
-		if from == acc[i].Address.String() {
+		if from == acc[i].GetAddress() {
 			current = acc[i]
 			isExist = true
 			break
@@ -804,11 +804,11 @@ func (c *EthChain) InvokeEstimate(from, conAddr, funcAbi, param string) string {
 	}
 
 	msg := ethereum.CallMsg{
-		From:  current.Address, // the sender of the 'transaction'
-		To:    &toAdd,          // the destination contract (nil for contract creation)
-		Gas:   0,               // if 0, the call executes with near-infinite gas
-		Value: big.NewInt(0),   // amount of wei sent along with the call
-		Data:  data,            // input data, usually an ABI-encoded contract method invocation
+		From:  common.HexToAddress(current.GetAddress()), // the sender of the 'transaction'
+		To:    &toAdd,                                    // the destination contract (nil for contract creation)
+		Gas:   0,                                         // if 0, the call executes with near-infinite gas
+		Value: big.NewInt(0),                             // amount of wei sent along with the call
+		Data:  data,                                      // input data, usually an ABI-encoded contract method invocation
 	}
 
 	gasLimit, err := connect.EstimateGas(ctx, msg)
@@ -865,7 +865,7 @@ func (c *EthChain) Signature(info string) string {
 		acc := ks.Accounts()
 		var i = 0
 		for i = 0; i < len(acc); i++ {
-			if acc[i].Address.String() == param["Address"] {
+			if acc[i].GetAddress() == param["Address"] {
 				signature, err2 := ks.SignHashWithPassphrase(acc[i], param["Ass"], crypto.Keccak256([]byte(param["Info"])))
 				if err2 == nil {
 					re, _ = json.Marshal(ErrorResult{0, common.Bytes2Hex(signature)})
@@ -959,7 +959,7 @@ func (c *EthChain) ChangeAccountPass(atype, address, old, new string) string {
 	acc := ks.Accounts()
 	var i = 0
 	for i = 0; i < len(acc); i++ {
-		if acc[i].Address.String() == address {
+		if acc[i].GetAddress() == address {
 			err2 := ks.Update(acc[i], old, new)
 			if err2 != nil {
 				re = GetResult(Msg_fail, err2.Error())
