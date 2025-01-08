@@ -26,30 +26,37 @@
     overflow: auto;
     flex-direction: column;
 }
-
-#menu{
-    width: 0; /*设置为0 隐藏自定义菜单*/
-    height: auto;
+.topmenu{
+    width: auto; /*设置为0 隐藏自定义菜单*/
+    height: 0;
     overflow: hidden; /*隐藏溢出的元素*/
     box-shadow: 0 1px 1px #888,1px 0 1px #ccc;
     position: absolute; /*自定义菜单相对与body元素进行定位*/
+}
+
+/*#menu{
+    width: 0; 
+    height: auto;
+    overflow: hidden; 
+    box-shadow: 0 1px 1px #888,1px 0 1px #ccc;
+    position: absolute; 
 }
 
 #toolMenu{
-    width: auto; /*设置为0 隐藏自定义菜单*/
+    width: auto; 
     height: 0;
-    overflow: hidden; /*隐藏溢出的元素*/
+    overflow: hidden; 
     box-shadow: 0 1px 1px #888,1px 0 1px #ccc;
-    position: absolute; /*自定义菜单相对与body元素进行定位*/
+    position: absolute; 
 }
 
 #systemMenu{
-    width: auto; /*设置为0 隐藏自定义菜单*/
+    width: auto; 
     height: 0;
-    overflow: hidden; /*隐藏溢出的元素*/
+    overflow: hidden; 
     box-shadow: 0 1px 1px #888,1px 0 1px #ccc;
-    position: absolute; /*自定义菜单相对与body元素进行定位*/
-}
+    position: absolute; 
+}*/
 
 .menu{
     width: auto;

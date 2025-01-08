@@ -72,7 +72,7 @@
         showResult(result)
     }
 
-    async function deleteContract(address){        
+    async function contractasset_func_delete(address){        
         var conf = await MYDIALOG.ShowConfirmDiv(await window.doGetMsg("42"))
         if(conf){
             var add = document.getElementById(address).value
@@ -90,6 +90,30 @@
         gParam.invokeContract = {}
         gParam.invokeContract.address = document.getElementById(address).value
         changePage("tools","invokecontract")
+    }
+
+    function contractasset_func_showfunc(id){
+        var p1 = document.getElementById(id).parentNode.parentNode
+        var cells = p1.getElementsByTagName("td")
+        var address = cells[1].childNodes[0].id
+
+        cells[0].childNodes[0].classList.add("highlight")
+        cells[1].childNodes[0].classList.add("highlight")
+        cells[2].childNodes[0].classList.add("highlight")
+    
+        clearFunc()
+        addFuncToMenu("contractasset_func_invoke('"+address+"')", gGetRes("contractasset_invoke"))
+        addFuncToMenu("contractasset_func_delete('"+address+"')", gGetRes("contractasset_delete"))
+        onFuncMenu(id)
+    }
+
+    function contractasset_func_mouseout(id){
+        var p1 = document.getElementById(id).parentNode.parentNode
+        var cells = p1.getElementsByTagName("td")
+
+        cells[0].childNodes[0].classList.remove("highlight")
+        cells[1].childNodes[0].classList.remove("highlight")
+        cells[2].childNodes[0].classList.remove("highlight")
     }
 
 
@@ -126,25 +150,40 @@
         ipt.setAttribute("value",obj.address) 
         ipt2.setAttribute("value",obj.name) 
 
-        var td4 = document.createElement("td")               
-        var bt = document.createElement("input")
-        //bt.setAttribute("style","width:50px")
-        bt.setAttribute("type","button")
-        bt.setAttribute("class","button1")
-        bt.setAttribute("value",gGetRes("contractasset_delete"))
-        bt.setAttribute("onclick","deleteContract("+"'address"+number+"')")
-        td4.append(bt) 
-        tr.append(td4)
+        // var td4 = document.createElement("td")               
+        // var bt = document.createElement("input")
+        // //bt.setAttribute("style","width:50px")
+        // bt.setAttribute("type","button")
+        // bt.setAttribute("class","button1")
+        // bt.setAttribute("value",gGetRes("contractasset_delete"))
+        // bt.setAttribute("onclick","contractasset_func_delete("+"'address"+number+"')")
+        // td4.append(bt) 
+        // tr.append(td4)
 
-        var td5 = document.createElement("td")               
-        var bt2 = document.createElement("input")
-        //bt.setAttribute("style","width:50px")
-        bt2.setAttribute("type","button")
-        bt2.setAttribute("class","button1")
-        bt2.setAttribute("value",gGetRes("contractasset_invoke"))
-        bt2.setAttribute("onclick","contractasset_func_invoke("+"'address"+number+"')")
-        td5.append(bt2) 
-        tr.append(td5)
+        // var td5 = document.createElement("td")               
+        // var bt2 = document.createElement("input")
+        // //bt.setAttribute("style","width:50px")
+        // bt2.setAttribute("type","button")
+        // bt2.setAttribute("class","button1")
+        // bt2.setAttribute("value",gGetRes("contractasset_invoke"))
+        // bt2.setAttribute("onclick","contractasset_func_invoke("+"'address"+number+"')")
+        // td5.append(bt2) 
+        // tr.append(td5)
+
+        var td6 = document.createElement("td")               
+        var bt3 = document.createElement("input")
+        bt3.setAttribute("class","button1")
+        bt3.setAttribute("id","contractasset_button"+number)
+        bt3.setAttribute("style","width:50px")
+        bt3.setAttribute("type","button")
+        bt3.setAttribute("value","↓")
+        bt3.setAttribute("onmouseover","contractasset_func_showfunc("+"'contractasset_button"+number+"')")
+        bt3.setAttribute("onmouseout","contractasset_func_mouseout("+"'contractasset_button"+number+"')")
+        td6.append(bt3) 
+        tr.append(td6)
+
+
+
 
         number++
         return tr

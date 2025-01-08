@@ -35,6 +35,8 @@
         menu.style.height=0
         menu.style.visibility = "hidden"
 
+        document.getElementById("funcMenu").style.height=0;
+
         var rec = document.getElementById("tools").getBoundingClientRect()
         if(e.clientX>rec.left && e.clientX <rec.right && e.clientY >rec.top && e.clientY < rec.bottom) {
 
@@ -219,5 +221,29 @@
         //改变自定义菜单的宽，让它显示出来
         menu.style.width='auto';
         menu.style.height='auto';
+    }
+
+    function onFuncMenu(id){
+        var menu=document.getElementById("funcMenu")
+         //根据事件对象中鼠标点击的位置，进行定位
+        var a = document.getElementById(id)
+        rec = a.getBoundingClientRect()
+        menu.style.left=(rec.right+window.scrollX)+'px';
+        menu.style.top=(rec.top+window.scrollY)+'px';
+        //改变自定义菜单的宽，让它显示出来
+        menu.style.width='auto';
+        menu.style.height='auto';
+    }
+    function addFuncToMenu(clickfunc,name){
+        var menu=document.getElementById("funcMenu")
+        var fun = document.createElement("div")
+        fun.setAttribute("class","menu")
+        fun.setAttribute("onclick",clickfunc)
+        fun.innerText=name
+        menu.append(fun)
+    }
+    function clearFunc(){
+        var menu=document.getElementById("funcMenu")
+        menu.innerHTML=""
     }
 

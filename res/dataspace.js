@@ -19,7 +19,7 @@
         
         var ipt2 = document.createElement("textarea")
         ipt2.setAttribute("id","dataspace_content"+number)
-        ipt2.setAttribute("style","width:300px;height:25px;font-size: 16px;overflow:auto")
+        ipt2.setAttribute("style","width:500px;height:25px;font-size: 16px;overflow:auto")
         var td3 = document.createElement("td")
         td3.append(ipt2)
         tr.append(td3)
@@ -66,7 +66,7 @@
 
     function dataspace_fun_recover(id){
         var data = document.getElementById(id)
-        data.style.width = '300px'
+        data.style.width = '500px'
         data.style.height = '25px'
     }
 
@@ -99,6 +99,32 @@
         if (ret == true){
             MYDIALOG.ShowDiv(await window.doGetMsg("0"))
         }
+    }
+
+    function dataspace_func_showfunc(id){
+        var p1 = document.getElementById(id).parentNode.parentNode
+        var cells = p1.getElementsByTagName("td")
+        var name = cells[0].childNodes[0].id
+        var content = cells[1].childNodes[0].id
+
+        cells[0].childNodes[0].classList.add("highlight")
+        cells[1].childNodes[0].classList.add("highlight")
+
+        clearFunc()
+        addFuncToMenu("dataspace_fun_recover('"+content+"')", gGetRes("dataspace_recover"))
+        addFuncToMenu("dataspace_fun_change('"+name+"','"+content+"')", gGetRes("dataspace_change"))
+        addFuncToMenu("dataspace_fun_delete('"+name+"')", gGetRes("dataspace_delete"))
+        onFuncMenu(id)
+    }
+
+
+
+    function dataspace_func_mouseout(id){
+        var p1 = document.getElementById(id).parentNode.parentNode
+        var cells = p1.getElementsByTagName("td")
+
+        cells[0].childNodes[0].classList.remove("highlight")
+        cells[1].childNodes[0].classList.remove("highlight")
     }
 
     async function loadDataSpace(){
@@ -159,40 +185,52 @@
         var ipt2 = document.createElement("textarea")
         ipt2.setAttribute("id","dataspace_content"+number)
         ipt2.value = content
-        ipt2.setAttribute("style","width:300px;height:25px;font-size: 16px;overflow:auto")
+        ipt2.setAttribute("style","width:500px;height:25px;font-size: 16px;overflow:auto")
         var td3 = document.createElement("td")
         td3.append(ipt2)
         tr.append(td3)
 
-        var td5 = document.createElement("td")               
-        var bt2 = document.createElement("input")
-        bt2.setAttribute("type","button")
-        bt2.setAttribute("class","button1")
-        bt2.setAttribute("style","width:100px")
-        bt2.setAttribute("value",gGetRes("dataspace_recover"))
-        bt2.setAttribute("onclick","dataspace_fun_recover("+"'dataspace_content"+number+"')")
-        td5.append(bt2) 
-        tr.append(td5)
+        // var td5 = document.createElement("td")               
+        // var bt2 = document.createElement("input")
+        // bt2.setAttribute("type","button")
+        // bt2.setAttribute("class","button1")
+        // bt2.setAttribute("style","width:100px")
+        // bt2.setAttribute("value",gGetRes("dataspace_recover"))
+        // bt2.setAttribute("onclick","dataspace_fun_recover("+"'dataspace_content"+number+"')")
+        // td5.append(bt2) 
+        // tr.append(td5)
+
+        // var td6 = document.createElement("td")               
+        // var bt3 = document.createElement("input")
+        // bt3.setAttribute("type","button")
+        // bt3.setAttribute("class","button1")
+        // bt3.setAttribute("style","width:100px")
+        // bt3.setAttribute("value",gGetRes("dataspace_change"))
+        // bt3.setAttribute("onclick","dataspace_fun_change("+"'dataspace_name"+number+"'" +",'dataspace_content"+number+"')")
+        // td6.append(bt3) 
+        // tr.append(td6)
+
+        // var td4 = document.createElement("td")               
+        // var bt = document.createElement("input")
+        // bt.setAttribute("type","button")
+        // bt.setAttribute("class","button1")
+        // bt.setAttribute("style","width:100px")
+        // bt.setAttribute("value",gGetRes("dataspace_delete"))
+        // bt.setAttribute("onclick","dataspace_fun_delete("+"'dataspace_name"+number+"')")
+        // td4.append(bt) 
+        // tr.append(td4)
 
         var td6 = document.createElement("td")               
-        var bt3 = document.createElement("input")
-        bt3.setAttribute("type","button")
-        bt3.setAttribute("class","button1")
-        bt3.setAttribute("style","width:100px")
-        bt3.setAttribute("value",gGetRes("dataspace_change"))
-        bt3.setAttribute("onclick","dataspace_fun_change("+"'dataspace_name"+number+"'" +",'dataspace_content"+number+"')")
-        td6.append(bt3) 
+        var bt4 = document.createElement("input")
+        bt4.setAttribute("class","button1")
+        bt4.setAttribute("id","dataspace_button"+number)
+        bt4.setAttribute("style","width:50px")
+        bt4.setAttribute("type","button")
+        bt4.setAttribute("value","↓")
+        bt4.setAttribute("onmouseover","dataspace_func_showfunc("+"'dataspace_button"+number+"')")
+        bt4.setAttribute("onmouseout","dataspace_func_mouseout("+"'dataspace_button"+number+"')")
+        td6.append(bt4) 
         tr.append(td6)
-
-        var td4 = document.createElement("td")               
-        var bt = document.createElement("input")
-        bt.setAttribute("type","button")
-        bt.setAttribute("class","button1")
-        bt.setAttribute("style","width:100px")
-        bt.setAttribute("value",gGetRes("dataspace_delete"))
-        bt.setAttribute("onclick","dataspace_fun_delete("+"'dataspace_name"+number+"')")
-        td4.append(bt) 
-        tr.append(td4)
         
         number++
         return tr

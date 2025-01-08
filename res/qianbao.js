@@ -6,6 +6,7 @@ async function changeName(address,name){
 }
 
 async function changePass(address,name){
+    window.doWebLog("enter changePass")
     gParam = {}
     gParam.type="eth"
     gParam.address=document.getElementById(address).value
@@ -16,6 +17,33 @@ async function changePass(address,name){
 function management(address,name){
     window.doWebLog("enter management")
 }
+
+function qianbao_func_showfunc(id){
+    var p1 = document.getElementById(id).parentNode.parentNode
+    var cells = p1.getElementsByTagName("td")
+    var address = cells[1].childNodes[0].id
+    var name = cells[2].childNodes[0].id
+
+    cells[1].childNodes[0].classList.add("highlight")
+    cells[2].childNodes[0].classList.add("highlight")
+    cells[3].childNodes[0].classList.add("highlight")
+
+    clearFunc()
+    addFuncToMenu("changeName('"+address+"','"+name+"')", gGetRes("qianbao_changebutton"))
+    addFuncToMenu("changePass('"+address+"','"+name+"')", gGetRes("qianbao_changepass"))
+    onFuncMenu(id)
+}
+
+function qianbao_func_mouseout(id){
+    var p1 = document.getElementById(id).parentNode.parentNode
+    var cells = p1.getElementsByTagName("td")
+
+    cells[1].childNodes[0].classList.remove("highlight")
+    cells[2].childNodes[0].classList.remove("highlight")
+    cells[3].childNodes[0].classList.remove("highlight")
+}
+
+
 function addAccountElement(acc,table){
     for (i=0; i<acc.length; i++){
         var par = acc[i]
@@ -53,25 +81,41 @@ function addAccountElement(acc,table){
         td4.append(ipt3)
         tr.append(td4)
 
-        var td4 = document.createElement("td")               
-        var bt = document.createElement("input")
-        bt.setAttribute("class","button1")
-        //bt.setAttribute("style","width:100px")
-        bt.setAttribute("type","button")
-        bt.setAttribute("value",gGetRes("qianbao_changebutton"))
-        bt.setAttribute("onclick","changeName("+"'address"+i +"'" +",'name"+i+"')")
-        td4.append(bt) 
-        tr.append(td4)
+        var td6 = document.createElement("td")               
+        var bt3 = document.createElement("input")
+        bt3.setAttribute("class","button1")
+        bt3.setAttribute("id","qianbao_button"+i)
+        bt3.setAttribute("style","width:50px")
+        bt3.setAttribute("type","button")
+        bt3.setAttribute("value","↓")
+        bt3.setAttribute("onmouseover","qianbao_func_showfunc("+"'qianbao_button"+i+"')")
+        bt3.setAttribute("onmouseout","qianbao_func_mouseout("+"'qianbao_button"+i+"')")
 
-        var td5 = document.createElement("td")               
-        var bt2 = document.createElement("input")
-        bt2.setAttribute("class","button1")
-        //bt.setAttribute("style","width:100px")
-        bt2.setAttribute("type","button")
-        bt2.setAttribute("value",gGetRes("qianbao_changepass"))
-        bt2.setAttribute("onclick","changePass("+"'address"+i +"'" +",'name"+i+"')")
-        td5.append(bt2) 
-        tr.append(td5)
+        
+        td6.append(bt3) 
+        tr.append(td6)
+
+        // var td4 = document.createElement("td")               
+        // var bt = document.createElement("input")
+        // bt.setAttribute("class","button1")
+        // //bt.setAttribute("style","width:100px")
+        // bt.setAttribute("type","button")
+        // bt.setAttribute("value",gGetRes("qianbao_changebutton"))
+        // bt.setAttribute("onclick","changeName("+"'address"+i +"'" +",'name"+i+"')")
+        // td4.append(bt) 
+        // tr.append(td4)
+
+        // var td5 = document.createElement("td")               
+        // var bt2 = document.createElement("input")
+        // bt2.setAttribute("class","button1")
+        // //bt.setAttribute("style","width:100px")
+        // bt2.setAttribute("type","button")
+        // bt2.setAttribute("value",gGetRes("qianbao_changepass"))
+        // bt2.setAttribute("onclick","changePass("+"'address"+i +"'" +",'name"+i+"')")
+        // td5.append(bt2) 
+        // tr.append(td5)
+
+
 
 
         table.append(tr)
