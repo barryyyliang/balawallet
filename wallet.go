@@ -3,8 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
-	"path/filepath"
-	"strings"
+	"os/user"
 
 	"balawallet/common"
 	"balawallet/ethchain"
@@ -24,8 +23,18 @@ func main() {
 	ethchain.InitAbiFile() //generate by tool
 	common.InitMsg()
 	common.InitRes()
-	path, _ := filepath.Abs(filepath.Dir(os.Args[0]))
-	dir = strings.Replace(path, "\\", "/", -1)
+	home, _ := user.Current()
+	dir = home.HomeDir + "/.balawallet"
+
+	_, err := os.Stat(dir)
+	if err != nil {
+		if !os.IsExist(err) {
+			os.Mkdir(dir, os.ModePerm)
+		}
+	}
+
+	//path, _ := filepath.Abs(filepath.Dir(os.Args[0]))
+	//dir = strings.Replace(path, "\\", "/", -1)
 	common.InitGlobal(dir)
 	ethchain.Init(dir)
 	tmp := ethchain.GetEthChain()
