@@ -72,14 +72,16 @@ type accountCache struct {
 	throttle *time.Timer
 	notify   chan struct{}
 	fileC    fileCache
+	cAdapter accounts.IChainAdapter
 }
 
-func newAccountCache(keydir string) (*accountCache, chan struct{}) {
+func newAccountCache(keydir string, adapter accounts.IChainAdapter) (*accountCache, chan struct{}) {
 	ac := &accountCache{
-		keydir: keydir,
-		byAddr: make(map[string][]accounts.Account),
-		notify: make(chan struct{}, 1),
-		fileC:  fileCache{all: mapset.NewThreadUnsafeSet[string]()},
+		keydir:   keydir,
+		byAddr:   make(map[string][]accounts.Account),
+		notify:   make(chan struct{}, 1),
+		fileC:    fileCache{all: mapset.NewThreadUnsafeSet[string]()},
+		cAdapter: adapter,
 	}
 	ac.watcher = newWatcher(ac)
 	return ac, ac.notify
@@ -110,7 +112,7 @@ func (ac *accountCache) add(newAccount accounts.Account) {
 		return
 	}
 	// newAccount is not in the cache.
-	ac.all = append(ac.all, chainAdapter.NewNullAccount())
+	ac.all = append(ac.all, ac.cAdapter.NewNullAccount())
 	copy(ac.all[i+1:], ac.all[i:])
 	ac.all[i] = newAccount
 	add := newAccount.GetAddress()
@@ -187,19 +189,19 @@ func (ac *accountCache) find(a accounts.Account) (accounts.Account, error) {
 			}
 		}
 		if a.AddressIsNull() {
-			return chainAdapter.NewNullAccount(), ErrNoMatch
+			return ac.cAdapter.NewNullAccount(), ErrNoMatch
 		}
 	}
 	switch len(matches) {
 	case 1:
 		return matches[0], nil
 	case 0:
-		return chainAdapter.NewNullAccount(), ErrNoMatch
+		return ac.cAdapter.NewNullAccount(), ErrNoMatch
 	default:
 		err := &AmbiguousAddrError{Addr: a.GetAddress(), Matches: make([]accounts.Account, len(matches))}
 		copy(err.Matches, matches)
 		slices.SortFunc(err.Matches, byURL)
-		return chainAdapter.NewNullAccount(), err
+		return ac.cAdapter.NewNullAccount(), err
 	}
 }
 
@@ -270,7 +272,7 @@ func (ac *accountCache) scanAccounts() error {
 		// Parse the address.
 		key.Address = ""
 		err = json.NewDecoder(buf).Decode(&key)
-		ac := chainAdapter.NewAccount(key.Address, accounts.URL{Scheme: accounts.KeyStoreScheme, Path: path})
+		ac := ac.cAdapter.NewAccount(key.Address, accounts.URL{Scheme: accounts.KeyStoreScheme, Path: path})
 		//addr := common.HexToAddress(key.Address)
 		switch {
 		case err != nil:

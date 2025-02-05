@@ -142,12 +142,24 @@ async function initBalance(){
 }
 
 async function initPage(){
-    gLoadRes()
-    window.doWebLog("test init")
+    gLoadRes()    
+    var se = document.getElementById("add")
+    se.options.length = 0
+
     window.doGetAccounts().then( (result) => {
         if (result != ""){
-            var arr = JSON.parse(result)
-            addAccountElement(arr.accounts,document.getElementById("tableWallet"))
+            var acc = JSON.parse(result)
+            addAccountElement(acc.accounts,document.getElementById("tableWallet"))
+            
+            if (acc != ""){    
+                var se = document.getElementById("add")            
+                for (i=0; i<acc.accounts.length; i++){
+                    var option = document.createElement("option")
+                    option.text = acc.accounts[i].address
+                    option.value = acc.accounts[i].address
+                    se.add(option)
+                }
+            }
         }
     })
     var re = await window.doCheckNode()

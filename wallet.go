@@ -7,7 +7,9 @@ import (
 
 	"balawallet/common"
 	"balawallet/ethchain"
+	"balawallet/pagefunc"
 	"balawallet/serverapi"
+	"balawallet/solchain"
 
 	webview "github.com/webview/webview_go"
 )
@@ -37,6 +39,7 @@ func main() {
 	//dir = strings.Replace(path, "\\", "/", -1)
 	common.InitGlobal(dir)
 	ethchain.Init(dir)
+	solchain.Init(dir)
 	tmp := ethchain.GetEthChain()
 	server := serverapi.GetServer(tmp)
 
@@ -47,19 +50,19 @@ func main() {
 
 	//注册全局函数
 
-	win.Bind("doWebLog", common.DoWebLog)
-	win.Bind("doConfig", common.DoConfig)
-	win.Bind("doGetConfig", common.DoGetConfig)
-	win.Bind("doGetRes", common.DoGetRes)
-	win.Bind("doGetMsg", common.DoGetMsg)
+	win.Bind("doWebLog", pagefunc.DoWebLog)
+	win.Bind("doConfig", pagefunc.DoConfig)
+	win.Bind("doGetConfig", pagefunc.DoGetConfig)
+	win.Bind("doGetRes", pagefunc.DoGetRes)
+	win.Bind("doGetMsg", pagefunc.DoGetMsg)
+	win.Bind("doGetComponent", pagefunc.DoGetComponent)
+	win.Bind("doChangeNet", pagefunc.DoChangeNet)
 	win.Bind("doSaveDataSpace", common.DoSaveDataSpace)
 	win.Bind("doChangeDataSpace", common.DoChangeDataSpace)
 	win.Bind("doDeleteDataSpace", common.DoDeleteDataSpace)
 	win.Bind("doGetDataSpace", common.DoGetDataSpace)
 	win.Bind("doCheckDataSpace", common.DoCheckDataSpace)
 	win.Bind("doInitDataSpace", common.DoInitDataSpace)
-	win.Bind("doGetComponent", common.DoGetComponent)
-	win.Bind("doChangeNet", common.DoChangeNet)
 
 	win.Bind("doNewAccount", server.DoNewAccount)
 	win.Bind("doGetAccounts", server.DoGetAccounts)

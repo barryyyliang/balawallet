@@ -1,9 +1,12 @@
-package common
+package pagefunc
 
 import (
+	"balawallet/common"
+	"balawallet/ethchain"
+	"balawallet/serverapi"
+	"balawallet/solchain"
 	"encoding/json"
 	"fmt"
-	"strconv"
 
 	//"github.com/ethereum/go-ethereum/crypto/sha3"
 
@@ -108,14 +111,14 @@ func DoGetComponent(com string) string {
 		htmlfile = "/" + com + ".html"
 	}
 
-	result.Css = string(G_Files[cssfile])
-	result.Js = string(G_Files[jsfile])
-	result.Html = string(G_Files[htmlfile])
-	language := G_Config["language"]
+	result.Css = string(common.G_Files[cssfile])
+	result.Js = string(common.G_Files[jsfile])
+	result.Html = string(common.G_Files[htmlfile])
+	language := common.G_Config["language"]
 	if language == "" {
 		language = "zh-CN"
 	}
-	res := G_Res[language][htmlfile]
+	res := common.G_Res[language][htmlfile]
 	if len(res) != 0 {
 		tmp, _ := json.Marshal(res)
 		result.Res = string(tmp)
@@ -130,18 +133,18 @@ func DoGetComponent(com string) string {
 }
 
 func DoConfig(configs string) string {
-	re := GetResult(Msg_success, "")
+	re := common.GetResult(common.Msg_success, "")
 	var config = make(map[string]string)
 
 	json.Unmarshal([]byte(configs), &config)
 
 	for key, value := range config {
-		G_Config[key] = value
+		common.G_Config[key] = value
 	}
 
-	db, _ := leveldb.OpenFile(G_DataDir+"db", nil)
+	db, _ := leveldb.OpenFile(common.G_DataDir+"db", nil)
 	defer db.Close()
-	tmp, _ := json.Marshal(G_Config)
+	tmp, _ := json.Marshal(common.G_Config)
 	db.Put([]byte("config"), tmp, nil)
 
 	/*
@@ -156,67 +159,26 @@ func DoConfig(configs string) string {
 		}
 	*/
 	// 配置更新后刷新链接
-	G_Etherclient = nil
+	common.G_Etherclient = nil
 	return string(re)
 }
 
 func DoGetConfig(configs string) string {
-	var re string
-	db, err := leveldb.OpenFile(G_DataDir+"db", nil)
-	if err != nil {
-		fmt.Println("open db error:" + err.Error())
-		return ""
-	}
-
-	defer db.Close()
-
-	data, err := db.Get([]byte("config"), nil)
-	if err != nil {
-		return ""
-	}
-	err = json.Unmarshal(data, &G_Config)
-	if err != nil {
-		return ""
-	}
-
-	if configs != "" {
-		var configName []string
-		json.Unmarshal([]byte(configs), &configName)
-		var result = make(map[string]string)
-		for _, value := range configName {
-			result[value] = G_Config[value]
-		}
-		tmp, _ := json.Marshal(result)
-		re = string(tmp)
-	} else {
-		tmp, _ := json.Marshal(G_Config)
-		re = string(tmp)
-	}
-	return string(re)
+	return common.GetConfig(configs)
 }
 
 func DoGetMsg(code string) string {
-	n, _ := strconv.Atoi(code)
-	lang := G_Config["language"]
-	if lang == "" {
-		lang = "zh-CN"
-	}
-	msg := G_Msg[lang][uint(n)]
-	if msg == "" {
-		msg = "null"
-	}
-
-	return msg
+	return common.GetMsg(code)
 }
 
 func DoGetRes(com string) string {
 	var re string = ""
 	htmlfile := "/" + com + ".html"
-	language := G_Config["language"]
+	language := common.G_Config["language"]
 	if language == "" {
 		language = "zh-CN"
 	}
-	res := G_Res[language][htmlfile]
+	res := common.G_Res[language][htmlfile]
 	if len(res) != 0 {
 		tmp, _ := json.Marshal(res)
 		re = string(tmp)
@@ -229,22 +191,28 @@ func DoChangeNet(nettype string) string {
 	tmpType := -1
 	switch nettype {
 	case "Ethereum":
-		tmpType = Nettype_ethereum
+		tmpType = common.Nettype_ethereum
 	case "Polygon":
-		tmpType = Nettype_polygon
+		tmpType = common.Nettype_polygon
 	case "Solana":
-		tmpType = Nettype_solana
+		tmpType = common.Nettype_solana
 	}
-	if G_NetType != tmpType {
-		if tmpType == Nettype_solana {
-			re = GetResult(Msg_fail, "not support")
+	if common.G_NetType != tmpType {
+		if tmpType == common.Nettype_solana {
+			//re = GetResult(Msg_fail, "not support")
+			re = common.GetResult(common.Msg_success, "")
+			common.G_NetType = tmpType
+			tmp := solchain.GetSolChain()
+			serverapi.SetServer(tmp)
 		} else {
-			G_NetType = tmpType
-			G_Etherclient = nil
-			re = GetResult(Msg_success, "")
+			common.G_NetType = tmpType
+			common.G_Etherclient = nil
+			tmp := ethchain.GetEthChain()
+			serverapi.SetServer(tmp)
+			re = common.GetResult(common.Msg_success, "")
 		}
 	} else {
-		re = GetResult(Msg_success, "")
+		re = common.GetResult(common.Msg_success, "")
 	}
 	return string(re)
 }

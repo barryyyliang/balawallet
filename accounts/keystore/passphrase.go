@@ -39,7 +39,6 @@ import (
 
 	"balawallet/accounts"
 
-	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/pbkdf2"
@@ -77,6 +76,7 @@ type keyStorePassphrase struct {
 	// reads and decrypts any newly created keyfiles. This should be 'false' in all
 	// cases except tests -- setting this to 'true' is not recommended.
 	skipKeyFileVerification bool
+	chainAdapter            accounts.IChainAdapter
 }
 
 func (ks keyStorePassphrase) GetKey(addr string, filename, auth string) (accounts.Key, error) {
@@ -85,7 +85,7 @@ func (ks keyStorePassphrase) GetKey(addr string, filename, auth string) (account
 	if err != nil {
 		return nil, err
 	}
-	key, err := DecryptKey(keyjson, auth)
+	key, err := DecryptKey(keyjson, auth, ks.chainAdapter)
 	if err != nil {
 		return nil, err
 	}
@@ -97,8 +97,8 @@ func (ks keyStorePassphrase) GetKey(addr string, filename, auth string) (account
 }
 
 // StoreKey generates a key, encrypts with 'auth' and stores in the given directory
-func StoreKey(dir, auth string, scryptN, scryptP int) (accounts.Account, error) {
-	_, a, err := storeNewKey(&keyStorePassphrase{dir, scryptN, scryptP, false}, rand.Reader, auth)
+func StoreKey(dir, auth string, scryptN, scryptP int, adpter accounts.IChainAdapter) (accounts.Account, error) {
+	_, a, err := storeNewKey(&keyStorePassphrase{dir, scryptN, scryptP, false, adpter}, rand.Reader, auth, adpter)
 	return a, err
 }
 
@@ -182,22 +182,23 @@ func EncryptDataV3(data, auth []byte, scryptN, scryptP int) (accounts.CryptoJSON
 // EncryptKey encrypts a key using the specified scrypt parameters into a json
 // blob that can be decrypted later on.
 func EncryptKey(key accounts.Key, auth string, scryptN, scryptP int) ([]byte, error) {
-	keyBytes := math.PaddedBigBytes(key.GetBigPrivate(), 32)
+	//keyBytes := math.PaddedBigBytes(key.GetBigPrivate(), 32)
+	keyBytes := key.GetByte()
 	cryptoStruct, err := EncryptDataV3(keyBytes, []byte(auth), scryptN, scryptP)
 	if err != nil {
 		return nil, err
 	}
 	encryptedKeyJSONV3 := accounts.EncryptedKeyJSONV3{
-		hex.EncodeToString(key.GetByteAddress()),
-		cryptoStruct,
-		key.GetID(),
-		accounts.Version,
+		Address: key.GetStringAddress(),
+		Crypto:  cryptoStruct,
+		Id:      key.GetID(),
+		Version: accounts.Version,
 	}
 	return json.Marshal(encryptedKeyJSONV3)
 }
 
 // DecryptKey decrypts a key from a json blob, returning the private key itself.
-func DecryptKey(keyjson []byte, auth string) (accounts.Key, error) {
+func DecryptKey(keyjson []byte, auth string, kAdapter accounts.IChainAdapter) (accounts.Key, error) {
 	// Parse the json into a simple map to fetch the key version
 	m := make(map[string]interface{})
 	if err := json.Unmarshal(keyjson, &m); err != nil {
@@ -226,7 +227,7 @@ func DecryptKey(keyjson []byte, auth string) (accounts.Key, error) {
 		return nil, err
 	}
 	//key, err := crypto.ToECDSA(keyBytes)
-	key, err := chainAdapter.BytesToPrivateKey(keyBytes)
+	key, err := kAdapter.BytesToPrivateKey(keyBytes)
 	if err != nil {
 		return nil, fmt.Errorf("invalid key: %w", err)
 	}
@@ -234,7 +235,13 @@ func DecryptKey(keyjson []byte, auth string) (accounts.Key, error) {
 	if err != nil {
 		return nil, fmt.Errorf("invalid UUID: %w", err)
 	}
-	return chainAdapter.InitKey(id, key), nil
+
+	tmp := kAdapter.InitKey(id, key)
+	if tmp == nil {
+		return nil, fmt.Errorf("init key error: %w", err)
+	}
+
+	return tmp, nil
 	// return &Key{
 	// 	Id:         id,
 	// 	Address:    crypto.PubkeyToAddress(key.PublicKey),

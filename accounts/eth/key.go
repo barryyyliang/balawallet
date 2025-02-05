@@ -23,12 +23,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"math/big"
 	"strings"
 
 	"balawallet/accounts"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/google/uuid"
 )
@@ -111,9 +111,10 @@ func (k *EthKey) ZeroKey() {
 func (k *EthKey) GetPrivateKey() interface{} {
 	return k.privateKey
 }
-func (k *EthKey) GetBigPrivate() *big.Int {
+
+func (k *EthKey) GetByte() []byte {
 	if k.privateKey != nil {
-		return k.privateKey.D
+		return math.PaddedBigBytes(k.privateKey.D, 32)
 	}
 	return nil
 }

@@ -63,7 +63,7 @@ type Key interface {
 	ZeroKey()
 	SinHash(hash []byte) ([]byte, error)
 	GetPrivateKey() interface{}
-	GetBigPrivate() *big.Int
+	GetByte() []byte
 	Is(add string) bool
 	GetID() string
 	SetID(id uuid.UUID)

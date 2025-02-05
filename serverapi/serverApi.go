@@ -27,16 +27,21 @@ type Bchain interface {
 	InvokeEstimate(from, conAddr, funcAbi, param string) string
 }
 
+var server = new(ServerAPI)
+
 func GetServer(in Bchain) *ServerAPI {
-	re := &ServerAPI{in}
-	return re
+	server.Chain = in
+	return server
+}
+func SetServer(in Bchain) {
+	server.setServer(in)
 }
 
 type ServerAPI struct {
 	Chain Bchain
 }
 
-func (in *ServerAPI) SetServer(bl Bchain) {
+func (in *ServerAPI) setServer(bl Bchain) {
 	in.Chain = bl
 }
 

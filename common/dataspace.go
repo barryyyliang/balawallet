@@ -198,7 +198,7 @@ func checkDataSpaceAuth(auth string) error {
 	if err == nil {
 		tag, err1 := db.Get([]byte("data_space_init"), nil)
 		if (err1 == errors.ErrNotFound) || (err1 == nil && len(tag) == 0) {
-			return errors.New(DoGetMsg(strconv.Itoa(int(Msg_space_notinited))))
+			return errors.New(GetMsg(strconv.Itoa(int(Msg_space_notinited))))
 		} else if err1 == nil { //have inited
 			var tmp accounts.CryptoJSON
 			if json.Unmarshal(tag, &tmp) == nil {
@@ -206,7 +206,7 @@ func checkDataSpaceAuth(auth string) error {
 				if err2 == nil && string(value) == "data_space_init" {
 					return nil
 				} else {
-					return errors.New(DoGetMsg(strconv.Itoa(int(Msg_password_error))))
+					return errors.New(GetMsg(strconv.Itoa(int(Msg_password_error))))
 				}
 			}
 		} else { //other error

@@ -12,6 +12,7 @@ import (
 	"strconv"
 	"strings"
 
+	"balawallet/accounts/eth"
 	"balawallet/accounts/keystore"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -270,24 +271,25 @@ func getKey(add string, pa string) (*ecdsa.PrivateKey, error) {
 		if err != nil {
 			return nil, err
 		}
-		key, err := keystore.DecryptKey(keyjson, pa)
+		ethAdapter := &eth.EthChainAdapter{}
+		key, err := keystore.DecryptKey(keyjson, pa, ethAdapter)
 		if err != nil {
 			return nil, err
 		}
 		// 确保导出的是需要私钥
 		if key.GetStringAddress() != add {
 			fmt.Errorf("key content mismatch: have account %x, want %s", key.GetStringAddress(), add)
-			return nil, errors.New(GetMsg(Msg_addressprivatekey_mismatch))
+			return nil, errors.New(GetMsgByCode(Msg_addressprivatekey_mismatch))
 		} else {
 			pri := key.GetPrivateKey()
 			if prikey, ok := pri.(*ecdsa.PrivateKey); ok {
 				return prikey, nil
 			} else {
-				return nil, errors.New(GetMsg(Msg_readaccountfile_fail))
+				return nil, errors.New(GetMsgByCode(Msg_readaccountfile_fail))
 			}
 		}
 	} else {
 		fmt.Println("can not find account:" + add)
 	}
-	return nil, errors.New(GetMsg(Msg_addressprivatekey_mismatch))
+	return nil, errors.New(GetMsgByCode(Msg_addressprivatekey_mismatch))
 }

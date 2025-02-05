@@ -75,7 +75,8 @@ func Init(dir string) {
 	}
 
 	//打开钱包
-	ks = keystore.NewKeyStore(accountdir, keystore.StandardScryptN, keystore.StandardScryptP)
+	ethAdapter := &eth.EthChainAdapter{}
+	ks = keystore.NewKeyStore(accountdir, keystore.StandardScryptN, keystore.StandardScryptP, ethAdapter)
 
 }
 
@@ -918,7 +919,7 @@ func (c EthChain) GetAbiFile() string {
 	re := GetResult(Msg_success, "")
 	var conf = [1]string{"contractDir"}
 	par, _ := json.Marshal(conf)
-	DoGetConfig(string(par))
+	GetConfig(string(par))
 	var dir = G_Config["contractDir"]
 	if dir != "" {
 		names, err := getFiles(dir, ".abi")
@@ -938,7 +939,7 @@ func (c *EthChain) GetBinFile() string {
 	re := GetResult(Msg_success, "")
 	var conf = [1]string{"contractDir"}
 	par, _ := json.Marshal(conf)
-	DoGetConfig(string(par))
+	GetConfig(string(par))
 	var dir = G_Config["contractDir"]
 	if dir != "" {
 		names, err := getFiles(dir, ".bin")

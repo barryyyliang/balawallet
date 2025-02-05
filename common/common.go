@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -33,7 +34,7 @@ func InitGlobal(dir string) {
 		}
 	}
 	//初始化配置
-	DoGetConfig("")
+	GetConfig("")
 	if G_Config["ethAddress"] != "" {
 		G_Etherclient, err = ethclient.Dial(G_Config["ethAddress"])
 		if err != nil {
@@ -79,11 +80,60 @@ func GetResult(code uint, addMsg string) []byte {
 	return re
 }
 
-func GetMsg(code uint) string {
+func GetMsgByCode(code uint) string {
 	lang := G_Config["language"]
 	if lang == "" {
 		lang = "zh-CN"
 	}
 	msg := G_Msg[lang][code]
 	return msg
+}
+
+func GetMsg(code string) string {
+	n, _ := strconv.Atoi(code)
+	lang := G_Config["language"]
+	if lang == "" {
+		lang = "zh-CN"
+	}
+	msg := G_Msg[lang][uint(n)]
+	if msg == "" {
+		msg = "null"
+	}
+
+	return msg
+}
+
+func GetConfig(configs string) string {
+	var re string
+	db, err := leveldb.OpenFile(G_DataDir+"db", nil)
+	if err != nil {
+		fmt.Println("open db error:" + err.Error())
+		return ""
+	}
+
+	defer db.Close()
+
+	data, err := db.Get([]byte("config"), nil)
+	if err != nil {
+		return ""
+	}
+	err = json.Unmarshal(data, &G_Config)
+	if err != nil {
+		return ""
+	}
+
+	if configs != "" {
+		var configName []string
+		json.Unmarshal([]byte(configs), &configName)
+		var result = make(map[string]string)
+		for _, value := range configName {
+			result[value] = G_Config[value]
+		}
+		tmp, _ := json.Marshal(result)
+		re = string(tmp)
+	} else {
+		tmp, _ := json.Marshal(G_Config)
+		re = string(tmp)
+	}
+	return string(re)
 }
