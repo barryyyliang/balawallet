@@ -3,13 +3,18 @@ package solchain
 import (
 	"balawallet/accounts/keystore"
 	"balawallet/common"
+	"context"
 	"encoding/json"
 	"fmt"
 	"os"
+	"strconv"
 
 	//"github.com/ethereum/go-ethereum/crypto/sha3"
 	"balawallet/accounts/sol"
+	balacommon "balawallet/common"
 
+	"github.com/gagliardetto/solana-go"
+	solRPC "github.com/gagliardetto/solana-go/rpc"
 	"github.com/syndtr/goleveldb/leveldb"
 )
 
@@ -153,9 +158,20 @@ func (c *SolChain) ChangeAccountName(address string, name string) string {
 }
 
 func (c *SolChain) GetAccountName(address string) string {
-
-	return ""
-
+	db, err := leveldb.OpenFile(balacommon.G_DataDir+"db", nil)
+	if err == nil {
+		defer db.Close()
+		name, err := db.Get([]byte(address), nil)
+		if err == nil {
+			return string(name)
+		} else {
+			fmt.Println("get name err")
+			return ""
+		}
+	} else {
+		fmt.Println("open db error:" + err.Error())
+		return ""
+	}
 }
 
 // 通过私钥导入账号
@@ -180,12 +196,53 @@ func (c *SolChain) Transfer(from string, to string, value string, pass string) s
 
 // 获取账户余额
 func (c *SolChain) GetBalance(add string) string {
-	re := common.GetResult(common.Msg_fail, "not support")
+	fmt.Println("enter sol GetBalance")
+	var re []byte
+
+	client := common.GetSolConnection()
+	if client != nil {
+		pub := solana.MustPublicKeyFromBase58(add)
+		ctx, fuc := context.WithTimeout(context.Background(), common.G_Timeout)
+		defer fuc()
+		res, err := client.GetBalance(ctx, pub, solRPC.CommitmentConfirmed)
+		if err == nil {
+			tmp, _ := json.Marshal(balacommon.ResBlance{add, strconv.FormatUint(res.Value, 10)})
+			re, _ = json.Marshal(balacommon.ErrorResult{0, string(tmp)})
+		} else {
+			re = balacommon.GetResult(balacommon.Msg_getbalance_fail, err.Error())
+		}
+	} else {
+		re = balacommon.GetResult(balacommon.Msg_connectnode_fail, "")
+	}
+
 	return string(re)
 }
 
 func (c *SolChain) GetFee() string {
-	return ""
+	fmt.Println("enter sol GetFee")
+
+	client := common.GetSolConnection()
+	if client != nil {
+		ctx, fuc := context.WithTimeout(context.Background(), common.G_Timeout)
+		defer fuc()
+
+		res, err := client.GetFeeForMessage(ctx,
+			"AQABAgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEBAQAA",
+			solRPC.CommitmentConfirmed)
+		fmt.Println("enter sol GetFee1")
+		if err == nil {
+			if res.Value != nil {
+				return strconv.FormatUint(*res.Value, 10)
+			} else {
+				fmt.Println("can not get fee for message")
+			}
+
+		} else {
+			fmt.Println("get fee:" + err.Error())
+		}
+	}
+	fmt.Println("enter sol GetFee2")
+	return "0"
 }
 
 func (c *SolChain) DeployContract(from string, file string, pass string) string {
@@ -212,8 +269,12 @@ func (c *SolChain) ImportContract(cons string) string {
 }
 
 func (c *SolChain) CheckNode() string {
-	re := common.GetResult(common.Msg_fail, "not support")
-
+	var re []byte
+	if balacommon.G_Config["solAddress"] != "" {
+		re = balacommon.GetResult(balacommon.Msg_success, "")
+	} else {
+		re = balacommon.GetResult(balacommon.Msg_nodeconfig_null, "")
+	}
 	return string(re)
 }
 
@@ -242,8 +303,29 @@ func (c *SolChain) InvokeEstimate(from, conAddr, funcAbi, param string) string {
 }
 
 func (c *SolChain) QueryTx(hs string) string {
-	re := common.GetResult(common.Msg_fail, "not support")
+	var re []byte
+	client := common.GetSolConnection()
+	if client != nil {
+		txSig := solana.MustSignatureFromBase58(hs)
+		ctx, fuc := context.WithTimeout(context.Background(), common.G_Timeout)
+		defer fuc()
 
+		opts := new(solRPC.GetTransactionOpts)
+		opts.MaxSupportedTransactionVersion = new(uint64)
+		out, err := client.GetTransaction(
+			ctx,
+			txSig,
+			opts,
+		)
+		if err == nil {
+			re, err = json.Marshal(out)
+			if err != nil {
+				fmt.Println("so get transaction marshal result error :" + out.BlockTime.String())
+			}
+		} else {
+			fmt.Println("get sol transaction err:" + err.Error())
+		}
+	}
 	return string(re)
 }
 

@@ -8,12 +8,14 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/ethclient"
+	solRPC "github.com/gagliardetto/solana-go/rpc"
 	"github.com/syndtr/goleveldb/leveldb"
 )
 
 var G_Timeout time.Duration = 5 * time.Second
 var G_Config = make(map[string]string)
 var G_Etherclient *ethclient.Client = nil
+var g_SolClient *solRPC.Client
 var G_BlockchainConfig bool = true
 var G_DataDir string
 var G_NetType int
@@ -39,17 +41,31 @@ func InitGlobal(dir string) {
 		G_Etherclient, err = ethclient.Dial(G_Config["ethAddress"])
 		if err != nil {
 			G_Etherclient = nil
-			fmt.Println("can not connect to node")
+			fmt.Println("can not connect to ethereum node")
 		}
 	} else {
-		fmt.Println("have not config blockchain node")
+		fmt.Println("have not config ethereum node")
 		G_BlockchainConfig = false
+	}
+
+	if G_Config["solAddress"] != "" {
+		g_SolClient = solRPC.New(G_Config["solAddress"])
+		if g_SolClient == nil {
+			fmt.Println("can not connect to ethereum node")
+		}
+	} else {
+		fmt.Println("have not config solana node")
 	}
 }
 
 type ErrorResult struct {
 	Code uint
 	Msg  string
+}
+
+type ResBlance struct {
+	Address string
+	Balance string
 }
 
 func IsExist(db *leveldb.DB, name string) bool {
@@ -136,4 +152,18 @@ func GetConfig(configs string) string {
 		re = string(tmp)
 	}
 	return string(re)
+}
+
+func GetSolConnection() *solRPC.Client {
+	if g_SolClient == nil {
+		if G_Config["solAddress"] != "" {
+			g_SolClient = solRPC.New(G_Config["solAddress"])
+			if g_SolClient == nil {
+				fmt.Println("can not connect to ethereum node")
+			}
+		} else {
+			fmt.Println("have not config solana node")
+		}
+	}
+	return g_SolClient
 }
