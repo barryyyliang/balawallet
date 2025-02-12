@@ -17,7 +17,9 @@
 package sol
 
 import (
+	"crypto"
 	"crypto/ed25519"
+	"crypto/rand"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -83,6 +85,11 @@ func (c *SolChainAdapter) NewKey(rand io.Reader) (accounts.Key, error) {
 	var publicKey ed25519.PublicKey
 	copy(publicKey[:], pub)
 
+	_, err = validatePrivateKey(priv)
+	if err != nil {
+		return nil, err
+	}
+
 	id, err := uuid.NewRandom()
 	if err != nil {
 		panic(fmt.Sprintf("Could not create random uuid: %v", err))
@@ -142,9 +149,18 @@ func (k *SolKey) GetStringAddress() string {
 	return tmp
 }
 
-func (k *SolKey) SinHash(hash []byte) ([]byte, error) {
-	//todo
-	return nil, nil
+func (k *SolKey) SignHash(hash []byte) ([]byte, error) {
+
+	return nil, fmt.Errorf("not support")
+}
+func (k *SolKey) SignMessage(message []byte) ([]byte, error) {
+
+	signData, err := k.privateKey.Sign(rand.Reader, message, crypto.Hash(0))
+	if err != nil {
+		fmt.Println("sol sign hash error:" + err.Error())
+	}
+
+	return signData, err
 }
 
 // func (k *Key) GetPrivateKey() []byte {
@@ -262,4 +278,30 @@ func isOnCurve(b []byte) bool {
 	_, err := new(edwards25519.Point).SetBytes(b)
 	isOnCurve := err == nil
 	return isOnCurve
+}
+
+func NewKeyFromBase58(p58 string) (accounts.Key, error) {
+
+	res, err := base58.Decode(p58)
+	if err != nil {
+		return nil, err
+	}
+
+	var priv = ed25519.PrivateKey(res)
+
+	_, err = validatePrivateKey(priv)
+	if err != nil {
+		return nil, err
+	}
+
+	id, err := uuid.NewRandom()
+	if err != nil {
+		panic(fmt.Sprintf("Could not create random uuid: %v", err))
+	}
+	key := &SolKey{
+		Id:         id,
+		address:    priv.Public().(ed25519.PublicKey),
+		privateKey: &priv,
+	}
+	return key, nil
 }

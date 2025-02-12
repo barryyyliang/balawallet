@@ -96,6 +96,18 @@ func (ac *accountCache) accounts() []accounts.Account {
 	return cpy
 }
 
+func (ac *accountCache) getByAddress(addr string) accounts.Account {
+	ac.maybeReload()
+	ac.mu.Lock()
+	defer ac.mu.Unlock()
+	for _, value := range ac.all {
+		if value.GetAddress() == addr {
+			return value
+		}
+	}
+	return nil
+}
+
 func (ac *accountCache) hasAddress(addr string) bool {
 	ac.maybeReload()
 	ac.mu.Lock()

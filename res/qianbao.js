@@ -5,10 +5,10 @@ async function changeName(address,name){
     showResult(result)
 }
 
-async function changePass(address,name){
+async function changePass(type,address,name){
     window.doWebLog("enter changePass")
     gParam = {}
-    gParam.type="eth"
+    gParam.type=document.getElementById(type).value
     gParam.address=document.getElementById(address).value
     gParam.name=document.getElementById(name).value
     changePage("qianbao","changepass")
@@ -21,16 +21,18 @@ function management(address,name){
 function qianbao_func_showfunc(id){
     var p1 = document.getElementById(id).parentNode.parentNode
     var cells = p1.getElementsByTagName("td")
+    var type = cells[0].childNodes[0].id
     var address = cells[1].childNodes[0].id
     var name = cells[2].childNodes[0].id
 
+    cells[0].childNodes[0].classList.add("highlight")
     cells[1].childNodes[0].classList.add("highlight")
     cells[2].childNodes[0].classList.add("highlight")
     cells[3].childNodes[0].classList.add("highlight")
 
     clearFunc()
-    addFuncToMenu("changeName('"+address+"','"+name+"')", gGetRes("qianbao_changebutton"))
-    addFuncToMenu("changePass('"+address+"','"+name+"')", gGetRes("qianbao_changepass"))
+    addFuncToMenu("changeName('" +address+ "','" + name + "')", gGetRes("qianbao_changebutton"))
+    addFuncToMenu("changePass('" + type + "','" + address + "','" + name + "')", gGetRes("qianbao_changepass"))
     onFuncMenu(id)
 }
 
@@ -38,6 +40,7 @@ function qianbao_func_mouseout(id){
     var p1 = document.getElementById(id).parentNode.parentNode
     var cells = p1.getElementsByTagName("td")
 
+    cells[0].childNodes[0].classList.remove("highlight")
     cells[1].childNodes[0].classList.remove("highlight")
     cells[2].childNodes[0].classList.remove("highlight")
     cells[3].childNodes[0].classList.remove("highlight")
@@ -50,17 +53,24 @@ function addAccountElement(acc,table){
 
         var tr = document.createElement("tr")
         tr.setAttribute("style","height:50px;")
+
+        var ipt0 = document.createElement("input")
+        ipt0.setAttribute("id","type"+i)
+        ipt0.setAttribute("type","text")
+        ipt0.setAttribute("style","width:50px;")
+        ipt0.setAttribute("value",par.type)
+        ipt0.setAttribute("readonly","readonly")
         var td1 = document.createElement("td")
-        td1.append("Eth: ")
+        td1.append(ipt0)
         tr.append(td1)
 
-        var ipt = document.createElement("input")
-        ipt.setAttribute("id","address"+i)
-        ipt.setAttribute("type","text")
-        ipt.setAttribute("value",par.address)
-        ipt.setAttribute("readonly","readonly")       //此处不用disable属性，disable属性会导致自定义copy菜单无法拷贝内容  
+        var ipt1 = document.createElement("input")
+        ipt1.setAttribute("id","address"+i)
+        ipt1.setAttribute("type","text")
+        ipt1.setAttribute("value",par.address)
+        ipt1.setAttribute("readonly","readonly")       //此处不用disable属性，disable属性会导致自定义copy菜单无法拷贝内容  
         var td2 = document.createElement("td")
-        td2.append(ipt)
+        td2.append(ipt1)
         tr.append(td2)
 
         var td3 = document.createElement("td")

@@ -93,8 +93,11 @@ func (k *EthKey) GetStringAddress() string {
 	return k.address.String()
 }
 
-func (k *EthKey) SinHash(hash []byte) ([]byte, error) {
+func (k *EthKey) SignHash(hash []byte) ([]byte, error) {
 	return crypto.Sign(hash, k.privateKey)
+}
+func (k *EthKey) SignMessage(message []byte) ([]byte, error) {
+	return nil, fmt.Errorf("not support")
 }
 
 // func (k *Key) GetPrivateKey() []byte {

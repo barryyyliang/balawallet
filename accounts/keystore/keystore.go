@@ -274,7 +274,7 @@ func (ks *KeyStore) SignHash(a accounts.Account, hash []byte) ([]byte, error) {
 	}
 	// Sign the hash using plain ECDSA operations
 	//return crypto.Sign(hash, unlockedKey.PrivateKey)
-	return unlockedKey.ukey.SinHash(hash)
+	return unlockedKey.ukey.SignHash(hash)
 }
 
 // SignTx signs the given transaction with the requested account.
@@ -306,7 +306,22 @@ func (ks *KeyStore) SignHashWithPassphrase(a accounts.Account, passphrase string
 		return nil, err
 	}
 	defer key.ZeroKey()
-	return key.SinHash(hash)
+	return key.SignHash(hash)
+}
+
+func (ks *KeyStore) SignMessageWithPassphrase(addr string, passphrase string, message []byte) (signature []byte, err error) {
+	acc := ks.cache.getByAddress(addr)
+	if acc != nil {
+		_, key, err := ks.getDecryptedKey(acc, passphrase)
+		if err != nil {
+			return nil, err
+		}
+		defer key.ZeroKey()
+		return key.SignMessage(message)
+	}
+
+	return nil, fmt.Errorf("account is not exists")
+
 }
 
 // SignTxWithPassphrase signs the transaction if the private key matching the

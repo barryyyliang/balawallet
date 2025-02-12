@@ -2,7 +2,7 @@ package solchain
 
 import (
 	"balawallet/accounts/keystore"
-	"balawallet/common"
+	"bufio"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -14,7 +14,9 @@ import (
 	balacommon "balawallet/common"
 
 	"github.com/gagliardetto/solana-go"
+	"github.com/gagliardetto/solana-go/programs/system"
 	solRPC "github.com/gagliardetto/solana-go/rpc"
+	"github.com/mr-tron/base58"
 	"github.com/syndtr/goleveldb/leveldb"
 )
 
@@ -76,33 +78,33 @@ type SolChain struct {
 
 // 新创建一个账号
 func (c *SolChain) NewAccount(pass string, walletName string) string {
-	re := common.GetResult(common.Msg_success, "")
+	re := balacommon.GetResult(balacommon.Msg_success, "")
 	//scryptN := keystore.StandardScryptN
 	//scryptP := keystore.StandardScryptP
 	//account, err := keystore.StoreKey(accountdir, pass, scryptN, scryptP)
 	account, err := ks.NewAccount(pass)
 	if err != nil {
 		fmt.Println("failed to generate new account")
-		re = common.GetResult(common.Msg_createuser_fail, err.Error())
+		re = balacommon.GetResult(balacommon.Msg_createuser_fail, err.Error())
 		return string(re)
 	}
 
 	//账户信息存库
-	db, err := leveldb.OpenFile(common.G_DataDir+"db", nil)
+	db, err := leveldb.OpenFile(balacommon.G_DataDir+"db", nil)
 	if err == nil {
 		defer db.Close()
-		if common.IsExist(db, walletName) == false {
+		if balacommon.IsExist(db, walletName) == false {
 			err = db.Put([]byte(account.GetAddress()), []byte(walletName), nil)
 			if err != nil {
 				fmt.Println("put name err")
-				re = common.GetResult(common.Msg_writename_fail, err.Error())
+				re = balacommon.GetResult(balacommon.Msg_writename_fail, err.Error())
 			}
 		} else {
 			fmt.Println("name has existed")
-			re = common.GetResult(common.Msg_createuser_nameexists, "")
+			re = balacommon.GetResult(balacommon.Msg_createuser_nameexists, "")
 		}
 	} else {
-		re = common.GetResult(common.Msg_writename_fail, err.Error())
+		re = balacommon.GetResult(balacommon.Msg_writename_fail, err.Error())
 	}
 
 	return string(re)
@@ -122,7 +124,7 @@ func (c *SolChain) GetAccounts() string {
 
 	//账户信息
 	addressCache := make(map[string]string)
-	db, err := leveldb.OpenFile(common.G_DataDir+"db", nil)
+	db, err := leveldb.OpenFile(balacommon.G_DataDir+"db", nil)
 	if err == nil {
 		defer db.Close()
 		it := db.NewIterator(nil, nil)
@@ -152,7 +154,22 @@ func (c *SolChain) GetAccounts() string {
 }
 
 func (c *SolChain) ChangeAccountName(address string, name string) string {
-	re := common.GetResult(common.Msg_fail, "not support")
+	re := balacommon.GetResult(balacommon.Msg_success, "")
+	//账户信息存库
+	db, err := leveldb.OpenFile(balacommon.G_DataDir+"db", nil)
+	if err == nil {
+		defer db.Close()
+		if balacommon.IsExist(db, name) == false {
+			err = db.Put([]byte(address), []byte(name), nil)
+			if err != nil {
+				re = balacommon.GetResult(balacommon.Msg_writedb_fail, err.Error())
+			}
+		} else {
+			re = balacommon.GetResult(balacommon.Msg_changename_nameexists, "")
+		}
+	} else {
+		re = balacommon.GetResult(balacommon.Msg_writedb_fail, err.Error())
+	}
 
 	return string(re)
 }
@@ -176,20 +193,114 @@ func (c *SolChain) GetAccountName(address string) string {
 
 // 通过私钥导入账号
 func (c *SolChain) ImportAccount(pa string, name string, kk string) string {
-	re := common.GetResult(common.Msg_fail, "not support")
+	re := balacommon.GetResult(balacommon.Msg_success, "")
+	akey, err := sol.NewKeyFromBase58(kk)
+	if err != nil {
+		re = balacommon.GetResult(balacommon.Msg_fail, err.Error())
+		return string(re)
+	}
+
+	ks.ImportKey(akey, pa)
+	//账户信息存库
+	db, err := leveldb.OpenFile(balacommon.G_DataDir+"db", nil)
+	if err == nil {
+		defer db.Close()
+		if !balacommon.IsExist(db, name) {
+			err = db.Put([]byte(akey.GetStringAddress()), []byte(name), nil)
+			if err != nil {
+				fmt.Println("put name err")
+				re = balacommon.GetResult(balacommon.Msg_writename_fail, err.Error())
+			}
+		} else {
+			fmt.Println("name has existed")
+			re = balacommon.GetResult(balacommon.Msg_createuser_nameexists, "")
+		}
+	} else {
+		re = balacommon.GetResult(balacommon.Msg_writename_fail, err.Error())
+	}
 
 	return string(re)
 }
 
 // 导出私钥
 func (c *SolChain) ExportAccount(add string, pa string) string {
-	re := common.GetResult(common.Msg_fail, "not support")
+	re := balacommon.GetResult(balacommon.Msg_success, "")
+	key, err := getKey(add, pa)
+	if err == nil {
+		defer clear(*key)
+		file, err1 := os.OpenFile(exportdir+add, os.O_RDWR|os.O_CREATE, 0666)
+		if err1 != nil {
+			fmt.Println("can not open file in export:" + err1.Error())
+			re = balacommon.GetResult(balacommon.Msg_openexportfile_fail, err1.Error())
+			return string(re)
+		}
+		defer file.Close()
 
+		value := base58.Encode(*key)
+		writer := bufio.NewWriter(file)
+		writer.WriteString(value)
+		writer.Flush()
+	} else {
+		re = balacommon.GetResult(balacommon.Msg_fail, err.Error())
+	}
 	return string(re)
 }
 
 func (c *SolChain) Transfer(from string, to string, value string, pass string) string {
-	re := common.GetResult(common.Msg_fail, "not support")
+	re := balacommon.GetResult(balacommon.Msg_fail, "not support")
+	client := balacommon.GetSolConnection()
+	if client == nil {
+		re = balacommon.GetResult(balacommon.Msg_fail, "connect is nil")
+		return string(re)
+	}
+	recent, err := client.GetLatestBlockhash(
+		context.TODO(),
+		solRPC.CommitmentFinalized,
+	)
+	if err != nil {
+		re = balacommon.GetResult(balacommon.Msg_fail, err.Error())
+		return string(re)
+	}
+
+	amount, err := solTolam(value)
+	if err != nil {
+		re = balacommon.GetResult(balacommon.Msg_fail, err.Error())
+		return string(re)
+	}
+
+	pubkeyFrom := solana.MustPublicKeyFromBase58(from)
+	tx, err := solana.NewTransaction(
+		[]solana.Instruction{
+			system.NewTransferInstruction(
+				amount,
+				pubkeyFrom,
+				solana.MustPublicKeyFromBase58(to),
+			).Build(),
+		},
+		recent.Value.Blockhash,
+		solana.TransactionPayer(pubkeyFrom),
+	)
+	if err != nil {
+		re = balacommon.GetResult(balacommon.Msg_fail, err.Error())
+		return string(re)
+	}
+
+	_, err = signTx(from, pass, tx)
+	if err != nil {
+		re = balacommon.GetResult(balacommon.Msg_fail, err.Error())
+		return string(re)
+	}
+
+	// Or just send the transaction WITHOUT waiting for confirmation:
+	sig, err := client.SendTransaction(
+		context.TODO(),
+		tx,
+	)
+	if err != nil {
+		re = balacommon.GetResult(balacommon.Msg_fail, err.Error())
+		return string(re)
+	}
+	re = balacommon.GetResult(balacommon.Msg_success, sig.String())
 
 	return string(re)
 }
@@ -199,14 +310,14 @@ func (c *SolChain) GetBalance(add string) string {
 	fmt.Println("enter sol GetBalance")
 	var re []byte
 
-	client := common.GetSolConnection()
+	client := balacommon.GetSolConnection()
 	if client != nil {
 		pub := solana.MustPublicKeyFromBase58(add)
-		ctx, fuc := context.WithTimeout(context.Background(), common.G_Timeout)
+		ctx, fuc := context.WithTimeout(context.Background(), balacommon.G_Timeout)
 		defer fuc()
 		res, err := client.GetBalance(ctx, pub, solRPC.CommitmentConfirmed)
 		if err == nil {
-			tmp, _ := json.Marshal(balacommon.ResBlance{add, strconv.FormatUint(res.Value, 10)})
+			tmp, _ := json.Marshal(balacommon.ResBlance{add, balacommon.ToBig(9, strconv.FormatUint(res.Value, 10))})
 			re, _ = json.Marshal(balacommon.ErrorResult{0, string(tmp)})
 		} else {
 			re = balacommon.GetResult(balacommon.Msg_getbalance_fail, err.Error())
@@ -219,34 +330,34 @@ func (c *SolChain) GetBalance(add string) string {
 }
 
 func (c *SolChain) GetFee() string {
-	fmt.Println("enter sol GetFee")
+	/* 	fmt.Println("enter sol GetFee")
 
-	client := common.GetSolConnection()
-	if client != nil {
-		ctx, fuc := context.WithTimeout(context.Background(), common.G_Timeout)
-		defer fuc()
+	   	client := balacommon.GetSolConnection()
+	   	if client != nil {
+	   		ctx, fuc := context.WithTimeout(context.Background(), balacommon.G_Timeout)
+	   		defer fuc()
 
-		res, err := client.GetFeeForMessage(ctx,
-			"AQABAgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEBAQAA",
-			solRPC.CommitmentConfirmed)
-		fmt.Println("enter sol GetFee1")
-		if err == nil {
-			if res.Value != nil {
-				return strconv.FormatUint(*res.Value, 10)
-			} else {
-				fmt.Println("can not get fee for message")
-			}
+	   		res, err := client.GetFeeForMessage(ctx,
+	   			"AQABAgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEBAQAA",
+	   			solRPC.CommitmentConfirmed)
+	   		fmt.Println("enter sol GetFee1")
+	   		if err == nil {
+	   			if res.Value != nil {
+	   				return strconv.FormatUint(*res.Value, 10)
+	   			} else {
+	   				fmt.Println("can not get fee for message")
+	   			}
 
-		} else {
-			fmt.Println("get fee:" + err.Error())
-		}
-	}
-	fmt.Println("enter sol GetFee2")
-	return "0"
+	   		} else {
+	   			fmt.Println("get fee:" + err.Error())
+	   		}
+	   	}
+	   	fmt.Println("enter sol GetFee2") */
+	return balacommon.ToBig(9, "5000")
 }
 
 func (c *SolChain) DeployContract(from string, file string, pass string) string {
-	re := common.GetResult(common.Msg_fail, "not support")
+	re := balacommon.GetResult(balacommon.Msg_fail, "not support")
 
 	return string(re)
 }
@@ -257,13 +368,13 @@ func (c *SolChain) GetContract() string {
 }
 
 func (c *SolChain) DeleteContract(address string) string {
-	re := common.GetResult(common.Msg_fail, "not support")
+	re := balacommon.GetResult(balacommon.Msg_fail, "not support")
 
 	return string(re)
 }
 
 func (c *SolChain) ImportContract(cons string) string {
-	re := common.GetResult(common.Msg_fail, "not support")
+	re := balacommon.GetResult(balacommon.Msg_fail, "not support")
 
 	return string(re)
 }
@@ -279,24 +390,24 @@ func (c *SolChain) CheckNode() string {
 }
 
 func (c *SolChain) LoadABI(file string) string {
-	re := common.GetResult(common.Msg_fail, "not support")
+	re := balacommon.GetResult(balacommon.Msg_fail, "not support")
 
 	return string(re)
 }
 
 func (c *SolChain) ReadContract(from, to, funcAbi, paremters string) string {
-	re := common.GetResult(common.Msg_fail, "not support")
+	re := balacommon.GetResult(balacommon.Msg_fail, "not support")
 	return string(re)
 }
 
 func (c *SolChain) InvokeContract(from, conAddr, funcAbi, param, pass string) string {
-	re := common.GetResult(common.Msg_fail, "not support")
+	re := balacommon.GetResult(balacommon.Msg_fail, "not support")
 
 	return string(re)
 }
 
 func (c *SolChain) InvokeEstimate(from, conAddr, funcAbi, param string) string {
-	re := common.GetResult(common.Msg_fail, "not support")
+	re := balacommon.GetResult(balacommon.Msg_fail, "not support")
 
 	return string(re)
 
@@ -304,10 +415,10 @@ func (c *SolChain) InvokeEstimate(from, conAddr, funcAbi, param string) string {
 
 func (c *SolChain) QueryTx(hs string) string {
 	var re []byte
-	client := common.GetSolConnection()
+	client := balacommon.GetSolConnection()
 	if client != nil {
 		txSig := solana.MustSignatureFromBase58(hs)
-		ctx, fuc := context.WithTimeout(context.Background(), common.G_Timeout)
+		ctx, fuc := context.WithTimeout(context.Background(), balacommon.G_Timeout)
 		defer fuc()
 
 		opts := new(solRPC.GetTransactionOpts)
@@ -330,30 +441,43 @@ func (c *SolChain) QueryTx(hs string) string {
 }
 
 func (c *SolChain) Signature(info string) string {
-	re := common.GetResult(common.Msg_fail, "not support")
+	re := balacommon.GetResult(balacommon.Msg_fail, "not support")
 
 	return string(re)
 }
 
 func (c *SolChain) SignatureVerify(info string) string {
-	re := common.GetResult(common.Msg_fail, "not support")
+	re := balacommon.GetResult(balacommon.Msg_fail, "not support")
 	return string(re)
 }
 
 func (c SolChain) GetAbiFile() string {
-	re := common.GetResult(common.Msg_fail, "not support")
+	re := balacommon.GetResult(balacommon.Msg_fail, "not support")
 
 	return string(re)
 }
 
 func (c *SolChain) GetBinFile() string {
-	re := common.GetResult(common.Msg_fail, "not support")
+	re := balacommon.GetResult(balacommon.Msg_fail, "not support")
 
 	return string(re)
 }
 
 func (c *SolChain) ChangeAccountPass(atype, address, old, new string) string {
-	re := common.GetResult(common.Msg_fail, "not support")
-
+	re := balacommon.GetResult(balacommon.Msg_success, "")
+	acc := ks.Accounts()
+	var i = 0
+	for i = 0; i < len(acc); i++ {
+		if acc[i].GetAddress() == address {
+			err2 := ks.Update(acc[i], old, new)
+			if err2 != nil {
+				re = balacommon.GetResult(balacommon.Msg_fail, err2.Error())
+			}
+			break
+		}
+	}
+	if i == len(acc) {
+		re = balacommon.GetResult(balacommon.Msg_account_noexist, "")
+	}
 	return string(re)
 }

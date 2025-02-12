@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -166,4 +167,51 @@ func GetSolConnection() *solRPC.Client {
 		}
 	}
 	return g_SolClient
+}
+
+/*
+将一个小的单位的数转换为一个大的单位的数，
+unittag 转换率，比如 “个” 转换为 “万” ，1万=10^4,所以参数为 4
+*/
+
+func ToBig(unittag int, wei string) string {
+	ballength := len(wei)
+	var balance string
+	if ballength > unittag {
+		var first []byte = make([]byte, ballength-unittag)
+		copy(first, []byte(wei)[0:ballength-unittag])
+		var second []byte = make([]byte, unittag)
+		copy(second, []byte(wei)[ballength-unittag:])
+		secondStr := strings.TrimRight(string(second), "0")
+		if secondStr != "" {
+			balance = string(first) + "." + secondStr
+		} else {
+			balance = string(first)
+		}
+	} else {
+		wei = strings.TrimRight(wei, "0")
+		if wei != "" {
+			gap := unittag - ballength
+			balance = "0."
+
+			for i := 0; i < gap; i++ {
+				balance = balance + "0"
+			}
+			balance = balance + wei
+		} else {
+			balance = "0"
+		}
+	}
+	return balance
+}
+
+// 判断字符串是否为10进制数字，，每个字符必须为数字【1--9】，最多有一个小数点”.“
+func IsNumber(value string) bool {
+	//todo
+	_, err := strconv.ParseFloat(value, 64)
+	if err != nil && err.(*strconv.NumError).Err == strconv.ErrSyntax {
+		fmt.Println("bad number:" + err.Error())
+		return false
+	}
+	return true
 }

@@ -61,7 +61,8 @@ type Key interface {
 	MarshalJSON() (j []byte, err error)
 	UnmarshalJSON(j []byte) (err error)
 	ZeroKey()
-	SinHash(hash []byte) ([]byte, error)
+	SignHash(hash []byte) ([]byte, error)
+	SignMessage(message []byte) ([]byte, error)
 	GetPrivateKey() interface{}
 	GetByte() []byte
 	Is(add string) bool

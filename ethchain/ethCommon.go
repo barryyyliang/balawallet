@@ -1,7 +1,7 @@
 package ethchain
 
 import (
-	. "balawallet/common"
+	balacommon "balawallet/common"
 	"context"
 	"crypto/ecdsa"
 	"errors"
@@ -9,7 +9,6 @@ import (
 	"math/big"
 	"os"
 	"reflect"
-	"strconv"
 	"strings"
 
 	"balawallet/accounts/eth"
@@ -60,48 +59,17 @@ func newCallContractTx(nonce uint64, to common.Address, amount *big.Int, gasLimi
 	})
 }
 
-func weiTox(unittag int, wei string) string {
-	ballength := len(wei)
-	var balance string
-	if ballength > unittag {
-		var first []byte = make([]byte, ballength-unittag)
-		copy(first, []byte(wei)[0:ballength-unittag])
-		var second []byte = make([]byte, unittag)
-		copy(second, []byte(wei)[ballength-unittag:])
-		secondStr := strings.TrimRight(string(second), "0")
-		if secondStr != "" {
-			balance = string(first) + "." + secondStr
-		} else {
-			balance = string(first)
-		}
-	} else {
-		wei = strings.TrimRight(wei, "0")
-		if wei != "" {
-			gap := unittag - ballength
-			balance = "0."
-
-			for i := 0; i < gap; i++ {
-				balance = balance + "0"
-			}
-			balance = balance + wei
-		} else {
-			balance = "0"
-		}
-	}
-	return balance
-}
-
 func weiToether(wei string) string {
-	return weiTox(18, wei)
+	return balacommon.ToBig(18, wei)
 }
 
 func weiTogwei(wei string) string {
-	return weiTox(9, wei)
+	return balacommon.ToBig(9, wei)
 }
 
 func etherTowei(ether string) (big.Int, error) {
 	// 要调用isnumber判断是否为正确数字格式
-	if isNumber(ether) {
+	if balacommon.IsNumber(ether) {
 		strs := strings.Split(ether, ".")
 		var balstr string
 		if len(strs) == 1 {
@@ -130,17 +98,6 @@ func etherTowei(ether string) (big.Int, error) {
 
 }
 
-// 判断字符串是否为10进制数字，，每个字符必须为数字【1--9】，最多有一个小数点”.“
-func isNumber(value string) bool {
-	//todo
-	_, err := strconv.ParseFloat(value, 64)
-	if err != nil && err.(*strconv.NumError).Err == strconv.ErrSyntax {
-		fmt.Println("bad number:" + err.Error())
-		return false
-	}
-	return true
-}
-
 func getChainInfo(connect *ethclient.Client, from string) (uint64, *big.Int, *big.Int, *big.Int, error) {
 	ctx := context.Background()
 	nounce, err := connect.NonceAt(ctx, common.HexToAddress(from), nil)
@@ -164,26 +121,26 @@ func getChainInfo(connect *ethclient.Client, from string) (uint64, *big.Int, *bi
 }
 
 func getConnection() *ethclient.Client {
-	if G_Etherclient == nil {
+	if balacommon.G_Etherclient == nil {
 		var connect *ethclient.Client
 		var err error
-		if Nettype_ethereum == G_NetType {
+		if balacommon.Nettype_ethereum == balacommon.G_NetType {
 			fmt.Println("net type eth")
-			connect, err = ethclient.Dial(G_Config["ethAddress"])
-		} else if Nettype_polygon == G_NetType {
-			fmt.Println("net type sol:" + G_Config["polAddress"])
-			connect, err = ethclient.Dial(G_Config["polAddress"])
+			connect, err = ethclient.Dial(balacommon.G_Config["ethAddress"])
+		} else if balacommon.Nettype_polygon == balacommon.G_NetType {
+			fmt.Println("net type sol:" + balacommon.G_Config["polAddress"])
+			connect, err = ethclient.Dial(balacommon.G_Config["polAddress"])
 		}
 
 		if err != nil {
 			fmt.Println("net connet fail")
-			G_Etherclient = nil
+			balacommon.G_Etherclient = nil
 
 		} else {
-			G_Etherclient = connect
+			balacommon.G_Etherclient = connect
 		}
 	}
-	return G_Etherclient
+	return balacommon.G_Etherclient
 }
 
 func stringToValue(t reflect.Type, value string) interface{} {
@@ -279,17 +236,17 @@ func getKey(add string, pa string) (*ecdsa.PrivateKey, error) {
 		// 确保导出的是需要私钥
 		if key.GetStringAddress() != add {
 			fmt.Errorf("key content mismatch: have account %x, want %s", key.GetStringAddress(), add)
-			return nil, errors.New(GetMsgByCode(Msg_addressprivatekey_mismatch))
+			return nil, errors.New(balacommon.GetMsgByCode(balacommon.Msg_addressprivatekey_mismatch))
 		} else {
 			pri := key.GetPrivateKey()
 			if prikey, ok := pri.(*ecdsa.PrivateKey); ok {
 				return prikey, nil
 			} else {
-				return nil, errors.New(GetMsgByCode(Msg_readaccountfile_fail))
+				return nil, errors.New(balacommon.GetMsgByCode(balacommon.Msg_readaccountfile_fail))
 			}
 		}
 	} else {
 		fmt.Println("can not find account:" + add)
 	}
-	return nil, errors.New(GetMsgByCode(Msg_addressprivatekey_mismatch))
+	return nil, errors.New(balacommon.GetMsgByCode(balacommon.Msg_addressprivatekey_mismatch))
 }
