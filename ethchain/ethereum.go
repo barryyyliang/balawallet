@@ -262,7 +262,6 @@ func (c *EthChain) ExportAccount(add string, pa string) string {
 		defer file.Close()
 
 		value := hex.EncodeToString(key.D.Bytes())
-		fmt.Println("do export account:" + value)
 		writer := bufio.NewWriter(file)
 		writer.WriteString(value)
 		writer.Flush()
