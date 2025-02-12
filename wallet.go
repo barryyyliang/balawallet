@@ -27,6 +27,9 @@ func main() {
 	common.InitRes()
 	home, _ := user.Current()
 	dir = home.HomeDir + "/.balawallet"
+	//for local
+	//path, _ := filepath.Abs(filepath.Dir(os.Args[0]))
+	//dir = strings.Replace(path, "\\", "/", -1)
 
 	_, err := os.Stat(dir)
 	if err != nil {
@@ -35,8 +38,6 @@ func main() {
 		}
 	}
 
-	//path, _ := filepath.Abs(filepath.Dir(os.Args[0]))
-	//dir = strings.Replace(path, "\\", "/", -1)
 	common.InitGlobal(dir)
 	ethchain.Init(dir)
 	solchain.Init(dir)
