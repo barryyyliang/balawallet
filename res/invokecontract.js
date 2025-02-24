@@ -25,19 +25,37 @@
         return tr  
     }
 
+    function loadSystemABI(ipt){
+        var net = getMainNet()
+        if (net === "Ethereum" || net === "Polygon"){
+            var option = document.createElement("option")
+            option.text = "ERC20"
+            option.value = "ERC20"
+            ipt.add(option)
+            var option2 = document.createElement("option")
+            option2.text = "ERC721"
+            option2.value = "ERC721"
+            ipt.add(option2)
+        } else if(net === "Solana") {
+            var option = document.createElement("option")
+            option.text = "SPL"
+            option.value = "SPL"
+            ipt.add(option)
+        }
+    }
+
     async function loadABI(){
         var seFile = document.getElementById("abiFile")
         seFile.options.length = 0
+        var option = document.createElement("option")
+        option.text = ""
+        option.value = ""
+        seFile.add(option)
+        loadSystemABI(seFile)
         var result = await window.doGetAbiFile()
         var jsonObj = JSON.parse(result)
         if (jsonObj.Code === 0 ){
             var names = JSON.parse(jsonObj.Msg)
-            var seFile = document.getElementById("abiFile")
-
-            var option = document.createElement("option")
-            option.text = ""
-            option.value = ""
-            seFile.add(option)
 
             for(var i=0;i<names.length;i++){
                 var option = document.createElement("option")
@@ -242,12 +260,11 @@
 
     async function initPage(){
         gLoadRes()
+        loadABI()
         try{
             document.getElementById("caddress").value = gParam.invokeContract.address
         } catch (e) {
         }
-        
-        loadABI()
     }
 
 

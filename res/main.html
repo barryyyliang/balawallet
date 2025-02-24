@@ -301,6 +301,7 @@
         var result = await window.doChangeNet(nettype)
         var obj = JSON.parse(result)
         if (obj.Code === 0){
+            document.getElementById('pageContent').innerHTML = ""
             changePage('qianbao','qianbao')            
         }
         MYDIALOG.ShowDiv(obj.Msg)

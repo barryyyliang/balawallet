@@ -476,8 +476,29 @@ func (c *SolChain) CheckNode() string {
 }
 
 func (c *SolChain) LoadABI(file string) string {
-	re := balacommon.GetResult(balacommon.Msg_fail, "not support")
+	var re []byte
+	if file == "SPL" {
+		abiContent := balacommon.G_Abis[file]
+		if abiContent != "" {
+			re, _ = json.Marshal(balacommon.ErrorResult{0, string(abiContent)})
+			return string(re)
+		}
+	}
 
+	filepath := balacommon.G_Config["contractDir"]
+	filepath = filepath + "/" + file
+	if filepath == "" {
+		re = balacommon.GetResult(balacommon.Msg_param_error, "")
+		return string(re)
+	}
+
+	abiContent, err := os.ReadFile(filepath)
+	if err != nil {
+		re = balacommon.GetResult(balacommon.Msg_openfile_fail, err.Error())
+		return string(re)
+	}
+
+	re, _ = json.Marshal(balacommon.ErrorResult{0, string(abiContent)})
 	return string(re)
 }
 
@@ -538,8 +559,22 @@ func (c *SolChain) SignatureVerify(info string) string {
 }
 
 func (c SolChain) GetAbiFile() string {
-	re := balacommon.GetResult(balacommon.Msg_fail, "not support")
-
+	re := balacommon.GetResult(balacommon.Msg_success, "")
+	var conf = [1]string{"contractDir"}
+	par, _ := json.Marshal(conf)
+	balacommon.GetConfig(string(par))
+	var dir = balacommon.G_Config["contractDir"]
+	if dir != "" {
+		names, err := balacommon.GetFilesName(dir, ".abi")
+		if err == nil {
+			tmp, _ := json.Marshal(names)
+			re, _ = json.Marshal(balacommon.ErrorResult{0, string(tmp)})
+		} else {
+			re = balacommon.GetResult(balacommon.Msg_openfile_fail, err.Error())
+		}
+	} else {
+		re = balacommon.GetResult(balacommon.Msg_contractdirconfig_null, "")
+	}
 	return string(re)
 }
 

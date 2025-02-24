@@ -514,7 +514,7 @@ func (c *EthChain) ImportContract(cons string) string {
 			connect := getConnection()
 			if connect != nil {
 				var conAdd common.Address = common.HexToAddress(jcons.Address)
-				contractAbi, _ := abi.JSON(strings.NewReader(G_Abis[jcons.Type]))
+				contractAbi, _ := abi.JSON(strings.NewReader(balacommon.G_Abis[jcons.Type]))
 				transferFnSignature := []byte("name()")
 				hash := crypto.Keccak256(transferFnSignature)
 				methodID := hash[:4]
@@ -583,6 +583,14 @@ func (c *EthChain) CheckNode() string {
 
 func (c *EthChain) LoadABI(file string) string {
 	var re []byte
+	if file == "ERC20" || file == "ERC721" {
+		abiContent := balacommon.G_Abis[file]
+		if abiContent != "" {
+			re, _ = json.Marshal(balacommon.ErrorResult{0, string(abiContent)})
+			return string(re)
+		}
+	}
+
 	filepath := balacommon.G_Config["contractDir"]
 	filepath = filepath + "/" + file
 	if filepath == "" {
@@ -904,7 +912,7 @@ func (c EthChain) GetAbiFile() string {
 	balacommon.GetConfig(string(par))
 	var dir = balacommon.G_Config["contractDir"]
 	if dir != "" {
-		names, err := getFiles(dir, ".abi")
+		names, err := balacommon.GetFilesName(dir, ".abi")
 		if err == nil {
 			tmp, _ := json.Marshal(names)
 			re, _ = json.Marshal(balacommon.ErrorResult{0, string(tmp)})
@@ -924,7 +932,7 @@ func (c *EthChain) GetBinFile() string {
 	balacommon.GetConfig(string(par))
 	var dir = balacommon.G_Config["contractDir"]
 	if dir != "" {
-		names, err := getFiles(dir, ".bin")
+		names, err := balacommon.GetFilesName(dir, ".bin")
 		if err == nil {
 			tmp, _ := json.Marshal(names)
 			re, _ = json.Marshal(balacommon.ErrorResult{0, string(tmp)})

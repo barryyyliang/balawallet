@@ -97,11 +97,11 @@ func htmlToMap(dir string) {
 }
 
 func abiToMap(dir string) {
-	f, err := os.OpenFile(dir+"/../ethchain/abi.go", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, fs.ModePerm)
+	f, err := os.OpenFile(dir+"/../common/abi.go", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, fs.ModePerm)
 	if err != nil {
 		fmt.Println("open err")
 	}
-	f.Write([]byte("package ethchain\r\n\r\n"))
+	f.Write([]byte("package common\r\n\r\n"))
 	f.Write([]byte("import \"encoding/hex\"\r\n\r\n"))
 	f.Write([]byte("var G_Abis = make(map[string]string)\r\n\r\n"))
 

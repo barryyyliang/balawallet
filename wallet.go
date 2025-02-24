@@ -21,8 +21,8 @@ var resdir string
 var currentAccount string
 
 func main() {
-	common.InitHtmlFile()  //generate by tool
-	ethchain.InitAbiFile() //generate by tool
+	common.InitHtmlFile() //generate by tool
+	common.InitAbiFile()  //generate by tool
 	common.InitMsg()
 	common.InitRes()
 	home, _ := user.Current()
