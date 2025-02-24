@@ -333,7 +333,7 @@ func (c *EthChain) GetBalance(add string) string {
 	fmt.Println("end  : " + strconv.FormatInt(time.Now().UnixMilli(), 10))
 
 	if err == nil {
-		tmp, _ := json.Marshal(balacommon.ResBlance{add, weiToether(balance.String())})
+		tmp, _ := json.Marshal(balacommon.ResBalance{add, weiToether(balance.String())})
 		re, _ = json.Marshal(balacommon.ErrorResult{0, string(tmp)})
 		return string(re)
 	} else {
@@ -452,16 +452,10 @@ func (c *EthChain) DeployContract(from string, file string, pass string) string 
 	return string(re)
 }
 
-type contract struct {
-	Type    string `json:"type"`
-	Address string `json:"address"`
-	Name    string `json:"name"`
-}
-
 func (c *EthChain) GetContract() string {
 
 	type contracts struct {
-		Contracts []contract `json:"contracts"`
+		Contracts []balacommon.ComContract `json:"contracts"`
 	}
 	var res contracts
 	//账户信息
@@ -475,7 +469,7 @@ func (c *EthChain) GetContract() string {
 			t, err := strconv.Atoi(tmp[0])
 			if err == nil {
 				if t == balacommon.G_NetType {
-					var aa contract
+					var aa balacommon.ComContract
 					json.Unmarshal(it.Value(), &aa)
 					res.Contracts = append(res.Contracts, aa)
 				}
@@ -511,14 +505,7 @@ func (c *EthChain) DeleteContract(address string) string {
 
 func (c *EthChain) ImportContract(cons string) string {
 	re := balacommon.GetResult(balacommon.Msg_success, "")
-	type param struct {
-		Type    string `json:"type"`
-		Address string `json:"address"`
-		Name    string `json:"name"`
-		From    string `json:"from"`
-	}
-
-	var jcons param
+	var jcons balacommon.InputImportContract
 	err := json.Unmarshal([]byte(cons), &jcons)
 	if err == nil {
 		if jcons.Name == "" {
@@ -564,7 +551,7 @@ func (c *EthChain) ImportContract(cons string) string {
 			}
 		}
 		db, err2 := leveldb.OpenFile(balacommon.G_DataDir+"contract", nil)
-		co := contract{Type: jcons.Type, Address: jcons.Address, Name: jcons.Name}
+		co := balacommon.ComContract{Type: jcons.Type, Address: jcons.Address, Name: jcons.Name}
 		jvalue, _ := json.Marshal(co)
 		if err2 == nil {
 			defer db.Close()

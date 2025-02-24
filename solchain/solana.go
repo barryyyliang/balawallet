@@ -8,13 +8,16 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 
 	//"github.com/ethereum/go-ethereum/crypto/sha3"
 	"balawallet/accounts/sol"
 	balacommon "balawallet/common"
 
+	bin "github.com/gagliardetto/binary"
 	"github.com/gagliardetto/solana-go"
 	"github.com/gagliardetto/solana-go/programs/system"
+	"github.com/gagliardetto/solana-go/programs/token"
 	solRPC "github.com/gagliardetto/solana-go/rpc"
 	"github.com/mr-tron/base58"
 	"github.com/syndtr/goleveldb/leveldb"
@@ -268,13 +271,23 @@ func (c *SolChain) Transfer(from string, to string, value string, pass string) s
 		return string(re)
 	}
 
-	pubkeyFrom := solana.MustPublicKeyFromBase58(from)
+	pubkeyFrom, err := solana.PublicKeyFromBase58(from)
+	if err != nil {
+		re = balacommon.GetResult(balacommon.Msg_fail, err.Error())
+		return string(re)
+	}
+	pubkeyTo, err := solana.PublicKeyFromBase58(to)
+	if err != nil {
+		re = balacommon.GetResult(balacommon.Msg_fail, err.Error())
+		return string(re)
+	}
+
 	tx, err := solana.NewTransaction(
 		[]solana.Instruction{
 			system.NewTransferInstruction(
 				amount,
 				pubkeyFrom,
-				solana.MustPublicKeyFromBase58(to),
+				pubkeyTo,
 			).Build(),
 		},
 		recent.Value.Blockhash,
@@ -312,12 +325,16 @@ func (c *SolChain) GetBalance(add string) string {
 
 	client := balacommon.GetSolConnection()
 	if client != nil {
-		pub := solana.MustPublicKeyFromBase58(add)
+		pub, err := solana.PublicKeyFromBase58(add)
+		if err != nil {
+			re = balacommon.GetResult(balacommon.Msg_getbalance_fail, err.Error())
+			return string(re)
+		}
 		ctx, fuc := context.WithTimeout(context.Background(), balacommon.G_Timeout)
 		defer fuc()
 		res, err := client.GetBalance(ctx, pub, solRPC.CommitmentConfirmed)
 		if err == nil {
-			tmp, _ := json.Marshal(balacommon.ResBlance{add, balacommon.ToBig(9, strconv.FormatUint(res.Value, 10))})
+			tmp, _ := json.Marshal(balacommon.ResBalance{add, balacommon.ToBig(9, strconv.FormatUint(res.Value, 10))})
 			re, _ = json.Marshal(balacommon.ErrorResult{0, string(tmp)})
 		} else {
 			re = balacommon.GetResult(balacommon.Msg_getbalance_fail, err.Error())
@@ -364,6 +381,36 @@ func (c *SolChain) DeployContract(from string, file string, pass string) string 
 
 func (c *SolChain) GetContract() string {
 
+	type contracts struct {
+		Contracts []balacommon.ComContract `json:"contracts"`
+	}
+	var res contracts
+	//账户信息
+	db, err := leveldb.OpenFile(balacommon.G_DataDir+"contract", nil)
+	if err == nil {
+		defer db.Close()
+		it := db.NewIterator(nil, nil)
+		defer it.Release()
+		for it.Next() {
+			tmp := strings.Split(string(it.Key()), "_")
+			t, err := strconv.Atoi(tmp[0])
+			if err == nil {
+				if t == balacommon.Nettype_solana {
+					var aa balacommon.ComContract
+					json.Unmarshal(it.Value(), &aa)
+					res.Contracts = append(res.Contracts, aa)
+				}
+			}
+
+		}
+	}
+
+	result, err2 := json.Marshal(res)
+	if err2 == nil {
+		return string(result)
+	} else {
+		fmt.Println(err2.Error())
+	}
 	return ""
 }
 
@@ -374,7 +421,46 @@ func (c *SolChain) DeleteContract(address string) string {
 }
 
 func (c *SolChain) ImportContract(cons string) string {
-	re := balacommon.GetResult(balacommon.Msg_fail, "not support")
+	re := balacommon.GetResult(balacommon.Msg_success, "")
+	var jcons balacommon.InputImportContract
+	err := json.Unmarshal([]byte(cons), &jcons)
+	if err == nil {
+		connection := balacommon.GetSolConnection()
+		pubkey, err := solana.PublicKeyFromBase58(jcons.Address)
+		if err != nil {
+			re = balacommon.GetResult(balacommon.Msg_fail, err.Error())
+			return string(re)
+		}
+		out, err := connection.GetAccountInfo(context.TODO(), pubkey)
+		if err != nil {
+			re = balacommon.GetResult(balacommon.Msg_fail, err.Error())
+			fmt.Println("get mint account:" + err.Error())
+			return string(re)
+		}
+		min := new(token.Mint)
+		data := out.Value.Data.GetBinary()
+		decoder := bin.NewBinDecoder(data)
+		err = decoder.Decode(min)
+		if err != nil {
+			re = balacommon.GetResult(balacommon.Msg_fail, err.Error())
+			return string(re)
+		} else {
+			db, err2 := leveldb.OpenFile(balacommon.G_DataDir+"contract", nil)
+			co := balacommon.ComContract{Type: jcons.Type, Address: jcons.Address, Name: jcons.Name}
+			jvalue, _ := json.Marshal(co)
+			if err2 == nil {
+				defer db.Close()
+				key := strconv.Itoa(balacommon.Nettype_solana) + "_" + jcons.Address
+				if db.Put([]byte(key), jvalue, nil) != nil {
+					re = balacommon.GetResult(balacommon.Msg_writedb_fail, "")
+				}
+			} else {
+				fmt.Println("open contract db error:" + err2.Error())
+				re = balacommon.GetResult(balacommon.Msg_opendb_fail, err2.Error())
+			}
+		}
+
+	}
 
 	return string(re)
 }

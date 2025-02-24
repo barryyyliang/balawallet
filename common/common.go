@@ -21,12 +21,6 @@ var G_BlockchainConfig bool = true
 var G_DataDir string
 var G_NetType int
 
-const (
-	Nettype_ethereum int = 0
-	Nettype_polygon  int = 1
-	Nettype_solana   int = 2
-)
-
 func InitGlobal(dir string) {
 	G_NetType = Nettype_ethereum
 	G_DataDir = dir + "/data/"
@@ -57,16 +51,6 @@ func InitGlobal(dir string) {
 	} else {
 		fmt.Println("have not config solana node")
 	}
-}
-
-type ErrorResult struct {
-	Code uint
-	Msg  string
-}
-
-type ResBlance struct {
-	Address string
-	Balance string
 }
 
 func IsExist(db *leveldb.DB, name string) bool {

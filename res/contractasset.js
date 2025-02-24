@@ -6,23 +6,35 @@
         table.append(tr)
     }
 
+    function initOption(ipt){
+        var net = getMainNet()
+        if (net === "Ethereum" || net === "Polygon"){
+            var option = document.createElement("option")
+            option.text = "ERC20"
+            option.value = "ERC20"
+            ipt.add(option)
+            var option2 = document.createElement("option")
+            option2.text = "ERC721"
+            option2.value = "ERC721"
+            ipt.add(option2)
+            var option3 = document.createElement("option")
+            option3.text = "Other"
+            option3.value = "Other"
+            ipt.add(option3)
+        } else if(net === "Solana") {
+            var option = document.createElement("option")
+            option.text = "SPL"
+            option.value = "SPL"
+            ipt.add(option)
+        }
+    }
+
     function addNewTr(){
         var tr = document.createElement("tr")
         var ipt0 = document.createElement("select")
         ipt0.setAttribute("id","type"+number)
         ipt0.setAttribute("style","font-size: 16px;height: 30px;width: 200px;border-radius: 0px;")
-        var option = document.createElement("option")
-        option.text = "ERC20"
-        option.value = "ERC20"
-        ipt0.add(option)
-        var option2 = document.createElement("option")
-        option2.text = "ERC721"
-        option2.value = "ERC721"
-        ipt0.add(option2)
-        var option3 = document.createElement("option")
-        option3.text = "Other"
-        option3.value = "Other"
-        ipt0.add(option3)
+        initOption(ipt0)
         
         var td1 = document.createElement("td")
         td1.append(ipt0)
@@ -50,7 +62,7 @@
         bt.setAttribute("type","button")
         bt.setAttribute("class","button1")
         bt.setAttribute("value",gGetRes("contractasset_import"))
-        bt.setAttribute("onclick","importContract("+"'address"+number +"'" +",'type"+number+"')")
+        bt.setAttribute("onclick","importContract("+"'address"+number + "'" + "," +"'type"+number+"'" + "," + "'name"+number +"'" + ")")
         td4.append(bt) 
         tr.append(td4)
 
@@ -59,11 +71,12 @@
     }
 
 
-    async function importContract(address,type){
+    async function importContract(address,type,name){
         var add = document.getElementById(address).value
         var ty = document.getElementById(type).value
         var fromadd = document.getElementById("add").value
-        var obj = {type:ty,address:add,name:'',from:fromadd}
+        var na = document.getElementById(name).value
+        var obj = {type:ty,address:add,name:na,from:fromadd}
         var result = await window.doImportContract(JSON.stringify(obj))
         var reobj = JSON.parse(result)
         if(reobj.Code === 0){
