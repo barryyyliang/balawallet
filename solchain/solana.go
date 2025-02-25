@@ -2,6 +2,7 @@ package solchain
 
 import (
 	"balawallet/accounts/keystore"
+	spltoken "balawallet/solchain/spltoken"
 	"bufio"
 	"context"
 	"encoding/json"
@@ -14,6 +15,7 @@ import (
 	"balawallet/accounts/sol"
 	balacommon "balawallet/common"
 
+	"github.com/ethereum/go-ethereum/accounts/abi"
 	bin "github.com/gagliardetto/binary"
 	"github.com/gagliardetto/solana-go"
 	"github.com/gagliardetto/solana-go/programs/system"
@@ -502,8 +504,32 @@ func (c *SolChain) LoadABI(file string) string {
 	return string(re)
 }
 
-func (c *SolChain) ReadContract(from, to, funcAbi, paremters string) string {
-	re := balacommon.GetResult(balacommon.Msg_fail, "not support")
+func (c *SolChain) ReadContract(from, mint, funcAbi, paremters string) string {
+	var re = balacommon.GetResult(balacommon.Msg_success, "")
+	contractAbi, err := abi.JSON(strings.NewReader(funcAbi))
+	if err != nil {
+		re = balacommon.GetResult(balacommon.Msg_parseabi_fail, err.Error())
+		return string(re)
+	}
+	for _, method := range contractAbi.Methods {
+		var parStrings []string
+		json.Unmarshal([]byte(paremters), &parStrings)
+		if len(parStrings) != len(method.Inputs) {
+			re = balacommon.GetResult(balacommon.Msg_param_error, "")
+		}
+		tokenAdd, err := solana.PublicKeyFromBase58(mint)
+		if err != nil {
+			re = balacommon.GetResult(balacommon.Msg_fail, err.Error())
+			return string(re)
+		}
+		result, err := spltoken.ReadTokenContract(tokenAdd, method, parStrings, balacommon.GetSolConnection())
+		if err == nil {
+			re, _ = json.Marshal(balacommon.ErrorResult{balacommon.Msg_success, result})
+		} else {
+			re = balacommon.GetResult(balacommon.Msg_fail, err.Error())
+		}
+	}
+
 	return string(re)
 }
 

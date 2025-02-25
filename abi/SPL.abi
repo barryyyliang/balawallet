@@ -6,7 +6,7 @@
         "outputs": [
             {
                 "name": "",
-                "type": "uint"
+                "type": "uint64"
             }
         ],
         "payable": false,
@@ -31,15 +31,27 @@
         "constant": true,
         "inputs": [
             {
-                "name": "who",
+                "name": "_account",
                 "type": "address"
             }
         ],
         "name": "balanceOf",
         "outputs": [
             {
-                "name": "",
-                "type": "uint256"
+                "name": "_account",
+                "type": "address"
+            },
+            {
+                "name": "_mint",
+                "type": "address"
+            },
+            {
+                "name": "_owner",
+                "type": "address"
+            },
+            {
+                "name": "_balance",
+                "type": "uint64"
             }
         ],
         "payable": false,
@@ -83,12 +95,16 @@
                 "type": "address"
             },
             {
+                "name": "_mint",
+                "type": "address"
+            },
+            {
                 "name": "_owner",
                 "type": "address"
             },
             {
                 "name": "_balance",
-                "type": "uint256"
+                "type": "uint64"
             }
         ],
         "payable": false,

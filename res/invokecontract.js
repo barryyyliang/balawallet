@@ -144,6 +144,12 @@
     }
 
     async function invoke() {
+
+        var outsTable = document.getElementById("outTable")
+        for (var n=2;n<outsTable.rows.length;n++){
+            outsTable.rows[n].cells[1].childNodes[0].value = ""                  
+        }
+
         var functype
         var funcName = document.getElementById("contractFunc").value
         var caddress = document.getElementById("caddress").value

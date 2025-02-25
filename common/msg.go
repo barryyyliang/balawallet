@@ -47,6 +47,7 @@ const (
 	Msg_modify_confirm             uint = 41
 	Msg_delete_confirm             uint = 42
 	Msg_account_noexist            uint = 43
+	Msg_account_mint_mismatch      uint = 44
 )
 
 func InitMsg() {
@@ -95,6 +96,7 @@ func InitMsg() {
 	G_Msg["zh-CN"][Msg_modify_confirm] = "修改不可撤销，请确认是否修改"
 	G_Msg["zh-CN"][Msg_delete_confirm] = "删除不可恢复，请确认是否删除"
 	G_Msg["zh-CN"][Msg_account_noexist] = "账户不存在"
+	G_Msg["zh-CN"][Msg_account_mint_mismatch] = "账户未关联此 Token"
 
 	G_Msg["en"] = make(map[uint]string)
 	G_Msg["en"][Msg_success] = "Success"
@@ -141,6 +143,7 @@ func InitMsg() {
 	G_Msg["en"][Msg_modify_confirm] = "Modify irreversible, please confirm whether to modify"
 	G_Msg["en"][Msg_delete_confirm] = "Deletion is irreversible, please confirm whether to delete"
 	G_Msg["en"][Msg_account_noexist] = "Account is not exist"
+	G_Msg["en"][Msg_account_mint_mismatch] = "The account is not associated with this Token"
 
 	G_Msg["zh-TW"] = make(map[uint]string)
 	G_Msg["zh-TW"][Msg_success] = "操作成功"
@@ -187,4 +190,5 @@ func InitMsg() {
 	G_Msg["zh-TW"][Msg_modify_confirm] = "修改不可撤銷，請確認是否修改"
 	G_Msg["zh-TW"][Msg_delete_confirm] = "刪除不可恢復，請確認是否刪除"
 	G_Msg["zh-TW"][Msg_account_noexist] = "賬戶不存在"
+	G_Msg["zh-TW"][Msg_account_mint_mismatch] = "帳戶未關聯此 Token"
 }
