@@ -62,16 +62,12 @@
         "constant": false,
         "inputs": [
             {
-                "name": "_from",
-                "type": "address"
-            },
-            {
-                "name": "_to",
+                "name": "_toOwner",
                 "type": "address"
             },
             {
                 "name": "_value",
-                "type": "uint256"
+                "type": "uint64"
             }
         ],
         "name": "transfer",

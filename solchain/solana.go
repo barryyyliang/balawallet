@@ -2,7 +2,6 @@ package solchain
 
 import (
 	"balawallet/accounts/keystore"
-	spltoken "balawallet/solchain/spltoken"
 	"bufio"
 	"context"
 	"encoding/json"
@@ -504,7 +503,7 @@ func (c *SolChain) LoadABI(file string) string {
 	return string(re)
 }
 
-func (c *SolChain) ReadContract(from, mint, funcAbi, paremters string) string {
+func (c *SolChain) ReadContract(from, conAdd, funcAbi, paremters string) string {
 	var re = balacommon.GetResult(balacommon.Msg_success, "")
 	contractAbi, err := abi.JSON(strings.NewReader(funcAbi))
 	if err != nil {
@@ -517,12 +516,12 @@ func (c *SolChain) ReadContract(from, mint, funcAbi, paremters string) string {
 		if len(parStrings) != len(method.Inputs) {
 			re = balacommon.GetResult(balacommon.Msg_param_error, "")
 		}
-		tokenAdd, err := solana.PublicKeyFromBase58(mint)
+		tokenAdd, err := solana.PublicKeyFromBase58(conAdd)
 		if err != nil {
 			re = balacommon.GetResult(balacommon.Msg_fail, err.Error())
 			return string(re)
 		}
-		result, err := spltoken.ReadTokenContract(tokenAdd, method, parStrings, balacommon.GetSolConnection())
+		result, err := ReadTokenContract(tokenAdd, method, parStrings, balacommon.GetSolConnection())
 		if err == nil {
 			re, _ = json.Marshal(balacommon.ErrorResult{balacommon.Msg_success, result})
 		} else {
@@ -533,8 +532,36 @@ func (c *SolChain) ReadContract(from, mint, funcAbi, paremters string) string {
 	return string(re)
 }
 
-func (c *SolChain) InvokeContract(from, conAddr, funcAbi, param, pass string) string {
-	re := balacommon.GetResult(balacommon.Msg_fail, "not support")
+func (c *SolChain) InvokeContract(from, conAdd, funcAbi, param, pass string) string {
+	var re = balacommon.GetResult(balacommon.Msg_success, "")
+	contractAbi, err := abi.JSON(strings.NewReader(funcAbi))
+	if err != nil {
+		re = balacommon.GetResult(balacommon.Msg_parseabi_fail, err.Error())
+		return string(re)
+	}
+	for _, method := range contractAbi.Methods {
+		var parStrings []string
+		json.Unmarshal([]byte(param), &parStrings)
+		if len(parStrings) != len(method.Inputs) {
+			re = balacommon.GetResult(balacommon.Msg_param_error, "")
+		}
+		tokenAdd, err := solana.PublicKeyFromBase58(conAdd)
+		if err != nil {
+			re = balacommon.GetResult(balacommon.Msg_fail, err.Error())
+			return string(re)
+		}
+		payer, err := solana.PublicKeyFromBase58(from)
+		if err != nil {
+			re = balacommon.GetResult(balacommon.Msg_fail, err.Error())
+			return string(re)
+		}
+		result, err := InvokeTokenContract(tokenAdd, method, parStrings, payer, pass, balacommon.GetSolConnection())
+		if err == nil {
+			re, _ = json.Marshal(balacommon.ErrorResult{balacommon.Msg_success, result})
+		} else {
+			re = balacommon.GetResult(balacommon.Msg_fail, err.Error())
+		}
+	}
 
 	return string(re)
 }
