@@ -59,6 +59,15 @@ func InvokeTokenContract(mint solana.PublicKey, method abi.Method, params []stri
 		}
 		return transfer(mint, payer, to, amount, pass, client)
 	case "mintTo":
+		to, err := solana.PublicKeyFromBase58(params[0])
+		if err != nil {
+			return "", err
+		}
+		amount, err := strconv.ParseUint(params[1], 10, 64)
+		if err != nil {
+			return "", err
+		}
+		return mintTo(mint, to, payer, amount, pass, client)
 	default:
 	}
 
@@ -259,18 +268,30 @@ func createTokenAccount(mint, owner, payer solana.PublicKey, pass string, client
 
 }
 
-func MintTo(mint, to solana.PublicKey, payer solana.PrivateKey, amount uint64, client *rpc.Client) {
+func mintTo(mint, owner, payer solana.PublicKey, amount uint64, pass string, client *rpc.Client) (string, error) {
+	//通过owner 获取代币关联账号
+	var conf rpc.GetTokenAccountsConfig
+	conf.Mint = &mint
+	out, err := client.GetTokenAccountsByOwner(context.TODO(), owner, &conf, nil)
+	if err != nil {
+		return "", err
+	}
+	var to solana.PublicKey
+	if len(out.Value) >= 1 {
+		to = out.Value[0].Pubkey
+	} else {
+		return "", fmt.Errorf("to owner dont have token account")
+	}
 	// 铸造代币指令
 	mintToInstruction, err := token.NewMintToInstruction(
-		amount, // 铸造 1 个代币，精度为 9
+		amount,
 		mint,
 		to,
-		payer.PublicKey(),
-		nil,
+		payer,
+		[]solana.PublicKey{},
 	).ValidateAndBuild()
 	if err != nil {
-		fmt.Println(err.Error())
-		return
+		return "", err
 	}
 
 	// 创建交易
@@ -279,38 +300,28 @@ func MintTo(mint, to solana.PublicKey, payer solana.PrivateKey, amount uint64, c
 		rpc.CommitmentFinalized,
 	)
 	if err != nil {
-		fmt.Println("get recent error")
-		return
+		return "", err
 	}
-	tx, err := solana.NewTransaction([]solana.Instruction{mintToInstruction}, recent.Value.Blockhash, solana.TransactionPayer(solana.PublicKey(payer.PublicKey())))
+	tx, err := solana.NewTransaction([]solana.Instruction{mintToInstruction}, recent.Value.Blockhash, solana.TransactionPayer(payer))
 	if err != nil {
-		fmt.Println("create NewTransaction error:" + err.Error())
-		return
+		return "", err
 	}
 
 	// 对交易进行签名
-	_, err = tx.Sign(func(key solana.PublicKey) *solana.PrivateKey {
-		if key.Equals(payer.PublicKey()) {
-			return &payer
-		}
-		return nil
-	})
+	// 对交易进行签名
+	_, err = signTx(payer.String(), pass, tx)
 	if err != nil {
-		fmt.Println("sign error:" + err.Error())
-		return
+		return "", err
 	}
 
 	// 发送交易
 	fmt.Println("send tx:")
 	sig, err := client.SendTransaction(context.TODO(), tx)
 	if err != nil {
-		fmt.Println("send tx:" + err.Error())
-		return
+		return "", err
 	}
 
-	fmt.Println("get tx sig:" + sig.String())
-
-	spew.Dump(tx)
+	return sig.String(), nil
 }
 
 func CreateSPLToken(payer solana.PrivateKey, client *rpc.Client) (solana.PublicKey, error) {

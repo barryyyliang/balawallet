@@ -126,7 +126,7 @@
         "constant": true,
         "inputs": [
             {
-                "name": "_to",
+                "name": "_toOwner",
                 "type": "address"
             },
             {
