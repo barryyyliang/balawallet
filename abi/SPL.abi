@@ -2,25 +2,27 @@
     {
         "constant": true,
         "inputs": [],
-        "name": "decimals",
+        "name": "mintInfo",
         "outputs": [
             {
-                "name": "",
+                "name": "_mintAuthority",
+                "type": "address"
+            },
+            {
+                "name": "_totalSupply",
                 "type": "uint64"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "constant": true,
-        "inputs": [],
-        "name": "totalSupply",
-        "outputs": [
+            },
             {
-                "name": "",
-                "type": "uint256"
+                "name": "_decimals",
+                "type": "uint64"
+            },
+            {
+                "name": "_isInitialized",
+                "type": "string"
+            },
+            {
+                "name": "_freezeAuthority",
+                "type": "address"
             }
         ],
         "payable": false,

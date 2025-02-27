@@ -34,6 +34,8 @@ func ReadTokenContract(mint solana.PublicKey, method abi.Method, params []string
 			return "", err
 		}
 		return getTokenAccount(owner, mint, client)
+	case "mintInfo":
+		return mintInfo(mint, client)
 	default:
 	}
 
@@ -74,14 +76,38 @@ func InvokeTokenContract(mint solana.PublicKey, method abi.Method, params []stri
 	return "", fmt.Errorf(balacommon.GetMsgByCode(balacommon.Msg_param_error))
 }
 
-func Decimals(mint solana.PublicKey, client *rpc.Client) string {
+func mintInfo(mint solana.PublicKey, client *rpc.Client) (string, error) {
 
-	return ""
+	out, err := client.GetAccountInfo(context.TODO(), mint)
+	var result []string
+	if err != nil {
+		return "", err
+	} else {
+		fmt.Println("mint account:" + out.Value.Owner.String())
+		min := new(token.Mint)
+		data2 := out.Value.Data.GetBinary()
+		dec2 := bin.NewBinDecoder(data2)
+		err = dec2.Decode(&min)
+		if err != nil {
+			return "", err
+		}
+		result = append(result, min.MintAuthority.String())
+		result = append(result, strconv.FormatUint(min.Supply, 10))
+		result = append(result, strconv.FormatUint(uint64(min.Decimals), 10))
+		if min.IsInitialized {
+			result = append(result, "true")
+		} else {
+			result = append(result, "false")
+		}
+		result = append(result, min.FreezeAuthority.String())
+	}
+	if len(result) != 5 {
+		return "", fmt.Errorf(balacommon.GetMsgByCode(balacommon.Msg_account_noexist))
+	}
+	outs, err := json.Marshal(result)
+	return string(outs), err
 }
-func TotalSupply(mint solana.PublicKey, client *rpc.Client) string {
 
-	return ""
-}
 func balanceOf(mint, account solana.PublicKey, client *rpc.Client) (string, error) {
 	var result []string
 	out, err := client.GetAccountInfo(context.TODO(), account)
