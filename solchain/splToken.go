@@ -77,8 +77,9 @@ func InvokeTokenContract(mint solana.PublicKey, method abi.Method, params []stri
 }
 
 func mintInfo(mint solana.PublicKey, client *rpc.Client) (string, error) {
-
-	out, err := client.GetAccountInfo(context.TODO(), mint)
+	ctx, fuc := context.WithTimeout(context.Background(), balacommon.G_Timeout)
+	defer fuc()
+	out, err := client.GetAccountInfo(ctx, mint)
 	var result []string
 	if err != nil {
 		return "", err
@@ -110,7 +111,9 @@ func mintInfo(mint solana.PublicKey, client *rpc.Client) (string, error) {
 
 func balanceOf(mint, account solana.PublicKey, client *rpc.Client) (string, error) {
 	var result []string
-	out, err := client.GetAccountInfo(context.TODO(), account)
+	ctx, fuc := context.WithTimeout(context.Background(), balacommon.G_Timeout)
+	defer fuc()
+	out, err := client.GetAccountInfo(ctx, account)
 	if err != nil {
 		return "", err
 	} else {
@@ -141,7 +144,9 @@ func transfer(mint, from, to solana.PublicKey, amount uint64, pass string, clien
 
 	var conf rpc.GetTokenAccountsConfig
 	conf.Mint = &mint
-	out, err := client.GetTokenAccountsByOwner(context.TODO(), from, &conf, nil)
+	ctx, fuc := context.WithTimeout(context.Background(), balacommon.G_Timeout)
+	defer fuc()
+	out, err := client.GetTokenAccountsByOwner(ctx, from, &conf, nil)
 	if err != nil {
 		return "", err
 	}
@@ -151,8 +156,9 @@ func transfer(mint, from, to solana.PublicKey, amount uint64, pass string, clien
 	} else {
 		return "", fmt.Errorf("from owner dont have token account")
 	}
-
-	out, err = client.GetTokenAccountsByOwner(context.TODO(), to, &conf, nil)
+	ctx1, fuc1 := context.WithTimeout(context.Background(), balacommon.G_Timeout)
+	defer fuc1()
+	out, err = client.GetTokenAccountsByOwner(ctx1, to, &conf, nil)
 	if err != nil {
 		return "", err
 	}
@@ -173,8 +179,10 @@ func transfer(mint, from, to solana.PublicKey, amount uint64, pass string, clien
 	if err != nil {
 		return "", err
 	}
+	ctx2, fuc2 := context.WithTimeout(context.Background(), balacommon.G_Timeout)
+	defer fuc2()
 	recent, err := client.GetLatestBlockhash(
-		context.TODO(),
+		ctx2,
 		rpc.CommitmentFinalized,
 	)
 	if err != nil {
@@ -213,8 +221,10 @@ func transfer(mint, from, to solana.PublicKey, amount uint64, pass string, clien
 	// spew.Dump(sig)
 
 	// Or just send the transaction WITHOUT waiting for confirmation:
+	ctx3, fuc3 := context.WithTimeout(context.Background(), balacommon.G_Timeout)
+	defer fuc3()
 	sig, err := client.SendTransaction(
-		context.TODO(),
+		ctx3,
 		tx,
 	)
 	if err != nil {
@@ -227,7 +237,9 @@ func getTokenAccount(owner solana.PublicKey, mint solana.PublicKey, client *rpc.
 
 	var conf rpc.GetTokenAccountsConfig
 	conf.Mint = &mint
-	out, err := client.GetTokenAccountsByOwner(context.TODO(), owner, &conf, nil)
+	ctx, fuc := context.WithTimeout(context.Background(), balacommon.G_Timeout)
+	defer fuc()
+	out, err := client.GetTokenAccountsByOwner(ctx, owner, &conf, nil)
 	if err != nil {
 		return "", err
 	}
@@ -266,8 +278,10 @@ func createTokenAccount(mint, owner, payer solana.PublicKey, pass string, client
 	}
 
 	// 创建交易
+	ctx, fuc := context.WithTimeout(context.Background(), balacommon.G_Timeout)
+	defer fuc()
 	recent, err := client.GetLatestBlockhash(
-		context.TODO(),
+		ctx,
 		rpc.CommitmentFinalized,
 	)
 	if err != nil {
@@ -285,7 +299,9 @@ func createTokenAccount(mint, owner, payer solana.PublicKey, pass string, client
 	}
 
 	// 发送交易
-	sig, err := client.SendTransaction(context.TODO(), tx)
+	ctx1, fuc1 := context.WithTimeout(context.Background(), balacommon.G_Timeout)
+	defer fuc1()
+	sig, err := client.SendTransaction(ctx1, tx)
 	if err != nil {
 		return "", err
 	}
@@ -298,7 +314,9 @@ func mintTo(mint, owner, payer solana.PublicKey, amount uint64, pass string, cli
 	//通过owner 获取代币关联账号
 	var conf rpc.GetTokenAccountsConfig
 	conf.Mint = &mint
-	out, err := client.GetTokenAccountsByOwner(context.TODO(), owner, &conf, nil)
+	ctx, fuc := context.WithTimeout(context.Background(), balacommon.G_Timeout)
+	defer fuc()
+	out, err := client.GetTokenAccountsByOwner(ctx, owner, &conf, nil)
 	if err != nil {
 		return "", err
 	}
@@ -321,8 +339,10 @@ func mintTo(mint, owner, payer solana.PublicKey, amount uint64, pass string, cli
 	}
 
 	// 创建交易
+	ctx1, fuc1 := context.WithTimeout(context.Background(), balacommon.G_Timeout)
+	defer fuc1()
 	recent, err := client.GetLatestBlockhash(
-		context.TODO(),
+		ctx1,
 		rpc.CommitmentFinalized,
 	)
 	if err != nil {
@@ -342,7 +362,9 @@ func mintTo(mint, owner, payer solana.PublicKey, amount uint64, pass string, cli
 
 	// 发送交易
 	fmt.Println("send tx:")
-	sig, err := client.SendTransaction(context.TODO(), tx)
+	ctx2, fuc2 := context.WithTimeout(context.Background(), balacommon.G_Timeout)
+	defer fuc2()
+	sig, err := client.SendTransaction(ctx2, tx)
 	if err != nil {
 		return "", err
 	}
@@ -385,8 +407,10 @@ func CreateSPLToken(payer solana.PrivateKey, client *rpc.Client) (solana.PublicK
 	}
 
 	// 创建交易
+	ctx, fuc := context.WithTimeout(context.Background(), balacommon.G_Timeout)
+	defer fuc()
 	recent, err := client.GetLatestBlockhash(
-		context.TODO(),
+		ctx,
 		rpc.CommitmentFinalized,
 	)
 	if err != nil {
@@ -416,7 +440,9 @@ func CreateSPLToken(payer solana.PrivateKey, client *rpc.Client) (solana.PublicK
 
 	// 发送交易
 	fmt.Println("send tx:")
-	sig, err := client.SendTransaction(context.TODO(), tx)
+	ctx1, fuc1 := context.WithTimeout(context.Background(), balacommon.G_Timeout)
+	defer fuc1()
+	sig, err := client.SendTransaction(ctx1, tx)
 	if err != nil {
 		fmt.Println("send tx:" + err.Error())
 		return solana.PublicKey{}, err

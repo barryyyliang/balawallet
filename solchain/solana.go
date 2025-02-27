@@ -257,8 +257,10 @@ func (c *SolChain) Transfer(from string, to string, value string, pass string) s
 		re = balacommon.GetResult(balacommon.Msg_fail, "connect is nil")
 		return string(re)
 	}
+	ctx, fuc := context.WithTimeout(context.Background(), balacommon.G_Timeout)
+	defer fuc()
 	recent, err := client.GetLatestBlockhash(
-		context.TODO(),
+		ctx,
 		solRPC.CommitmentFinalized,
 	)
 	if err != nil {
@@ -306,8 +308,10 @@ func (c *SolChain) Transfer(from string, to string, value string, pass string) s
 	}
 
 	// Or just send the transaction WITHOUT waiting for confirmation:
+	ctx1, fuc1 := context.WithTimeout(context.Background(), balacommon.G_Timeout)
+	defer fuc1()
 	sig, err := client.SendTransaction(
-		context.TODO(),
+		ctx1,
 		tx,
 	)
 	if err != nil {
@@ -432,7 +436,9 @@ func (c *SolChain) ImportContract(cons string) string {
 			re = balacommon.GetResult(balacommon.Msg_fail, err.Error())
 			return string(re)
 		}
-		out, err := connection.GetAccountInfo(context.TODO(), pubkey)
+		ctx, fuc := context.WithTimeout(context.Background(), balacommon.G_Timeout)
+		defer fuc()
+		out, err := connection.GetAccountInfo(ctx, pubkey)
 		if err != nil {
 			re = balacommon.GetResult(balacommon.Msg_fail, err.Error())
 			fmt.Println("get mint account:" + err.Error())
