@@ -92,7 +92,12 @@ func mintInfo(mint solana.PublicKey, client *rpc.Client) (string, error) {
 		if err != nil {
 			return "", err
 		}
-		result = append(result, min.MintAuthority.String())
+		if min.MintAuthority != nil {
+			result = append(result, min.MintAuthority.String())
+		} else {
+			result = append(result, "null")
+		}
+
 		result = append(result, strconv.FormatUint(min.Supply, 10))
 		result = append(result, strconv.FormatUint(uint64(min.Decimals), 10))
 		if min.IsInitialized {
@@ -100,7 +105,12 @@ func mintInfo(mint solana.PublicKey, client *rpc.Client) (string, error) {
 		} else {
 			result = append(result, "false")
 		}
-		result = append(result, min.FreezeAuthority.String())
+		if min.FreezeAuthority != nil {
+			result = append(result, min.FreezeAuthority.String())
+		} else {
+			result = append(result, "null")
+		}
+
 	}
 	if len(result) != 5 {
 		return "", fmt.Errorf(balacommon.GetMsgByCode(balacommon.Msg_account_noexist))

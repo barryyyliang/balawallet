@@ -431,6 +431,10 @@ func (c *SolChain) ImportContract(cons string) string {
 	err := json.Unmarshal([]byte(cons), &jcons)
 	if err == nil {
 		connection := balacommon.GetSolConnection()
+		if connection == nil {
+			re = balacommon.GetResult(balacommon.Msg_fail, "connect is nil")
+			return string(re)
+		}
 		pubkey, err := solana.PublicKeyFromBase58(jcons.Address)
 		if err != nil {
 			re = balacommon.GetResult(balacommon.Msg_fail, err.Error())
@@ -527,7 +531,12 @@ func (c *SolChain) ReadContract(from, conAdd, funcAbi, paremters string) string 
 			re = balacommon.GetResult(balacommon.Msg_fail, err.Error())
 			return string(re)
 		}
-		result, err := ReadTokenContract(tokenAdd, method, parStrings, balacommon.GetSolConnection())
+		client := balacommon.GetSolConnection()
+		if client == nil {
+			re = balacommon.GetResult(balacommon.Msg_fail, "connect is nil")
+			return string(re)
+		}
+		result, err := ReadTokenContract(tokenAdd, method, parStrings, client)
 		if err == nil {
 			re, _ = json.Marshal(balacommon.ErrorResult{balacommon.Msg_success, result})
 		} else {
@@ -561,7 +570,12 @@ func (c *SolChain) InvokeContract(from, conAdd, funcAbi, param, pass string) str
 			re = balacommon.GetResult(balacommon.Msg_fail, err.Error())
 			return string(re)
 		}
-		result, err := InvokeTokenContract(tokenAdd, method, parStrings, payer, pass, balacommon.GetSolConnection())
+		client := balacommon.GetSolConnection()
+		if client == nil {
+			re = balacommon.GetResult(balacommon.Msg_fail, "connect is nil")
+			return string(re)
+		}
+		result, err := InvokeTokenContract(tokenAdd, method, parStrings, payer, pass, client)
 		if err == nil {
 			re, _ = json.Marshal(balacommon.ErrorResult{balacommon.Msg_success, result})
 		} else {
