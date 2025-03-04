@@ -5,6 +5,10 @@
         "name": "mintInfo",
         "outputs": [
             {
+                "name": "_owner",
+                "type": "address"
+            },
+            {
                 "name": "_mintAuthority",
                 "type": "address"
             },

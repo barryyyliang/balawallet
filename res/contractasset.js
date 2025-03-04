@@ -120,13 +120,14 @@
         onFuncMenu(id)
     }
 
-    function contractasset_func_mouseout(id){
-        var p1 = document.getElementById(id).parentNode.parentNode
+    function contractasset_func_mouseout(event){
+        var p1 = document.getElementById(event.target.id).parentNode.parentNode
         var cells = p1.getElementsByTagName("td")
 
         cells[0].childNodes[0].classList.remove("highlight")
         cells[1].childNodes[0].classList.remove("highlight")
         cells[2].childNodes[0].classList.remove("highlight")
+        onFuncOut(event)
     }
 
 
@@ -191,7 +192,9 @@
         bt3.setAttribute("type","button")
         bt3.setAttribute("value","↓")
         bt3.setAttribute("onmouseover","contractasset_func_showfunc("+"'contractasset_button"+number+"')")
-        bt3.setAttribute("onmouseout","contractasset_func_mouseout("+"'contractasset_button"+number+"')")
+        //bt3.setAttribute("onmouseout","contractasset_func_mouseout("+"'contractasset_button"+number+"')")
+        bt3.setAttribute("onmouseout","contractasset_func_mouseout(event)")
+
         td6.append(bt3) 
         tr.append(td6)
 

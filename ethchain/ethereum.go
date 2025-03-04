@@ -273,7 +273,7 @@ func (c *EthChain) ExportAccount(add string, pa string) string {
 
 func (c *EthChain) Transfer(from string, to string, value string, pass string) string {
 	var re []byte
-	connect := getConnection()
+	connect := balacommon.GetEthConnection()
 	if connect == nil {
 		fmt.Println("doTransfer: connection is nil")
 		re = balacommon.GetResult(balacommon.Msg_connectnode_fail, "")
@@ -320,7 +320,7 @@ func (c *EthChain) Transfer(from string, to string, value string, pass string) s
 // 获取账户余额
 func (c *EthChain) GetBalance(add string) string {
 	var re []byte
-	connect := getConnection()
+	connect := balacommon.GetEthConnection()
 	if connect == nil {
 		re = balacommon.GetResult(balacommon.Msg_connectnode_fail, "")
 		return string(re)
@@ -343,7 +343,7 @@ func (c *EthChain) GetBalance(add string) string {
 }
 
 func (c *EthChain) GetFee() string {
-	connect := getConnection()
+	connect := balacommon.GetEthConnection()
 	if connect == nil {
 		fmt.Println("doGetFee: connection is nil")
 		return ""
@@ -381,7 +381,7 @@ func (c *EthChain) DeployContract(from string, file string, pass string) string 
 	}
 	filepath := balacommon.G_Config["contractDir"]
 	filepath = filepath + "/" + file
-	connect := getConnection()
+	connect := balacommon.GetEthConnection()
 
 	if connect == nil {
 		fmt.Println("can not connect to node:")
@@ -511,7 +511,7 @@ func (c *EthChain) ImportContract(cons string) string {
 		if jcons.Name == "" {
 			ctx, fuc := context.WithTimeout(context.Background(), balacommon.G_Timeout)
 			defer fuc()
-			connect := getConnection()
+			connect := balacommon.GetEthConnection()
 			if connect != nil {
 				var conAdd common.Address = common.HexToAddress(jcons.Address)
 				contractAbi, _ := abi.JSON(strings.NewReader(balacommon.G_Abis[jcons.Type]))
@@ -627,7 +627,7 @@ func (c *EthChain) ReadContract(from, to, funcAbi, paremters string) string {
 				re = balacommon.GetResult(balacommon.Msg_packabiparam_error, err.Error())
 				return string(re)
 			}
-			connect := getConnection()
+			connect := balacommon.GetEthConnection()
 			if connect != nil {
 				ctx, fuc := context.WithTimeout(context.Background(), balacommon.G_Timeout)
 				defer fuc()
@@ -668,7 +668,7 @@ func (c *EthChain) InvokeContract(from, conAddr, funcAbi, param, pass string) st
 		re = balacommon.GetResult(balacommon.Msg_param_error, "")
 		return string(re)
 	}
-	connect := getConnection()
+	connect := balacommon.GetEthConnection()
 	var toAdd common.Address = common.HexToAddress(conAddr)
 
 	if connect == nil {
@@ -753,7 +753,7 @@ func (c *EthChain) InvokeEstimate(from, conAddr, funcAbi, param string) string {
 		re = balacommon.GetResult(balacommon.Msg_param_error, "")
 		return string(re)
 	}
-	connect := getConnection()
+	connect := balacommon.GetEthConnection()
 	var toAdd common.Address = common.HexToAddress(conAddr)
 
 	if connect == nil {
@@ -830,7 +830,7 @@ func (c *EthChain) QueryTx(hs string) string {
 	var re []byte
 	var info txinfo
 	txhash := common.HexToHash(hs)
-	connect := getConnection()
+	connect := balacommon.GetEthConnection()
 	ctx, fuc := context.WithTimeout(context.Background(), balacommon.G_Timeout)
 	defer fuc()
 	tx, _, err := connect.TransactionByHash(ctx, txhash)

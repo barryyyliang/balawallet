@@ -84,7 +84,14 @@ func mintInfo(mint solana.PublicKey, client *rpc.Client) (string, error) {
 	if err != nil {
 		return "", err
 	} else {
-		fmt.Println("mint account:" + out.Value.Owner.String())
+		if out.Value.Owner.Equals(solana.TokenProgramID) {
+			result = append(result, "Token")
+		} else if out.Value.Owner.Equals(solana.Token2022ProgramID) {
+			result = append(result, "Token-2022")
+		} else {
+			result = append(result, out.Value.Owner.String())
+		}
+
 		min := new(token.Mint)
 		data2 := out.Value.Data.GetBinary()
 		dec2 := bin.NewBinDecoder(data2)
@@ -92,6 +99,7 @@ func mintInfo(mint solana.PublicKey, client *rpc.Client) (string, error) {
 		if err != nil {
 			return "", err
 		}
+
 		if min.MintAuthority != nil {
 			result = append(result, min.MintAuthority.String())
 		} else {
@@ -112,7 +120,7 @@ func mintInfo(mint solana.PublicKey, client *rpc.Client) (string, error) {
 		}
 
 	}
-	if len(result) != 5 {
+	if len(result) != 6 {
 		return "", fmt.Errorf(balacommon.GetMsgByCode(balacommon.Msg_account_noexist))
 	}
 	outs, err := json.Marshal(result)

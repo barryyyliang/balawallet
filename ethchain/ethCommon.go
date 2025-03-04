@@ -120,29 +120,6 @@ func getChainInfo(connect *ethclient.Client, from string) (uint64, *big.Int, *bi
 
 }
 
-func getConnection() *ethclient.Client {
-	if balacommon.G_Etherclient == nil {
-		var connect *ethclient.Client
-		var err error
-		if balacommon.Nettype_ethereum == balacommon.G_NetType {
-			fmt.Println("net type eth")
-			connect, err = ethclient.Dial(balacommon.G_Config["ethAddress"])
-		} else if balacommon.Nettype_polygon == balacommon.G_NetType {
-			fmt.Println("net type sol:" + balacommon.G_Config["polAddress"])
-			connect, err = ethclient.Dial(balacommon.G_Config["polAddress"])
-		}
-
-		if err != nil {
-			fmt.Println("net connet fail")
-			balacommon.G_Etherclient = nil
-
-		} else {
-			balacommon.G_Etherclient = connect
-		}
-	}
-	return balacommon.G_Etherclient
-}
-
 func stringToValue(t reflect.Type, value string) interface{} {
 
 	switch t.String() {

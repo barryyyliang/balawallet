@@ -15,8 +15,8 @@ import (
 
 var G_Timeout time.Duration = 5 * time.Second
 var G_Config = make(map[string]string)
-var G_Etherclient *ethclient.Client = nil
-var g_SolClient *solRPC.Client
+var g_Etherclient *ethclient.Client = nil
+var g_SolClient *solRPC.Client = nil
 var G_BlockchainConfig bool = true
 var G_DataDir string
 var G_NetType int
@@ -33,9 +33,9 @@ func InitGlobal(dir string) {
 	//初始化配置
 	GetConfig("")
 	if G_Config["ethAddress"] != "" {
-		G_Etherclient, err = ethclient.Dial(G_Config["ethAddress"])
+		g_Etherclient, err = ethclient.Dial(G_Config["ethAddress"])
 		if err != nil {
-			G_Etherclient = nil
+			g_Etherclient = nil
 			fmt.Println("can not connect to ethereum node")
 		}
 	} else {
@@ -151,6 +151,38 @@ func GetSolConnection() *solRPC.Client {
 		}
 	}
 	return g_SolClient
+}
+
+func GetEthConnection() *ethclient.Client {
+	if g_Etherclient == nil {
+		var connect *ethclient.Client
+		var err error
+		if Nettype_ethereum == G_NetType {
+			connect, err = ethclient.Dial(G_Config["ethAddress"])
+		} else if Nettype_polygon == G_NetType {
+			connect, err = ethclient.Dial(G_Config["polAddress"])
+		}
+
+		if err != nil {
+			fmt.Println("net connet fail")
+			g_Etherclient = nil
+
+		} else {
+			g_Etherclient = connect
+		}
+	}
+	return g_Etherclient
+}
+
+func NullConnect(ntye int) {
+	switch ntye {
+	case Nettype_ethereum:
+		g_Etherclient = nil
+	case Nettype_polygon:
+		g_Etherclient = nil
+	case Nettype_solana:
+		g_SolClient = nil
+	}
 }
 
 /*

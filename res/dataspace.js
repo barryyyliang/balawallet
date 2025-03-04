@@ -119,12 +119,13 @@
 
 
 
-    function dataspace_func_mouseout(id){
-        var p1 = document.getElementById(id).parentNode.parentNode
+    function dataspace_func_mouseout(event){
+        var p1 = document.getElementById(event.target.id).parentNode.parentNode
         var cells = p1.getElementsByTagName("td")
 
         cells[0].childNodes[0].classList.remove("highlight")
         cells[1].childNodes[0].classList.remove("highlight")
+        onFuncOut(event)
     }
 
     async function loadDataSpace(){
@@ -228,7 +229,7 @@
         bt4.setAttribute("type","button")
         bt4.setAttribute("value","↓")
         bt4.setAttribute("onmouseover","dataspace_func_showfunc("+"'dataspace_button"+number+"')")
-        bt4.setAttribute("onmouseout","dataspace_func_mouseout("+"'dataspace_button"+number+"')")
+        bt4.setAttribute("onmouseout","dataspace_func_mouseout(event)")
         td6.append(bt4) 
         tr.append(td6)
         

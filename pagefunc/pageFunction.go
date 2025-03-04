@@ -159,7 +159,9 @@ func DoConfig(configs string) string {
 		}
 	*/
 	// 配置更新后刷新链接
-	common.G_Etherclient = nil
+	common.NullConnect(common.Nettype_ethereum)
+	common.NullConnect(common.Nettype_polygon)
+	common.NullConnect(common.Nettype_solana)
 	return string(re)
 }
 
@@ -206,7 +208,7 @@ func DoChangeNet(nettype string) string {
 			serverapi.SetServer(tmp)
 		} else {
 			common.G_NetType = tmpType
-			common.G_Etherclient = nil
+			common.NullConnect(common.Nettype_ethereum)
 			tmp := ethchain.GetEthChain()
 			serverapi.SetServer(tmp)
 			re = common.GetResult(common.Msg_success, "")

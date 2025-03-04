@@ -247,3 +247,15 @@
         menu.innerHTML=""
     }
 
+    function onFuncOut(event){
+        var rec = document.getElementById("funcMenu").getBoundingClientRect()
+        if(event.clientX>rec.left+window.scrollX - 5
+            && event.clientX <rec.right+window.scrollX
+            && event.clientY >rec.top + window.scrollY
+            && event.clientY < rec.bottom + window.scrollY) {
+
+        } else {
+            document.getElementById("funcMenu").style.height=0;
+        }
+    }
+
