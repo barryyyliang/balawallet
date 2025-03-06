@@ -37,11 +37,30 @@
         "constant": true,
         "inputs": [
             {
-                "name": "_account",
+                "name": "_owner",
                 "type": "address"
             }
         ],
         "name": "balanceOf",
+        "outputs": [
+            {
+                "name": "_balance",
+                "type": "uint64"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [
+            {
+                "name": "_account",
+                "type": "address"
+            }
+        ],
+        "name": "balanceOfAccount",
         "outputs": [
             {
                 "name": "_account",

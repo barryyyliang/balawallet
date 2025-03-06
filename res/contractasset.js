@@ -81,6 +81,7 @@
         var reobj = JSON.parse(result)
         if(reobj.Code === 0){
             initData()
+            initContractBalance()
         } 
         showResult(result)
     }
@@ -93,6 +94,7 @@
             var reobj = JSON.parse(result)
             if(reobj.Code === 0){
                 initData()
+                initContractBalance()
             } 
             showResult(result)
         } 
@@ -160,6 +162,17 @@
         td3.append(ipt2)
         tr.append(td3)
 
+        var ipt3 = document.createElement("input")
+        ipt3.setAttribute("id","balance"+number)
+        ipt3.setAttribute("style","width:200px")
+        ipt3.setAttribute("type","text")
+        ipt3.setAttribute("size","20")  
+        ipt3.setAttribute("readonly","readonly")
+        var td4 = document.createElement("td")
+        td4.append(ipt3)
+        tr.append(td4)
+
+
         ipt0.setAttribute("value",obj.type) 
         ipt.setAttribute("value",obj.address) 
         ipt2.setAttribute("value",obj.name) 
@@ -205,26 +218,58 @@
         return tr
     }
 
-    function initData(){
-        window.doGetContract().then( (result) => {
-            if (result != ""){
-                var obj = JSON.parse(result)
-                var table = document.getElementById("assetTable")
-                for (var n=table.rows.length-1;n>0;n--){
-                    table.removeChild(table.rows[n])
-                }
-                for(var i = 0; i < obj.contracts.length;i++)
-                {                    
-                    var tr = initTr(obj.contracts[i])
-                    table.append(tr)
-                }
+    async function initData(){
+        var result =  await window.doGetContract()
+        if (result != ""){
+            var obj = JSON.parse(result)
+            var table = document.getElementById("assetTable")
+            for (var n=table.rows.length-1;n>0;n--){
+                table.removeChild(table.rows[n])
             }
-        })
+            for(var i = 0; i < obj.contracts.length;i++)
+            {                    
+                var tr = initTr(obj.contracts[i])
+                table.append(tr)
+            }
+        }
+    }
+
+
+    async function initContractBalance(){
+        // 获取每个地址的balance
+        if ( getCurrentPage() === "contractasset"){
+            var table = document.getElementById("assetTable")
+            var address = document.getElementById("add").value 
+            for(var i =1; i< table.rows.length;i++){
+                result = await window.doGetContractBalance(
+                    table.rows[i].cells[0].childNodes[0].value,
+                    table.rows[i].cells[1].childNodes[0].value,
+                    address)
+                var jsonObj = JSON.parse(result)
+                if (jsonObj.Code === 0){
+                    var blObj = JSON.parse(jsonObj.Msg)
+                    table.rows[i].cells[3].childNodes[0].value = blObj.Balance
+                } else {
+                    MYDIALOG.ShowDiv(jsonObj.Msg);
+                }
+            }   
+        } 
+    }
+
+    async function accountChange(){
+        if ( getCurrentPage() === "contractasset"){
+            var table = document.getElementById("assetTable")
+            for(var i =1; i< table.rows.length;i++){  
+                table.rows[i].cells[3].childNodes[0].value = ""
+            }  
+            initContractBalance()  
+        }   
     }
 
     function initPage(){
         gLoadRes()
         initData()
+        setTimeout(initContractBalance,500)
     }
 
 

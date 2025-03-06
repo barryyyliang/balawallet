@@ -612,7 +612,7 @@ func (c *EthChain) ReadContract(from, to, funcAbi, paremters string) string {
 	var toAdd common.Address = common.HexToAddress(to)
 	contractAbi, err := abi.JSON(strings.NewReader(funcAbi))
 	var parems []interface{}
-	var re = balacommon.GetResult(balacommon.Msg_success, "")
+	var re = balacommon.GetResult(balacommon.Msg_fail, "")
 	var data []byte
 	var outs []string
 	if err == nil {
@@ -643,7 +643,15 @@ func (c *EthChain) ReadContract(from, to, funcAbi, paremters string) string {
 				}
 				result, err5 := connect.CallContract(ctx, msg, nil)
 				if err5 == nil {
-					ret, _ := method.Outputs.Unpack(result)
+					if len(result) == 0 {
+						re = balacommon.GetResult(balacommon.Msg_callcontract_fail, "result null")
+						return string(re)
+					}
+					ret, err := method.Outputs.Unpack(result)
+					if err != nil {
+						re = balacommon.GetResult(balacommon.Msg_callcontract_fail, err.Error())
+						return string(re)
+					}
 					for _, a := range ret {
 						aa := valueToString(a)
 						outs = append(outs, aa)
@@ -961,5 +969,96 @@ func (c *EthChain) ChangeAccountPass(atype, address, old, new string) string {
 	if i == len(acc) {
 		re = balacommon.GetResult(balacommon.Msg_account_noexist, "")
 	}
+	return string(re)
+}
+
+func (c *EthChain) GetContractBalance(assetType, conAddr, ownerAddr string) string {
+	re := balacommon.GetResult(balacommon.Msg_fail, "not support")
+
+	abis := c.LoadABI(assetType)
+	var abiResult = new(balacommon.ErrorResult)
+	err := json.Unmarshal([]byte(abis), abiResult)
+	if err == nil && abiResult.Code == balacommon.Msg_success {
+		contractAbi, err := abi.JSON(strings.NewReader(abiResult.Msg))
+		if err != nil {
+			re = balacommon.GetResult(balacommon.Msg_fail, err.Error())
+			return string(re)
+		}
+		for _, value := range contractAbi.Methods {
+			if value.Name == "balanceOf" &&
+				len(value.Inputs) == 1 &&
+				len(value.Outputs) == 1 &&
+				value.Inputs[0].Type.T == abi.AddressTy {
+				type argument struct {
+					Name string
+					Type string
+				}
+				type localMethod struct {
+					Type    string
+					Name    string
+					Inputs  []argument
+					Outputs []argument
+
+					// Status indicator which can be: "pure", "view",
+					// "nonpayable" or "payable".
+					StateMutability string
+
+					// Deprecated Status indicators, but removed in v0.6.0.
+					Constant bool // True if function is either pure or view
+					Payable  bool // True if function is payable
+
+					// Event relevant indicator represents the event is
+					// declared as anonymous.
+					Anonymous bool
+				}
+				meth := localMethod{Type: "function",
+					Name:            value.Name,
+					Inputs:          []argument{argument{value.Inputs[0].Name, value.Inputs[0].Type.String()}},
+					Outputs:         []argument{argument{value.Outputs[0].Name, value.Outputs[0].Type.String()}},
+					StateMutability: value.StateMutability}
+				arrMethod := []localMethod{meth}
+				jsonMethod, err := json.Marshal(arrMethod)
+				if err != nil {
+					re = balacommon.GetResult(balacommon.Msg_fail, err.Error())
+					return string(re)
+				}
+
+				sParams := []string{ownerAddr}
+				jParams, err := json.Marshal(sParams)
+				if err != nil {
+					re = balacommon.GetResult(balacommon.Msg_fail, err.Error())
+					return string(re)
+				}
+
+				result := c.ReadContract(ownerAddr, conAddr, string(jsonMethod), string(jParams))
+				callResult := new(balacommon.ErrorResult)
+				err = json.Unmarshal([]byte(result), callResult)
+				if err != nil {
+					re = balacommon.GetResult(balacommon.Msg_fail, err.Error())
+					return string(re)
+				}
+
+				if callResult.Code == balacommon.Msg_success {
+					var arrRet []string
+					err = json.Unmarshal([]byte(callResult.Msg), &arrRet)
+					if err != nil {
+						re = balacommon.GetResult(balacommon.Msg_fail, err.Error())
+						return string(re)
+					}
+					if len(arrRet) == 0 {
+						re = balacommon.GetResult(balacommon.Msg_callcontract_fail, "result null")
+						return string(re)
+					}
+					tmp, _ := json.Marshal(balacommon.ResBalance{ownerAddr, arrRet[0]})
+					re, _ = json.Marshal(balacommon.ErrorResult{balacommon.Msg_success, string(tmp)})
+					return string(re)
+				} else {
+					return result
+				}
+
+			}
+		}
+	}
+
 	return string(re)
 }

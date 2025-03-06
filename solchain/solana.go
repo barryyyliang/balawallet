@@ -675,3 +675,53 @@ func (c *SolChain) ChangeAccountPass(atype, address, old, new string) string {
 	}
 	return string(re)
 }
+
+func (c *SolChain) GetContractBalance(assetType, conAddr, ownerAddr string) string {
+	re := balacommon.GetResult(balacommon.Msg_fail, "not support")
+
+	abis := c.LoadABI(assetType)
+	var abiResult = new(balacommon.ErrorResult)
+	err := json.Unmarshal([]byte(abis), abiResult)
+	if err == nil && abiResult.Code == balacommon.Msg_success {
+		contractAbi, err := abi.JSON(strings.NewReader(abiResult.Msg))
+		if err != nil {
+			return string(re)
+		}
+		for _, value := range contractAbi.Methods {
+			if value.Name == "balanceOf" &&
+				len(value.Inputs) == 1 &&
+				value.Inputs[0].Type.T == abi.AddressTy {
+				if assetType == "SPL" {
+					client := balacommon.GetSolConnection()
+					if client == nil {
+						re = balacommon.GetResult(balacommon.Msg_fail, "connect is nil")
+						return string(re)
+					}
+					mint, err := solana.PublicKeyFromBase58(conAddr)
+					if err != nil {
+						re = balacommon.GetResult(balacommon.Msg_fail, err.Error())
+						return string(re)
+					}
+
+					result, err := ReadTokenContract(mint, value, []string{ownerAddr}, client)
+					if err == nil {
+						var arrRet []string
+						err = json.Unmarshal([]byte(result), &arrRet)
+						if err != nil {
+							re = balacommon.GetResult(balacommon.Msg_fail, err.Error())
+							return string(re)
+						}
+						tmp, _ := json.Marshal(balacommon.ResBalance{ownerAddr, arrRet[0]})
+						re, _ = json.Marshal(balacommon.ErrorResult{balacommon.Msg_success, string(tmp)})
+						return string(re)
+					} else {
+						re = balacommon.GetResult(balacommon.Msg_fail, err.Error())
+					}
+				}
+				break
+			}
+		}
+	}
+
+	return string(re)
+}

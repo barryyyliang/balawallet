@@ -25,6 +25,7 @@ type Bchain interface {
 	SignatureVerify(info string) string
 	ChangeAccountPass(atype, address, old, new string) string
 	InvokeEstimate(from, conAddr, funcAbi, param string) string
+	GetContractBalance(assetType, conAddr, ownerAddr string) string
 }
 
 var server = new(ServerAPI)
@@ -117,4 +118,7 @@ func (in *ServerAPI) DoChangeAccountPass(atype, address, old, new string) string
 }
 func (in *ServerAPI) DoInvokeEstimate(from, conAddr, funcAbi, param string) string {
 	return in.Chain.InvokeEstimate(from, conAddr, funcAbi, param)
+}
+func (in *ServerAPI) DoGetContractBalance(assetType, conAddr, ownerAddr string) string {
+	return in.Chain.GetContractBalance(assetType, conAddr, ownerAddr)
 }

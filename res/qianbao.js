@@ -37,8 +37,6 @@ function qianbao_func_showfunc(id){
 }
 
 function qianbao_func_mouseout(event){
-    window.doWebLog("enter: mouseout")
-    window.doWebLog(event.target.id)
     var p1 = document.getElementById(event.target.id).parentNode.parentNode
     var cells = p1.getElementsByTagName("td")
 

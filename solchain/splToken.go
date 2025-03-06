@@ -23,11 +23,17 @@ import (
 func ReadTokenContract(mint solana.PublicKey, method abi.Method, params []string, client *rpc.Client) (string, error) {
 	switch method.Name {
 	case "balanceOf":
+		owner, err := solana.PublicKeyFromBase58(params[0])
+		if err != nil {
+			return "", err
+		}
+		return balanceOf(mint, owner, client)
+	case "balanceOfAccount":
 		account, err := solana.PublicKeyFromBase58(params[0])
 		if err != nil {
 			return "", err
 		}
-		return balanceOf(mint, account, client)
+		return balanceOfAccount(mint, account, client)
 	case "getTokenAccount":
 		owner, err := solana.PublicKeyFromBase58(params[0])
 		if err != nil {
@@ -127,7 +133,7 @@ func mintInfo(mint solana.PublicKey, client *rpc.Client) (string, error) {
 	return string(outs), err
 }
 
-func balanceOf(mint, account solana.PublicKey, client *rpc.Client) (string, error) {
+func balanceOfAccount(mint, account solana.PublicKey, client *rpc.Client) (string, error) {
 	var result []string
 	ctx, fuc := context.WithTimeout(context.Background(), balacommon.G_Timeout)
 	defer fuc()
@@ -152,6 +158,35 @@ func balanceOf(mint, account solana.PublicKey, client *rpc.Client) (string, erro
 		}
 	}
 	if len(result) != 4 {
+		return "", fmt.Errorf(balacommon.GetMsgByCode(balacommon.Msg_account_noexist))
+	}
+	outs, err := json.Marshal(result)
+	return string(outs), err
+}
+
+func balanceOf(mint, owner solana.PublicKey, client *rpc.Client) (string, error) {
+	var conf rpc.GetTokenAccountsConfig
+	conf.Mint = &mint
+	ctx, fuc := context.WithTimeout(context.Background(), balacommon.G_Timeout)
+	defer fuc()
+	out, err := client.GetTokenAccountsByOwner(ctx, owner, &conf, nil)
+	if err != nil {
+		return "", err
+	}
+
+	var result []string
+	for _, value := range out.Value {
+		var token token.Account
+		data := value.Account.Data.GetBinary()
+		dec := bin.NewBinDecoder(data)
+		err := dec.Decode(&token)
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+		result = append(result, strconv.FormatUint(token.Amount, 10))
+		break
+	}
+	if len(result) != 1 {
 		return "", fmt.Errorf(balacommon.GetMsgByCode(balacommon.Msg_account_noexist))
 	}
 	outs, err := json.Marshal(result)
