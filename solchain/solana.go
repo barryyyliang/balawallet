@@ -420,8 +420,18 @@ func (c *SolChain) GetContract() string {
 }
 
 func (c *SolChain) DeleteContract(address string) string {
-	re := balacommon.GetResult(balacommon.Msg_fail, "not support")
-
+	re := balacommon.GetResult(balacommon.Msg_success, "")
+	db, err := leveldb.OpenFile(balacommon.G_DataDir+"contract", nil)
+	if err == nil {
+		defer db.Close()
+		key := strconv.Itoa(balacommon.G_NetType) + "_" + address
+		if db.Delete([]byte(key), nil) != nil {
+			re = balacommon.GetResult(balacommon.Msg_writedb_fail, "")
+		}
+	} else {
+		fmt.Println("open contract db error:" + err.Error())
+		re = balacommon.GetResult(balacommon.Msg_opendb_fail, err.Error())
+	}
 	return string(re)
 }
 

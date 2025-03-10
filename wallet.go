@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"os/user"
+	"path/filepath"
+	"strings"
 
 	"balawallet/common"
 	"balawallet/ethchain"
@@ -25,11 +27,16 @@ func main() {
 	common.InitAbiFile()  //generate by tool
 	common.InitMsg()
 	common.InitRes()
-	home, _ := user.Current()
-	dir = home.HomeDir + "/.balawallet"
-	//for local
-	//path, _ := filepath.Abs(filepath.Dir(os.Args[0]))
-	//dir = strings.Replace(path, "\\", "/", -1)
+	var local bool = false
+	if local {
+		//for local
+		path, _ := filepath.Abs(filepath.Dir(os.Args[0]))
+		dir = strings.Replace(path, "\\", "/", -1)
+
+	} else {
+		home, _ := user.Current()
+		dir = home.HomeDir + "/.balawallet"
+	}
 
 	_, err := os.Stat(dir)
 	if err != nil {

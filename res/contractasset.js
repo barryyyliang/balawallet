@@ -250,7 +250,8 @@
                     var blObj = JSON.parse(jsonObj.Msg)
                     table.rows[i].cells[3].childNodes[0].value = blObj.Balance
                 } else {
-                    MYDIALOG.ShowDiv(jsonObj.Msg);
+                    //MYDIALOG.ShowDiv(jsonObj.Msg);
+                    table.rows[i].cells[3].childNodes[0].value = jsonObj.Msg
                 }
             }   
         } 
