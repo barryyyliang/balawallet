@@ -54,7 +54,7 @@ func main() {
 	win = webview.New(false)
 	defer win.Destroy()
 	win.SetTitle("BalaWallet")
-	win.SetSize(1024, 640, webview.HintNone)
+	win.SetSize(1280, 800, webview.HintNone)
 
 	//注册全局函数
 
