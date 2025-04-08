@@ -249,10 +249,20 @@
 
     function onFuncOut(event){
         var rec = document.getElementById("funcMenu").getBoundingClientRect()
-        if(event.clientX>rec.left+window.scrollX - 5
-            && event.clientX <rec.right+window.scrollX
-            && event.clientY >rec.top + window.scrollY
-            && event.clientY < rec.bottom + window.scrollY) {
+
+        window.doWebLog("zuobiao")
+        window.doWebLog(event.clientX+'px')
+        window.doWebLog(event.clientY+'px')
+        window.doWebLog(window.scrollX+'px')
+        window.doWebLog(window.scrollY+'px')
+        window.doWebLog(rec.left+'px')
+        window.doWebLog(rec.right+'px')
+        window.doWebLog(rec.top+'px')
+        window.doWebLog(rec.bottom+'px')
+        if(event.clientX>rec.left - 5
+            && event.clientX <rec.right
+            && event.clientY >rec.top
+            && event.clientY < rec.bottom) {
 
         } else {
             document.getElementById("funcMenu").style.height=0;
