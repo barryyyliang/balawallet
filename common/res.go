@@ -419,6 +419,8 @@ func InitRes() {
 	G_Res["zh-CN"]["/dataspace.html"]["dataspace_auth"] = "个人空间密码"
 	G_Res["zh-CN"]["/dataspace.html"]["dataspace_load"] = "加载"
 	G_Res["zh-CN"]["/dataspace.html"]["dataspace_init"] = "初始化密码"
+	G_Res["zh-CN"]["/dataspace.html"]["dataspace_show"] = "显示"
+	G_Res["zh-CN"]["/dataspace.html"]["dataspace_hide"] = "隐藏"
 
 	G_Res["zh-TW"]["/dataspace.html"] = make(map[string]string)
 	G_Res["zh-TW"]["/dataspace.html"]["dataspace_name"] = "數據名稱"
@@ -431,6 +433,8 @@ func InitRes() {
 	G_Res["zh-TW"]["/dataspace.html"]["dataspace_auth"] = "個人空間密碼"
 	G_Res["zh-TW"]["/dataspace.html"]["dataspace_load"] = "加載"
 	G_Res["zh-TW"]["/dataspace.html"]["dataspace_init"] = "初始化密碼"
+	G_Res["zh-TW"]["/dataspace.html"]["dataspace_show"] = "顯示"
+	G_Res["zh-TW"]["/dataspace.html"]["dataspace_hide"] = "隱藏"
 
 	G_Res["en"]["/dataspace.html"] = make(map[string]string)
 	G_Res["en"]["/dataspace.html"]["dataspace_name"] = "Data Name"
@@ -443,6 +447,8 @@ func InitRes() {
 	G_Res["en"]["/dataspace.html"]["dataspace_auth"] = "Personal Data Space Password"
 	G_Res["en"]["/dataspace.html"]["dataspace_load"] = "Load"
 	G_Res["en"]["/dataspace.html"]["dataspace_init"] = "Initialize Password"
+	G_Res["en"]["/dataspace.html"]["dataspace_show"] = "Show"
+	G_Res["en"]["/dataspace.html"]["dataspace_hide"] = "Hide"
 
 	//changepass
 	G_Res["zh-CN"]["/changepass.html"] = make(map[string]string)

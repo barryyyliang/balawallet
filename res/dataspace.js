@@ -64,10 +64,27 @@
         
     }
 
+    async function dataspace_fun_show(name,content){
+        var auth = document.getElementById("dataspace_pass").value
+        var key = document.getElementById(name).value
+
+        var result = await window.doGetDataItem(auth,key)
+        var obj = JSON.parse(result)         
+        if (obj.Code === 0){
+            document.getElementById(content).value = obj.Msg
+        }  else {
+            MYDIALOG.ShowDiv(obj.Msg) 
+        }       
+    }
+
     function dataspace_fun_recover(id){
         var data = document.getElementById(id)
         data.style.width = '500px'
         data.style.height = '25px'
+    }
+
+    function dataspace_fun_hide(id){
+        document.getElementById(id).value = "**********"
     }
 
     async function dataspace_fun_save(name,content){
@@ -100,7 +117,10 @@
             MYDIALOG.ShowDiv(await window.doGetMsg("0"))
         }
     }
-
+    
+    /*
+    在每一行显示对应的功能菜单，数据绑定对应行
+     */
     function dataspace_func_showfunc(id){
         var p1 = document.getElementById(id).parentNode.parentNode
         var cells = p1.getElementsByTagName("td")
@@ -111,6 +131,8 @@
         cells[1].childNodes[0].classList.add("highlight")
 
         clearFunc()
+        addFuncToMenu("dataspace_fun_show('"+name+"','"+content+"')", gGetRes("dataspace_show"))
+        addFuncToMenu("dataspace_fun_hide('"+content+"')", gGetRes("dataspace_hide"))
         addFuncToMenu("dataspace_fun_recover('"+content+"')", gGetRes("dataspace_recover"))
         addFuncToMenu("dataspace_fun_change('"+name+"','"+content+"')", gGetRes("dataspace_change"))
         addFuncToMenu("dataspace_fun_delete('"+name+"')", gGetRes("dataspace_delete"))

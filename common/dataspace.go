@@ -118,18 +118,57 @@ func DoGetDataSpace(auth string) string {
 			if string(it.Key()) == "data_space_init" {
 				continue
 			}
-			var tmp accounts.CryptoJSON
-			if json.Unmarshal(it.Value(), &tmp) == nil {
-				dedata, err1 := keystore.DecryptDataV3(tmp, auth)
-				if err1 == nil {
-					data[string(it.Key())] = string(dedata)
-				} else {
-					data[string(it.Key())] = err1.Error()
+
+			/*
+				var tmp accounts.CryptoJSON
+				if json.Unmarshal(it.Value(), &tmp) == nil {
+					dedata, err1 := keystore.DecryptDataV3(tmp, auth)
+					if err1 == nil {
+						data[string(it.Key())] = string(dedata)
+					} else {
+						data[string(it.Key())] = err1.Error()
+					}
 				}
-			}
+			*/
+			data[string(it.Key())] = "**********"
 		}
 		msg, _ := json.Marshal(data)
 		re, _ = json.Marshal(ErrorResult{Msg_success, string(msg)})
+	} else {
+		re = GetResult(Msg_fail, err.Error())
+	}
+	return string(re)
+}
+
+func DoGetDataItem(auth, key string) string {
+	var re []byte
+	check := checkDataSpaceAuth(auth)
+	if check != nil {
+		re = GetResult(Msg_fail, check.Error())
+		return string(re)
+	}
+	db, err := leveldb.OpenFile(G_DataDir+"dataspace", nil)
+	if db != nil {
+		defer db.Close()
+	}
+	if err == nil {
+		value, err2 := db.Get([]byte(key), nil)
+		if err2 == nil {
+			var tmp accounts.CryptoJSON
+			if json.Unmarshal(value, &tmp) == nil {
+				dedata, err3 := keystore.DecryptDataV3(tmp, auth)
+				if err3 == nil {
+					re, err3 = json.Marshal(ErrorResult{Msg_success, string(dedata)})
+					if err3 != nil {
+						re = GetResult(Msg_fail, err3.Error())
+					}
+				} else {
+					re = GetResult(Msg_fail, err3.Error())
+				}
+			}
+		} else {
+			re = GetResult(Msg_fail, err2.Error())
+		}
 	} else {
 		re = GetResult(Msg_fail, err.Error())
 	}
