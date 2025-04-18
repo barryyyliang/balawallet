@@ -72,6 +72,7 @@
         var obj = JSON.parse(result)         
         if (obj.Code === 0){
             document.getElementById(content).value = obj.Msg
+            g_items[document.getElementById(name).value] = 1
         }  else {
             MYDIALOG.ShowDiv(obj.Msg) 
         }       
@@ -83,8 +84,10 @@
         data.style.height = '25px'
     }
 
-    function dataspace_fun_hide(id){
-        document.getElementById(id).value = "**********"
+    function dataspace_fun_hide(name,content){
+        document.getElementById(content).value = "**********"
+        g_items[document.getElementById(name).value] = 0
+
     }
 
     async function dataspace_fun_save(name,content){
@@ -104,7 +107,13 @@
         var auth = document.getElementById("dataspace_pass").value
         var dataname = document.getElementById(name).value
         var datacontent = document.getElementById(content).value
-        var conf = await MYDIALOG.ShowConfirmDiv(await window.doGetMsg("41"))
+        if(g_items[dataname] === 0){
+            var change_guide = await window.doGetMsg("45")
+            MYDIALOG.ShowDiv(change_guide)
+            return
+        }
+        var tips = await window.doGetMsg("41")
+        var conf = await MYDIALOG.ShowConfirmDiv(tips + ":" + "\r\n" + datacontent)
         if(conf){
             var result = await window.doChangeDataSpace(dataname,datacontent,auth)
             showResult(result)
@@ -132,7 +141,7 @@
 
         clearFunc()
         addFuncToMenu("dataspace_fun_show('"+name+"','"+content+"')", gGetRes("dataspace_show"))
-        addFuncToMenu("dataspace_fun_hide('"+content+"')", gGetRes("dataspace_hide"))
+        addFuncToMenu("dataspace_fun_hide('"+name+"','"+content+"')", gGetRes("dataspace_hide"))
         addFuncToMenu("dataspace_fun_recover('"+content+"')", gGetRes("dataspace_recover"))
         addFuncToMenu("dataspace_fun_change('"+name+"','"+content+"')", gGetRes("dataspace_change"))
         addFuncToMenu("dataspace_fun_delete('"+name+"')", gGetRes("dataspace_delete"))
@@ -150,20 +159,22 @@
         onFuncOut(event)
     }
 
+    var g_items = {}
     async function loadDataSpace(){
         var auth = document.getElementById("dataspace_pass").value
         var result =await window.doGetDataSpace(auth)
         if (result != ""){
             var obj = JSON.parse(result)
             if (obj.Code == 0 ){
-                data = JSON.parse(obj.Msg)
+                g_items = JSON.parse(obj.Msg)
                 var table = document.getElementById("dataspace_table")
                 for (var n=table.rows.length-1;n>0;n--){
                     table.removeChild(table.rows[n])
                 }
-                for(var val in data)
+                for(var val in g_items)
                 {                            
-                    var tr = initTr(val,data[val])
+                    var tr = initTr(val,g_items[val])
+                    g_items[val] = 0
                     table.append(tr)
                 }
                 return true
