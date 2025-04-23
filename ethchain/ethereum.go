@@ -942,8 +942,18 @@ func (c *EthChain) GetBinFile() string {
 	if dir != "" {
 		names, err := balacommon.GetFilesName(dir, ".bin")
 		if err == nil {
-			tmp, _ := json.Marshal(names)
-			re, _ = json.Marshal(balacommon.ErrorResult{0, string(tmp)})
+			var msg string
+			if len(names) != 0 {
+				tmp, err := json.Marshal(names)
+				if err == nil {
+					msg = string(tmp)
+				} else {
+					msg = ""
+				}
+			} else {
+				msg = ""
+			}
+			re, _ = json.Marshal(balacommon.ErrorResult{0, msg})
 		} else {
 			re = balacommon.GetResult(balacommon.Msg_openfile_fail, err.Error())
 		}
