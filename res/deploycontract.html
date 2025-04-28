@@ -1,12 +1,12 @@
 <div class="cdiv">
     <table class="contractTable">
         <tr>
-            <td id="deploycontract_file">合约文件（bin):</td>
+            <td id="deploycontract_file">合约文件(bin):</td>
             <td><select id="binFile" name="binFile" style="font-size: 14px;height: 30px;width: 300px;border-radius: 0px;"></select></td>
             <!--td><button class="button1" onclick="selectfile()">选择</button></td--></td>
         </tr> 
         <tr>
-            <td id="deploycontractabi_file">ABI文件（abi):</td>
+            <td id="deploycontractabi_file">ABI文件(abi):</td>
             <td><select id="deploycontractabiFile" style="font-size: 14px;height: 30px;width: 300px;border-radius: 0px;" onchange="deploycontract_func_abichange()"></select></td>
             <!--td><button class="button1" onclick="selectfile()">选择</button></td--></td>
         </tr> 
@@ -15,10 +15,10 @@
             <td><input type="password" id="deploycontract_ass"  style="font-size: 14px;height: 25px;width: 300px;"></td>        
         </tr> 
         <tr>
-            <td id="invokecontract_fee" class="firstTd">预估费用:</td>
+            <td id="deploycontract_fee" class="firstTd">预估费用:</td>
             <td >
-                <input type="text" id="invokecontract_input_fee"  style="width: 190px;" ></input>
-                <button id="invokecontract_estimate" type="button" class="button1" onclick="invokecontract_fun_estimate()" style="width: 100px;">预估</button>
+                <input type="text" id="deploycontract_input_fee"  style="width: 190px;" ></input>
+                <button id="deploycontract_estimate" type="button" class="button1" onclick="deploycontract_fun_estimate()" style="width: 100px;">预估</button>
             </td>  
         </tr> 
     </table>

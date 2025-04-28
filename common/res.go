@@ -169,16 +169,37 @@ func InitRes() {
 	G_Res["zh-CN"]["/deploycontract.html"]["deploycontract_file"] = "合约文件（bin)"
 	G_Res["zh-CN"]["/deploycontract.html"]["deploycontract_acc"] = "账户密码"
 	G_Res["zh-CN"]["/deploycontract.html"]["deploycontract_deploy"] = "部署"
+	G_Res["zh-CN"]["/deploycontract.html"]["deploycontractabi_file"] = "ABI文件(abi)"
+	G_Res["zh-CN"]["/deploycontract.html"]["deploycontract_fee"] = "预估费用"
+	G_Res["zh-CN"]["/deploycontract.html"]["deploycontract_estimate"] = "预估"
+	G_Res["zh-CN"]["/deploycontract.html"]["deploycontract_inputparameter"] = "构造参数"
+	G_Res["zh-CN"]["/deploycontract.html"]["deploycontract_parameter"] = "参数"
+	G_Res["zh-CN"]["/deploycontract.html"]["deploycontract_inputvalue"] = "值"
+	G_Res["zh-CN"]["/deploycontract.html"]["deploycontract_inputtype"] = "类型"
 
 	G_Res["en"]["/deploycontract.html"] = make(map[string]string)
 	G_Res["en"]["/deploycontract.html"]["deploycontract_file"] = "Contract Bin File"
 	G_Res["en"]["/deploycontract.html"]["deploycontract_acc"] = "Password"
 	G_Res["en"]["/deploycontract.html"]["deploycontract_deploy"] = "Deploy"
+	G_Res["en"]["/deploycontract.html"]["deploycontractabi_file"] = "ABI File(abi)"
+	G_Res["en"]["/deploycontract.html"]["deploycontract_fee"] = "Estimate Fee"
+	G_Res["en"]["/deploycontract.html"]["deploycontract_estimate"] = "Estimate"
+	G_Res["en"]["/deploycontract.html"]["deploycontract_inputparameter"] = "Construct Parameter"
+	G_Res["en"]["/deploycontract.html"]["deploycontract_parameter"] = "Parameter"
+	G_Res["en"]["/deploycontract.html"]["deploycontract_inputvalue"] = "Value"
+	G_Res["en"]["/deploycontract.html"]["deploycontract_inputtype"] = "Type"
 
 	G_Res["zh-TW"]["/deploycontract.html"] = make(map[string]string)
 	G_Res["zh-TW"]["/deploycontract.html"]["deploycontract_file"] = "合約文件（bin)"
 	G_Res["zh-TW"]["/deploycontract.html"]["deploycontract_acc"] = "帳戶密碼"
 	G_Res["zh-TW"]["/deploycontract.html"]["deploycontract_deploy"] = "部署"
+	G_Res["zh-TW"]["/deploycontract.html"]["deploycontractabi_file"] = "ABI文件(abi)"
+	G_Res["zh-TW"]["/deploycontract.html"]["deploycontract_fee"] = "預估費用"
+	G_Res["zh-TW"]["/deploycontract.html"]["deploycontract_estimate"] = "預估"
+	G_Res["zh-TW"]["/deploycontract.html"]["deploycontract_inputparameter"] = "構建參數"
+	G_Res["zh-TW"]["/deploycontract.html"]["deploycontract_parameter"] = "參數"
+	G_Res["zh-TW"]["/deploycontract.html"]["deploycontract_inputvalue"] = "值"
+	G_Res["zh-TW"]["/deploycontract.html"]["deploycontract_inputtype"] = "類型"
 
 	//invokecontract
 	G_Res["zh-CN"]["/invokecontract.html"] = make(map[string]string)
@@ -238,7 +259,7 @@ func InitRes() {
 	G_Res["zh-TW"]["/invokecontract.html"]["invokecontract_fee"] = "預估費用"
 	G_Res["zh-TW"]["/invokecontract.html"]["invokecontract_estimate"] = "預估"
 
-	//deploycontract
+	//querytx
 	G_Res["zh-CN"]["/querytx.html"] = make(map[string]string)
 	G_Res["zh-CN"]["/querytx.html"]["querytx_txhash"] = "交易 hash"
 	G_Res["zh-CN"]["/querytx.html"]["querytx_query"] = "查询"

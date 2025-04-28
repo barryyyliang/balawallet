@@ -1,3 +1,4 @@
+var abijson
 
 async function initPage() {
     gLoadRes()
@@ -27,6 +28,48 @@ function selectfile(){
 
 function changedfile(){
     document.getElementById("filePath").value = document.getElementById("contractFile").value
+}
+
+//改为合约部署交易预估
+async function deploycontract_fun_estimate(){
+    var funcName = document.getElementById("contractFunc").value
+    var caddress = document.getElementById("caddress").value
+    var from = document.getElementById("add").value
+    if(caddress === ""){
+        var msg = await window.doGetMsg("29")
+        MYDIALOG.ShowDiv(msg)
+        return
+    }
+    if(funcName === ""){
+        var msg = await window.doGetMsg("31")
+        MYDIALOG.ShowDiv(msg)
+        return
+    }
+    var i = 0
+    for ( ; i<abijson.length;i++){
+        if (abijson[i].type === "function" && abijson[i].name === funcName){
+            break               
+        } 
+    } 
+    var tmp = new Array()
+    tmp.push(abijson[i])
+    var func = JSON.stringify(tmp)
+    var parems = new Array()
+    var inputTable = document.getElementById("paramterTable")
+
+    for (var n=2;n<inputTable.rows.length;n++){
+        parems.push(inputTable.rows[n].cells[1].childNodes[0].value)
+    }
+
+    var paremsString = JSON.stringify(parems)  
+
+    var result = await window.doInvokeEstimate(from,caddress,func, paremsString)
+    var obj = JSON.parse(result)
+    if(obj.Code === 0){
+        document.getElementById("invokecontract_input_fee").value = obj.Msg
+    } else {
+        MYDIALOG.ShowDiv(obj.Msg)
+    }
 }
 
 
@@ -61,14 +104,6 @@ async function deploycontract_func_abichange(){
         inputTable.removeChild(inputTable.rows[n])
     }
 
-
-    document.getElementById("deploycontract_parameter_div").style.visibility = "hidden"
-    document.getElementById("deploycontract_parameter_div").style.height = "0px"
-
-
-
-
-
     var filepath = document.getElementById("deploycontractabiFile").value
     if (filepath === ""){
         window.doWebLog("deploycontract_func_abichange2")
@@ -77,7 +112,7 @@ async function deploycontract_func_abichange(){
     var strjson = await window.doLoadABI(filepath)
     var obj =  JSON.parse(strjson)
     if (obj.Code === 0){
-        var abijson
+
         try {
             abijson = JSON.parse(obj.Msg)
         } catch (e){
@@ -85,16 +120,23 @@ async function deploycontract_func_abichange(){
             return
         }
         window.doWebLog("deploycontract_func_abichange3")
+        var hasConstruct = false
         for (var i=0; i<abijson.length;i++){
             if (abijson[i].type === "constructor"){
                 window.doWebLog("deploycontract_func_abichange4")
+                hasConstruct = true
                 document.getElementById("deploycontract_parameter_div").style.visibility = "visible"
                 document.getElementById("deploycontract_parameter_div").style.height = ""
                 for (var n=0; n<abijson[i].inputs.length;n++){
                     addNew(inputTable,abijson[i].inputs[n])
                 } 
             }                
-        }                     
+        } 
+        if (!hasConstruct) {
+            document.getElementById("deploycontract_parameter_div").style.visibility = "hidden"
+            document.getElementById("deploycontract_parameter_div").style.height = "0px"
+        }
+        
     } else {
         MYDIALOG.ShowDiv(obj.Msg);
     }
