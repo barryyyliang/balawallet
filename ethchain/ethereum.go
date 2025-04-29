@@ -372,7 +372,7 @@ func (c *EthChain) GetFee() string {
 	return str
 }
 
-func (c *EthChain) DeployContract(from string, file string, pass string) string {
+func (c *EthChain) DeployContract(from, file, pass, funcAbi, param string) string {
 	var re []byte
 	if from == "" || file == "" || pass == "" {
 		fmt.Println("parameter error")
@@ -413,15 +413,43 @@ func (c *EthChain) DeployContract(from string, file string, pass string) string 
 				re = balacommon.GetResult(balacommon.Msg_decodebinfile_fail, err.Error())
 				break
 			}
+
+			var data []byte
+			if funcAbi != "" && param != "" {
+				contractAbi, err := abi.JSON(strings.NewReader(funcAbi))
+				var parems []interface{}
+				var parStrings []string
+
+				if err == nil {
+					method := contractAbi.Constructor
+					json.Unmarshal([]byte(param), &parStrings)
+					for i, pType := range method.Inputs {
+						parems = append(parems, stringToValue(pType.Type.GetType(), parStrings[i]))
+					}
+					data, err = contractAbi.Pack(method.RawName, parems...)
+					if err != nil {
+						re = balacommon.GetResult(balacommon.Msg_packabiparam_error, err.Error())
+						return string(re)
+					}
+				} else {
+					re = balacommon.GetResult(balacommon.Msg_packabiparam_error, err.Error())
+					return string(re)
+				}
+			}
+
+			if len(data) > 0 {
+				bytecode = append(bytecode, data...)
+			}
+
 			msg := ethereum.CallMsg{
-				From:      common.HexToAddress(acc[i].GetAddress()), // the sender of the 'transaction'
-				To:        nil,                                      // the destination contract (nil for contract creation)
-				Gas:       0,                                        // if 0, the call executes with near-infinite gas
-				GasPrice:  gasPrice,                                 // wei <-> gas exchange ratio
-				GasFeeCap: tipsPrice,                                // EIP-1559 fee cap per gas.
-				GasTipCap: tipsPrice,                                // EIP-1559 tip per gas.
-				Value:     big.NewInt(0),                            // amount of wei sent along with the call
-				Data:      bytecode,                                 // input data, usually an ABI-encoded contract method invocation
+				From:     common.HexToAddress(acc[i].GetAddress()), // the sender of the 'transaction'
+				To:       nil,                                      // the destination contract (nil for contract creation)
+				Gas:      0,                                        // if 0, the call executes with near-infinite gas
+				GasPrice: gasPrice,                                 // wei <-> gas exchange ratio
+				//GasFeeCap: tipsPrice,                                // EIP-1559 fee cap per gas.
+				//GasTipCap: tipsPrice,     // EIP-1559 tip per gas.
+				Value: big.NewInt(0), // amount of wei sent along with the call
+				Data:  bytecode,      // input data, usually an ABI-encoded contract method invocation
 			}
 
 			gasLimit, err := connect.EstimateGas(ctx, msg)
@@ -1070,5 +1098,91 @@ func (c *EthChain) GetContractBalance(assetType, conAddr, ownerAddr string) stri
 		}
 	}
 
+	return string(re)
+}
+
+func (c *EthChain) DeployEstimate(from, conFile, funcAbi, param string) string {
+
+	var re []byte
+	if from == "" || conFile == "" {
+		fmt.Println("parameter error")
+		re = balacommon.GetResult(balacommon.Msg_param_error, "")
+		return string(re)
+	}
+	filepath := balacommon.G_Config["contractDir"]
+	filepath = filepath + "/" + conFile
+	connect := balacommon.GetEthConnection()
+
+	if connect == nil {
+		fmt.Println("can not connect to node:")
+		re = balacommon.GetResult(balacommon.Msg_connectnode_fail, "")
+		return string(re)
+	}
+	ctx := context.Background()
+
+	_, gasPrice, _, _, err := getChainInfo(connect, from)
+	if err != nil {
+		re = balacommon.GetResult(balacommon.Msg_getchaininfo_fail, err.Error())
+		return string(re)
+	}
+	bin, err := os.ReadFile(filepath)
+	if err != nil {
+		re = balacommon.GetResult(balacommon.Msg_openfile_fail, err.Error())
+		return string(re)
+	}
+	bytecode, err := hex.DecodeString(string(bin))
+	if err != nil {
+		re = balacommon.GetResult(balacommon.Msg_decodebinfile_fail, err.Error())
+		return string(re)
+	}
+
+	//add constructor invoke
+	var data []byte
+	if funcAbi != "" && param != "" {
+		contractAbi, err := abi.JSON(strings.NewReader(funcAbi))
+		var parems []interface{}
+		var parStrings []string
+
+		if err == nil {
+			method := contractAbi.Constructor
+			json.Unmarshal([]byte(param), &parStrings)
+			for i, pType := range method.Inputs {
+				parems = append(parems, stringToValue(pType.Type.GetType(), parStrings[i]))
+			}
+			data, err = contractAbi.Pack(method.RawName, parems...)
+			if err != nil {
+				re = balacommon.GetResult(balacommon.Msg_packabiparam_error, err.Error())
+				return string(re)
+			}
+		} else {
+			re = balacommon.GetResult(balacommon.Msg_packabiparam_error, err.Error())
+			return string(re)
+		}
+	}
+
+	if len(data) > 0 {
+		bytecode = append(bytecode, data...)
+	}
+
+	msg := ethereum.CallMsg{
+		From:     common.HexToAddress(from), // the sender of the 'transaction'
+		To:       nil,                       // the destination contract (nil for contract creation)
+		Gas:      0,                         // if 0, the call executes with near-infinite gas
+		GasPrice: gasPrice,
+		Value:    big.NewInt(0), // amount of wei sent along with the call
+		Data:     bytecode,      // input data, usually an ABI-encoded contract method invocation
+	}
+
+	gasLimit, err := connect.EstimateGas(ctx, msg)
+	if err != nil {
+		re = balacommon.GetResult(balacommon.Msg_getgaslimit_fail, err.Error())
+		return string(re)
+	}
+
+	var gas = new(big.Int)
+	gas.SetUint64(gasLimit)
+	fee := gasPrice.Mul(gasPrice, gas)
+	str := weiToether(fee.String())
+	re, _ = json.Marshal(balacommon.ErrorResult{0, str})
 	return string(re)
 }

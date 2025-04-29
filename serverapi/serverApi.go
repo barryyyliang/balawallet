@@ -12,7 +12,7 @@ type Bchain interface {
 	GetFee() string
 	GetContract() string
 	ImportContract(cons string) string
-	DeployContract(from string, file string, pass string) string
+	DeployContract(from, file, pass, funcAbi, param string) string
 	CheckNode() string
 	LoadABI(file string) string
 	ReadContract(from, to, funcAbi, paremters string) string
@@ -26,6 +26,7 @@ type Bchain interface {
 	ChangeAccountPass(atype, address, old, new string) string
 	InvokeEstimate(from, conAddr, funcAbi, param string) string
 	GetContractBalance(assetType, conAddr, ownerAddr string) string
+	DeployEstimate(from, conFile, funcAbi, param string) string
 }
 
 var server = new(ServerAPI)
@@ -80,8 +81,8 @@ func (in *ServerAPI) DoGetContract() string {
 func (in *ServerAPI) DoImportContract(cons string) string {
 	return in.Chain.ImportContract(cons)
 }
-func (in *ServerAPI) DoDeployContract(from string, file string, pass string) string {
-	return in.Chain.DeployContract(from, file, pass)
+func (in *ServerAPI) DoDeployContract(from, file, pass, funcAbi, param string) string {
+	return in.Chain.DeployContract(from, file, pass, funcAbi, param)
 }
 func (in *ServerAPI) DoCheckNode() string {
 	return in.Chain.CheckNode()
@@ -121,4 +122,7 @@ func (in *ServerAPI) DoInvokeEstimate(from, conAddr, funcAbi, param string) stri
 }
 func (in *ServerAPI) DoGetContractBalance(assetType, conAddr, ownerAddr string) string {
 	return in.Chain.GetContractBalance(assetType, conAddr, ownerAddr)
+}
+func (in *ServerAPI) DoDeployEstimate(from, conFile, funcAbi, param string) string {
+	return in.Chain.DeployEstimate(from, conFile, funcAbi, param)
 }

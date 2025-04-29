@@ -378,7 +378,7 @@ func (c *SolChain) GetFee() string {
 	return balacommon.ToBig(9, "5000")
 }
 
-func (c *SolChain) DeployContract(from string, file string, pass string) string {
+func (c *SolChain) DeployContract(from, file, pass, funcAbi, param string) string {
 	re := balacommon.GetResult(balacommon.Msg_fail, "not support")
 
 	return string(re)
@@ -732,6 +732,11 @@ func (c *SolChain) GetContractBalance(assetType, conAddr, ownerAddr string) stri
 			}
 		}
 	}
+
+	return string(re)
+}
+func (c *SolChain) DeployEstimate(from, conFile, funcAbi, param string) string {
+	re := balacommon.GetResult(balacommon.Msg_fail, "not support")
 
 	return string(re)
 }

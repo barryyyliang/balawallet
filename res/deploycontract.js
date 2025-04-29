@@ -32,44 +32,44 @@ function changedfile(){
 
 //改为合约部署交易预估
 async function deploycontract_fun_estimate(){
-    var funcName = document.getElementById("contractFunc").value
-    var caddress = document.getElementById("caddress").value
+    var contractFile = document.getElementById("binFile").value
     var from = document.getElementById("add").value
-    if(caddress === ""){
+    if(contractFile === ""){
         var msg = await window.doGetMsg("29")
-        MYDIALOG.ShowDiv(msg)
-        return
-    }
-    if(funcName === ""){
-        var msg = await window.doGetMsg("31")
         MYDIALOG.ShowDiv(msg)
         return
     }
     var i = 0
     for ( ; i<abijson.length;i++){
-        if (abijson[i].type === "function" && abijson[i].name === funcName){
+        if (abijson[i].type === "constructor" ){
             break               
         } 
     } 
     var tmp = new Array()
-    tmp.push(abijson[i])
-    var func = JSON.stringify(tmp)
-    var parems = new Array()
-    var inputTable = document.getElementById("paramterTable")
-
-    for (var n=2;n<inputTable.rows.length;n++){
-        parems.push(inputTable.rows[n].cells[1].childNodes[0].value)
+    var paremsString = ""
+    var func = ""
+    if (i < abijson.length){
+        tmp.push(abijson[i])
+        func = JSON.stringify(tmp)
+        var parems = new Array()
+        var inputTable = document.getElementById("deploycontract_paramterTable")
+    
+        for (var n=2;n<inputTable.rows.length;n++){
+            parems.push(inputTable.rows[n].cells[1].childNodes[0].value)
+        }
+        if (parems.length > 0){
+            paremsString = JSON.stringify(parems)  
+        }        
     }
-
-    var paremsString = JSON.stringify(parems)  
-
-    var result = await window.doInvokeEstimate(from,caddress,func, paremsString)
+    
+    var result = await window.doDeployEstimate(from,contractFile,func, paremsString)
     var obj = JSON.parse(result)
     if(obj.Code === 0){
-        document.getElementById("invokecontract_input_fee").value = obj.Msg
+        document.getElementById("deploycontract_input_fee").value = obj.Msg
     } else {
         MYDIALOG.ShowDiv(obj.Msg)
     }
+    
 }
 
 
@@ -98,7 +98,6 @@ async function deploy_func_loadABI(){
 }
 
 async function deploycontract_func_abichange(){
-    window.doWebLog("deploycontract_func_abichange1")
     var inputTable = document.getElementById("deploycontract_paramterTable")
     for (var n=inputTable.rows.length-1;n>1;n--){
         inputTable.removeChild(inputTable.rows[n])
@@ -106,7 +105,6 @@ async function deploycontract_func_abichange(){
 
     var filepath = document.getElementById("deploycontractabiFile").value
     if (filepath === ""){
-        window.doWebLog("deploycontract_func_abichange2")
         return
     }
     var strjson = await window.doLoadABI(filepath)
@@ -119,17 +117,21 @@ async function deploycontract_func_abichange(){
             MYDIALOG.ShowDiv(e.message);
             return
         }
-        window.doWebLog("deploycontract_func_abichange3")
         var hasConstruct = false
         for (var i=0; i<abijson.length;i++){
             if (abijson[i].type === "constructor"){
-                window.doWebLog("deploycontract_func_abichange4")
-                hasConstruct = true
-                document.getElementById("deploycontract_parameter_div").style.visibility = "visible"
-                document.getElementById("deploycontract_parameter_div").style.height = ""
-                for (var n=0; n<abijson[i].inputs.length;n++){
-                    addNew(inputTable,abijson[i].inputs[n])
-                } 
+                hasConstruct = true                
+                if (abijson[i].inputs.length > 0){
+                    document.getElementById("deploycontract_parameter_div").style.visibility = "visible"
+                    document.getElementById("deploycontract_parameter_div").style.height = ""
+                    
+                    for (var n=0; n<abijson[i].inputs.length;n++){
+                        addNew(inputTable,abijson[i].inputs[n])
+                    }
+                } else {
+                    document.getElementById("deploycontract_parameter_div").style.visibility = "hidden"
+                    document.getElementById("deploycontract_parameter_div").style.height = "0px"
+                }                 
             }                
         } 
         if (!hasConstruct) {
@@ -170,7 +172,31 @@ async function deploy(){
     var address = document.getElementById("add").value
     var file = document.getElementById("binFile").value
     var ass = document.getElementById("deploycontract_ass").value
-    var result = await window.doDeployContract(address,file,ass)
+
+    var i = 0
+    for ( ; i<abijson.length;i++){
+        if (abijson[i].type === "constructor" ){
+            break               
+        } 
+    } 
+    var tmp = new Array()
+    var paremsString = ""
+    var func = ""
+    if (i < abijson.length){
+        tmp.push(abijson[i])
+        func = JSON.stringify(tmp)
+        var parems = new Array()
+        var inputTable = document.getElementById("deploycontract_paramterTable")
+    
+        for (var n=2;n<inputTable.rows.length;n++){
+            parems.push(inputTable.rows[n].cells[1].childNodes[0].value)
+        }
+        if (parems.length > 0){
+            paremsString = JSON.stringify(parems)  
+        }        
+    }
+
+    var result = await window.doDeployContract(address,file,ass,func, paremsString)
     var jsonObj = JSON.parse(result)
     if (jsonObj.Code === 0 ){
         showMsg("34",jsonObj.Msg)

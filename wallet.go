@@ -98,6 +98,7 @@ func main() {
 	win.Bind("doChangeAccountPass", server.DoChangeAccountPass)
 	win.Bind("doInvokeEstimate", server.DoInvokeEstimate)
 	win.Bind("doGetContractBalance", server.DoGetContractBalance)
+	win.Bind("doDeployEstimate", server.DoDeployEstimate)
 
 	content := common.G_Files["/main.html"]
 	if len(content) == 0 {
