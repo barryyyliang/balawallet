@@ -6,6 +6,26 @@ func InitRes() {
 	G_Res["zh-CN"] = make(map[string]map[string]string)
 	G_Res["en"] = make(map[string]map[string]string)
 	G_Res["zh-TW"] = make(map[string]map[string]string)
+	G_Res["common"] = make(map[string]map[string]string)
+
+	//common
+	G_Res["common"]["zh-CN"] = make(map[string]string)
+	G_Res["common"]["zh-CN"]["old_pass"] = "旧密码"
+	G_Res["common"]["zh-CN"]["new_pass"] = "新密码"
+	G_Res["common"]["zh-CN"]["confirm_pass"] = "确认密码"
+	G_Res["common"]["zh-CN"]["change"] = "修改"
+
+	G_Res["common"]["zh-TW"] = make(map[string]string)
+	G_Res["common"]["zh-TW"]["old_pass"] = "舊密碼"
+	G_Res["common"]["zh-TW"]["new_pass"] = "新密碼"
+	G_Res["common"]["zh-TW"]["confirm_pass"] = "確認密碼"
+	G_Res["common"]["zh-TW"]["change"] = "修改"
+
+	G_Res["common"]["en"] = make(map[string]string)
+	G_Res["common"]["en"]["old_pass"] = "Old Password"
+	G_Res["common"]["en"]["new_pass"] = "New Password"
+	G_Res["common"]["en"]["confirm_pass"] = "Confirm Password"
+	G_Res["common"]["en"]["change"] = "Change"
 
 	//main
 	G_Res["zh-CN"]["/main.html"] = make(map[string]string)
@@ -31,6 +51,7 @@ func InitRes() {
 	G_Res["zh-CN"]["/main.html"]["dataspace"] = "数据空间"
 	G_Res["zh-CN"]["/main.html"]["main_ok"] = "确定"
 	G_Res["zh-CN"]["/main.html"]["main_cancel"] = "取消"
+	G_Res["zh-CN"]["/main.html"]["main_changespacepass"] = "数据空间密码"
 
 	G_Res["en"]["/main.html"] = make(map[string]string)
 	G_Res["en"]["/main.html"]["qianbao"] = "Wallet"
@@ -55,6 +76,7 @@ func InitRes() {
 	G_Res["en"]["/main.html"]["dataspace"] = "Data Space"
 	G_Res["en"]["/main.html"]["main_ok"] = "Ok"
 	G_Res["en"]["/main.html"]["main_cancel"] = "Cancel"
+	G_Res["en"]["/main.html"]["main_changespacepass"] = "Data Space Password"
 
 	G_Res["zh-TW"]["/main.html"] = make(map[string]string)
 	G_Res["zh-TW"]["/main.html"]["qianbao"] = "錢包"
@@ -79,6 +101,7 @@ func InitRes() {
 	G_Res["zh-TW"]["/main.html"]["dataspace"] = "數據空間"
 	G_Res["zh-TW"]["/main.html"]["main_ok"] = "確定"
 	G_Res["zh-TW"]["/main.html"]["main_cancel"] = "取消"
+	G_Res["zh-TW"]["/main.html"]["main_changespacepass"] = "數據空間密碼"
 
 	//qianbao
 	G_Res["zh-CN"]["/qianbao.html"] = make(map[string]string)
@@ -476,29 +499,52 @@ func InitRes() {
 	G_Res["zh-CN"]["/changepass.html"]["changepass_type"] = "账户类型"
 	G_Res["zh-CN"]["/changepass.html"]["changepass_address"] = "账户地址"
 	G_Res["zh-CN"]["/changepass.html"]["changepass_name"] = "账户名称"
-	G_Res["zh-CN"]["/changepass.html"]["changepass_old"] = "旧密码"
-	G_Res["zh-CN"]["/changepass.html"]["changepass_new"] = "新密码"
-	G_Res["zh-CN"]["/changepass.html"]["changepass_confirm"] = "确认密码"
-	G_Res["zh-CN"]["/changepass.html"]["changepass_change"] = "修改"
+	G_Res["zh-CN"]["/changepass.html"]["changepass_old"] = G_Res["common"]["zh-CN"]["old_pass"]
+	G_Res["zh-CN"]["/changepass.html"]["changepass_new"] = G_Res["common"]["zh-CN"]["new_pass"]
+	G_Res["zh-CN"]["/changepass.html"]["changepass_confirm"] = G_Res["common"]["zh-CN"]["confirm_pass"]
+	G_Res["zh-CN"]["/changepass.html"]["changepass_change"] = G_Res["common"]["zh-CN"]["change"]
 	G_Res["zh-CN"]["/changepass.html"]["changepass_hint"] = "提示：请妥善保管密码，忘记密码，无法恢复，会导致秘钥管理的数字资产丢失，请备份账户私钥"
 
 	G_Res["zh-TW"]["/changepass.html"] = make(map[string]string)
 	G_Res["zh-TW"]["/changepass.html"]["changepass_type"] = "賬戶類型"
 	G_Res["zh-TW"]["/changepass.html"]["changepass_address"] = "賬戶地址"
 	G_Res["zh-TW"]["/changepass.html"]["changepass_name"] = "名稱"
-	G_Res["zh-TW"]["/changepass.html"]["changepass_old"] = "舊密碼"
-	G_Res["zh-TW"]["/changepass.html"]["changepass_new"] = "新密碼"
-	G_Res["zh-TW"]["/changepass.html"]["changepass_confirm"] = "確認密碼"
-	G_Res["zh-TW"]["/changepass.html"]["changepass_change"] = "修改"
+	G_Res["zh-TW"]["/changepass.html"]["changepass_old"] = G_Res["common"]["zh-TW"]["old_pass"]
+	G_Res["zh-TW"]["/changepass.html"]["changepass_new"] = G_Res["common"]["zh-TW"]["new_pass"]
+	G_Res["zh-TW"]["/changepass.html"]["changepass_confirm"] = G_Res["common"]["zh-TW"]["confirm_pass"]
+	G_Res["zh-TW"]["/changepass.html"]["changepass_change"] = G_Res["common"]["zh-TW"]["change"]
 	G_Res["zh-TW"]["/changepass.html"]["changepass_hint"] = "提示：請妥善保管密碼，忘記密碼將無法恢復，這將導致密鑰管理的數字資產丟失，請備份賬戶私鑰。"
 
 	G_Res["en"]["/changepass.html"] = make(map[string]string)
 	G_Res["en"]["/changepass.html"]["changepass_type"] = "Type"
 	G_Res["en"]["/changepass.html"]["changepass_address"] = "Address"
 	G_Res["en"]["/changepass.html"]["changepass_name"] = "Name"
-	G_Res["en"]["/changepass.html"]["changepass_old"] = "Old Password"
-	G_Res["en"]["/changepass.html"]["changepass_new"] = "New Password"
-	G_Res["en"]["/changepass.html"]["changepass_confirm"] = "Confirm Password"
-	G_Res["en"]["/changepass.html"]["changepass_change"] = "Change"
+	G_Res["en"]["/changepass.html"]["changepass_old"] = G_Res["common"]["en"]["old_pass"]
+	G_Res["en"]["/changepass.html"]["changepass_new"] = G_Res["common"]["en"]["new_pass"]
+	G_Res["en"]["/changepass.html"]["changepass_confirm"] = G_Res["common"]["en"]["confirm_pass"]
+	G_Res["en"]["/changepass.html"]["changepass_change"] = G_Res["common"]["en"]["change"]
 	G_Res["en"]["/changepass.html"]["changepass_hint"] = "Note: Please keep your password safe. Forgetting your password cannot be recovered, which will lead to the loss of digital assets in key management. Please back up your account private key."
+
+	//spacepass
+	G_Res["zh-CN"]["/spacepass.html"] = make(map[string]string)
+	G_Res["zh-CN"]["/spacepass.html"]["spacepass_old"] = G_Res["common"]["zh-CN"]["old_pass"]
+	G_Res["zh-CN"]["/spacepass.html"]["spacepass_new"] = G_Res["common"]["zh-CN"]["new_pass"]
+	G_Res["zh-CN"]["/spacepass.html"]["spacepass_confirm"] = G_Res["common"]["zh-CN"]["confirm_pass"]
+	G_Res["zh-CN"]["/spacepass.html"]["spacepass_change"] = G_Res["common"]["zh-CN"]["change"]
+	G_Res["zh-CN"]["/spacepass.html"]["spacepass_hint"] = "提示：请妥善保管密码，忘记密码，无法恢复。"
+
+	G_Res["zh-TW"]["/spacepass.html"] = make(map[string]string)
+	G_Res["zh-TW"]["/spacepass.html"]["spacepass_old"] = G_Res["common"]["zh-TW"]["old_pass"]
+	G_Res["zh-TW"]["/spacepass.html"]["spacepass_new"] = G_Res["common"]["zh-TW"]["new_pass"]
+	G_Res["zh-TW"]["/spacepass.html"]["spacepass_confirm"] = G_Res["common"]["zh-TW"]["confirm_pass"]
+	G_Res["zh-TW"]["/spacepass.html"]["spacepass_change"] = G_Res["common"]["zh-TW"]["change"]
+	G_Res["zh-TW"]["/spacepass.html"]["spacepass_hint"] = "提示：請妥善保管密碼，忘記密碼將無法恢復。"
+
+	G_Res["en"]["/spacepass.html"] = make(map[string]string)
+	G_Res["en"]["/spacepass.html"]["spacepass_old"] = G_Res["common"]["en"]["old_pass"]
+	G_Res["en"]["/spacepass.html"]["spacepass_new"] = G_Res["common"]["en"]["new_pass"]
+	G_Res["en"]["/spacepass.html"]["spacepass_confirm"] = G_Res["common"]["en"]["confirm_pass"]
+	G_Res["en"]["/spacepass.html"]["spacepass_change"] = G_Res["common"]["en"]["change"]
+	G_Res["en"]["/spacepass.html"]["spacepass_hint"] = "Note: Please keep your password safe. Forgetting your password cannot be recovered."
+
 }

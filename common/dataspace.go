@@ -229,6 +229,18 @@ func DoInitDataSpace(auth string) string {
 	return string(re)
 }
 
+func DoChangeSpacePass(oldpass, newpass string) string {
+	re := GetResult(Msg_success, "")
+	err := checkDataSpaceAuth(oldpass)
+	if err == nil {
+
+	} else {
+		re = GetResult(Msg_fail, err.Error())
+	}
+
+	return string(re)
+}
+
 func checkDataSpaceAuth(auth string) error {
 	db, err := leveldb.OpenFile(G_DataDir+"dataspace", nil)
 	if db != nil {

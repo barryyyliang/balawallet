@@ -72,6 +72,7 @@ func main() {
 	win.Bind("doCheckDataSpace", common.DoCheckDataSpace)
 	win.Bind("doInitDataSpace", common.DoInitDataSpace)
 	win.Bind("doGetDataItem", common.DoGetDataItem)
+	win.Bind("doChangeSpacePass", common.DoChangeSpacePass)
 
 	win.Bind("doNewAccount", server.DoNewAccount)
 	win.Bind("doGetAccounts", server.DoGetAccounts)
