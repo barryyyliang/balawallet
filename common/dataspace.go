@@ -232,10 +232,52 @@ func DoInitDataSpace(auth string) string {
 func DoChangeSpacePass(oldpass, newpass string) string {
 	re := GetResult(Msg_success, "")
 	err := checkDataSpaceAuth(oldpass)
-	if err == nil {
-
-	} else {
+	if err != nil {
 		re = GetResult(Msg_fail, err.Error())
+		return string(re)
+	}
+
+	db, err := leveldb.OpenFile(G_DataDir+"dataspace", nil)
+	if db != nil {
+		defer db.Close()
+	}
+	if err != nil {
+		re = GetResult(Msg_fail, err.Error())
+		return string(re)
+	}
+
+	it := db.NewIterator(nil, nil)
+	defer it.Release()
+	var batch leveldb.Batch
+	var errortag bool = true
+	for it.Next() {
+		var tmp accounts.CryptoJSON
+		err = json.Unmarshal(it.Value(), &tmp)
+		if err == nil {
+			dedata, err1 := keystore.DecryptDataV3(tmp, oldpass)
+			if err1 == nil {
+				encryptData, err1 := keystore.EncryptDataV3(dedata, []byte(newpass), keystore.StandardScryptN, keystore.StandardScryptP)
+				if err1 == nil {
+					data, _ := json.Marshal(encryptData)
+					batch.Put(it.Key(), data)
+				} else {
+					re = GetResult(Msg_fail, err1.Error())
+					errortag = false
+					break
+				}
+			} else {
+				re = GetResult(Msg_fail, err1.Error())
+				errortag = false
+				break
+			}
+		} else {
+			re = GetResult(Msg_fail, err.Error())
+			errortag = false
+			break
+		}
+	}
+	if errortag {
+		db.Write(&batch, nil)
 	}
 
 	return string(re)
