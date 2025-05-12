@@ -87,7 +87,7 @@
     function dataspace_fun_hide(name,content){
         document.getElementById(content).value = "**********"
         g_items[document.getElementById(name).value] = 0
-
+        dataspace_fun_recover(content)
     }
 
     async function dataspace_fun_save(name,content){
