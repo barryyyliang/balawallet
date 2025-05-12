@@ -19,7 +19,7 @@
         
         var ipt2 = document.createElement("textarea")
         ipt2.setAttribute("id","dataspace_content"+number)
-        ipt2.setAttribute("style","width:500px;height:25px;font-size: 16px;overflow:auto")
+        ipt2.setAttribute("style","vertical-align: bottom;width:500px;height:25px;font-size: 16px;overflow:auto")
         var td3 = document.createElement("td")
         td3.append(ipt2)
         tr.append(td3)
@@ -219,7 +219,7 @@
         var ipt2 = document.createElement("textarea")
         ipt2.setAttribute("id","dataspace_content"+number)
         ipt2.value = content
-        ipt2.setAttribute("style","width:500px;height:25px;font-size: 16px;overflow:auto")
+        ipt2.setAttribute("style","vertical-align: bottom;width:500px;height:25px;font-size: 16px;overflow:auto")
         var td3 = document.createElement("td")
         td3.append(ipt2)
         tr.append(td3)
