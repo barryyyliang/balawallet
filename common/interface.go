@@ -4,6 +4,7 @@ const (
 	Nettype_ethereum int = 0
 	Nettype_polygon  int = 1
 	Nettype_solana   int = 2
+	Nettype_pharos   int = 3
 )
 
 type ErrorResult struct {

@@ -4,6 +4,7 @@ async function onSaveConfig() {
     obj["ethAddress"] = document.getElementById("config_input_eth_address").value   
     obj["polAddress"] = document.getElementById("config_input_pol_address").value  
     obj["solAddress"] = document.getElementById("config_input_sol_address").value 
+    obj["phrsAddress"] = document.getElementById("config_input_phrs_address").value 
     obj["contractDir"] = document.getElementById("config_input_contractDir").value
     obj["language"] = document.getElementById("config_select_language").value
     var json = JSON.stringify(obj)
@@ -18,6 +19,7 @@ function initPage() {
         obj["ethAddress"] = "config_input_eth_address"    
         obj["polAddress"] = "config_input_pol_address"  
         obj["solAddress"] = "config_input_sol_address" 
+        obj["phrsAddress"] = "config_input_phrs_address" 
         obj["contractDir"] = "config_input_contractDir"
         obj["language"] = "config_select_language"
         var acc = JSON.parse(result)

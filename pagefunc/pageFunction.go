@@ -162,6 +162,7 @@ func DoConfig(configs string) string {
 	common.NullConnect(common.Nettype_ethereum)
 	common.NullConnect(common.Nettype_polygon)
 	common.NullConnect(common.Nettype_solana)
+	common.NullConnect(common.Nettype_pharos)
 	return string(re)
 }
 
@@ -198,6 +199,8 @@ func DoChangeNet(nettype string) string {
 		tmpType = common.Nettype_polygon
 	case "Solana":
 		tmpType = common.Nettype_solana
+	case "Pharos":
+		tmpType = common.Nettype_pharos
 	}
 	if common.G_NetType != tmpType {
 		if tmpType == common.Nettype_solana {

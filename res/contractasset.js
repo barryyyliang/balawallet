@@ -8,7 +8,7 @@
 
     function initOption(ipt){
         var net = getMainNet()
-        if (net === "Ethereum" || net === "Polygon"){
+        if (net === "Ethereum" || net === "Polygon" || net === "Pharos"){
             var option = document.createElement("option")
             option.text = "ERC20"
             option.value = "ERC20"
@@ -80,8 +80,7 @@
         var result = await window.doImportContract(JSON.stringify(obj))
         var reobj = JSON.parse(result)
         if(reobj.Code === 0){
-            initData()
-            initContractBalance()
+            reloadData()
         } 
         showResult(result)
     }
@@ -93,8 +92,7 @@
             var result = await window.doDeleteContract(add)
             var reobj = JSON.parse(result)
             if(reobj.Code === 0){
-                initData()
-                initContractBalance()
+                reloadData()
             } 
             showResult(result)
         } 
@@ -211,11 +209,13 @@
         td6.append(bt3) 
         tr.append(td6)
 
-
-
-
         number++
         return tr
+    }
+
+    async function reloadData(){
+        await initData()
+        await initContractBalance()
     }
 
     async function initData(){
@@ -263,13 +263,13 @@
             for(var i =1; i< table.rows.length;i++){  
                 table.rows[i].cells[3].childNodes[0].value = ""
             }  
-            initContractBalance()  
+            await initContractBalance()  
         }   
     }
 
-    function initPage(){
+    async function initPage(){
         gLoadRes()
-        initData()
+        await initData()
         setTimeout(initContractBalance,500)
     }
 

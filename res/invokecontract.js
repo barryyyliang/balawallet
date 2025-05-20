@@ -27,7 +27,7 @@
 
     function loadSystemABI(ipt){
         var net = getMainNet()
-        if (net === "Ethereum" || net === "Polygon"){
+        if (net === "Ethereum" || net === "Polygon" || net === "Pharos"){
             var option = document.createElement("option")
             option.text = "ERC20"
             option.value = "ERC20"

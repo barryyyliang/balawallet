@@ -161,6 +161,8 @@ func GetEthConnection() *ethclient.Client {
 			connect, err = ethclient.Dial(G_Config["ethAddress"])
 		} else if Nettype_polygon == G_NetType {
 			connect, err = ethclient.Dial(G_Config["polAddress"])
+		} else if Nettype_pharos == G_NetType {
+			connect, err = ethclient.Dial(G_Config["phrsAddress"])
 		}
 
 		if err != nil {
@@ -182,6 +184,8 @@ func NullConnect(ntye int) {
 		g_Etherclient = nil
 	case Nettype_solana:
 		g_SolClient = nil
+	case Nettype_pharos:
+		g_Etherclient = nil
 	}
 }
 

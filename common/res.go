@@ -382,6 +382,7 @@ func InitRes() {
 	G_Res["zh-CN"]["/config.html"]["config_save"] = "保存"
 	G_Res["zh-CN"]["/config.html"]["config_pol_address"] = "Polygon 地址"
 	G_Res["zh-CN"]["/config.html"]["config_sol_address"] = "Solana 地址"
+	G_Res["zh-CN"]["/config.html"]["config_phrs_address"] = "Pharos 地址"
 
 	G_Res["en"]["/config.html"] = make(map[string]string)
 	G_Res["en"]["/config.html"]["config_eth_address"] = "Eth Address"
@@ -390,6 +391,7 @@ func InitRes() {
 	G_Res["en"]["/config.html"]["config_save"] = "Save"
 	G_Res["en"]["/config.html"]["config_pol_address"] = "Polygon Address"
 	G_Res["en"]["/config.html"]["config_sol_address"] = "Solana Address"
+	G_Res["en"]["/config.html"]["config_phrs_address"] = "Pharos Address"
 
 	G_Res["zh-TW"]["/config.html"] = make(map[string]string)
 	G_Res["zh-TW"]["/config.html"]["config_eth_address"] = "以太坊位址"
@@ -398,6 +400,7 @@ func InitRes() {
 	G_Res["zh-TW"]["/config.html"]["config_save"] = "儲存"
 	G_Res["zh-TW"]["/config.html"]["config_pol_address"] = "Polygon 位址"
 	G_Res["zh-TW"]["/config.html"]["config_sol_address"] = "Solana 位址"
+	G_Res["zh-TW"]["/config.html"]["config_phrs_address"] = "Pharos 位址"
 
 	//about
 	G_Res["zh-CN"]["/about.html"] = make(map[string]string)
