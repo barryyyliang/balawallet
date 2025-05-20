@@ -650,7 +650,7 @@ func (c *EthChain) ReadContract(from, to, funcAbi, paremters string) string {
 			for i, pType := range method.Inputs {
 				parems = append(parems, stringToValue(pType.Type.GetType(), parStrings[i]))
 			}
-			data, err = contractAbi.Pack(method.RawName, parems...)
+			data, err = contractAbi.Pack(method.Name, parems...)
 			if err != nil {
 				re = balacommon.GetResult(balacommon.Msg_packabiparam_error, err.Error())
 				return string(re)
@@ -682,6 +682,16 @@ func (c *EthChain) ReadContract(from, to, funcAbi, paremters string) string {
 					}
 					for _, a := range ret {
 						aa := valueToString(a)
+						fmt.Println(aa)
+						if len(method.Outputs) == 1 &&
+							(method.Name == "balanceOf" ||
+								method.Name == "allowance" ||
+								method.Name == "totalSupply") {
+							deci := c.getDecimals(from, to)
+							if deci > 0 && deci < 20 {
+								aa = balacommon.ToBig(deci, aa)
+							}
+						}
 						outs = append(outs, aa)
 					}
 					bouts, _ := json.Marshal(outs)
@@ -741,7 +751,29 @@ func (c *EthChain) InvokeContract(from, conAddr, funcAbi, param, pass string) st
 		for _, method := range contractAbi.Methods {
 			json.Unmarshal([]byte(param), &parStrings)
 			for i, pType := range method.Inputs {
-				parems = append(parems, stringToValue(pType.Type.GetType(), parStrings[i]))
+				value := stringToValue(pType.Type.GetType(), parStrings[i])
+				fmt.Println(method.RawName)
+				fmt.Println(pType.Type.String())
+				fmt.Println(parStrings[i])
+				if (method.RawName == "transfer" ||
+					method.RawName == "transferFrom" ||
+					method.RawName == "approve") && pType.Type.String() == "uint256" {
+					deci := c.getDecimals(from, conAddr)
+					if deci > 0 && deci < 20 {
+						tmp, err := balacommon.ToSmall(deci, parStrings[i])
+						fmt.Println("change:" + tmp)
+						if err == nil {
+							value = stringToValue(pType.Type.GetType(), tmp)
+							fmt.Println("complete change")
+						} else {
+							re = balacommon.GetResult(balacommon.Msg_fail, err.Error())
+							return string(re)
+						}
+					}
+
+				}
+
+				parems = append(parems, value)
 			}
 			data, err = contractAbi.Pack(method.RawName, parems...)
 			if err != nil {
@@ -1010,6 +1042,7 @@ func (c *EthChain) ChangeAccountPass(atype, address, old, new string) string {
 	return string(re)
 }
 
+/*
 func (c *EthChain) GetContractBalance(assetType, conAddr, ownerAddr string) string {
 	re := balacommon.GetResult(balacommon.Msg_fail, "not support")
 
@@ -1027,6 +1060,8 @@ func (c *EthChain) GetContractBalance(assetType, conAddr, ownerAddr string) stri
 				len(value.Inputs) == 1 &&
 				len(value.Outputs) == 1 &&
 				value.Inputs[0].Type.T == abi.AddressTy {
+				fmt.Println(value.String())
+				abi.ABI.
 				type argument struct {
 					Name string
 					Type string
@@ -1095,6 +1130,120 @@ func (c *EthChain) GetContractBalance(assetType, conAddr, ownerAddr string) stri
 				}
 
 			}
+		}
+	}
+
+	return string(re)
+}
+*/
+
+func (c *EthChain) getDecimals(ownerAddr, cantract string) int {
+	var deci int = -1
+
+	abis := balacommon.G_Abis["ERC20"]
+	//get balance and decimals method
+	methods := []localMethod{}
+	err := json.Unmarshal([]byte(abis), &methods)
+	if err != nil {
+		return deci
+	}
+	var sDecimals string
+	for _, value := range methods {
+		if value.Name == "decimals" {
+			jsonMethod, _ := json.Marshal(value)
+			sDecimals = "[" + string(jsonMethod) + "]"
+		}
+	}
+
+	//get decimals
+	if sDecimals != "" {
+		result := c.ReadContract(ownerAddr, cantract, sDecimals, "")
+		callResult := new(balacommon.ErrorResult)
+		err = json.Unmarshal([]byte(result), callResult)
+		if err != nil {
+			return deci
+		}
+
+		if callResult.Code == balacommon.Msg_success {
+			var arrRet []string
+			err = json.Unmarshal([]byte(callResult.Msg), &arrRet)
+			if err == nil {
+				if len(arrRet) > 0 {
+					deci, err = strconv.Atoi(arrRet[0])
+					if err != nil {
+						deci = -1
+					}
+				}
+			}
+		}
+
+	}
+	return deci
+}
+
+func (c *EthChain) GetContractBalance(assetType, conAddr, ownerAddr string) string {
+	re := balacommon.GetResult(balacommon.Msg_fail, "not support")
+	abis := c.LoadABI(assetType)
+	var abiResult = new(balacommon.ErrorResult)
+	err := json.Unmarshal([]byte(abis), abiResult)
+	if err != nil || abiResult.Code != balacommon.Msg_success {
+		re = balacommon.GetResult(balacommon.Msg_parseabi_fail, "")
+		return string(re)
+	}
+
+	//get balance and decimals method
+	methods := []localMethod{}
+	err = json.Unmarshal([]byte(abiResult.Msg), &methods)
+	if err != nil {
+		re = balacommon.GetResult(balacommon.Msg_fail, err.Error())
+		return string(re)
+	}
+	var sBalance string
+	for _, value := range methods {
+		if value.Name == "balanceOf" &&
+			len(value.Inputs) == 1 &&
+			len(value.Outputs) == 1 &&
+			value.Inputs[0].Type == "address" {
+
+			jsonMethod, err := json.Marshal(value)
+			if err != nil {
+				re = balacommon.GetResult(balacommon.Msg_fail, err.Error())
+				return string(re)
+			}
+			fmt.Println(string(jsonMethod))
+			sBalance = "[" + string(jsonMethod) + "]"
+
+		}
+	}
+
+	//get balance
+	if sBalance != "" {
+		sParams := []string{ownerAddr}
+		jParams, _ := json.Marshal(sParams)
+		result := c.ReadContract(ownerAddr, conAddr, sBalance, string(jParams))
+		callResult := new(balacommon.ErrorResult)
+		err = json.Unmarshal([]byte(result), callResult)
+		if err != nil {
+			re = balacommon.GetResult(balacommon.Msg_fail, err.Error())
+			return string(re)
+		}
+
+		if callResult.Code == balacommon.Msg_success {
+			var arrRet []string
+			err = json.Unmarshal([]byte(callResult.Msg), &arrRet)
+			if err != nil {
+				re = balacommon.GetResult(balacommon.Msg_fail, err.Error())
+				return string(re)
+			}
+			if len(arrRet) == 0 {
+				re = balacommon.GetResult(balacommon.Msg_callcontract_fail, "result null")
+				return string(re)
+			}
+			tmp, _ := json.Marshal(balacommon.ResBalance{ownerAddr, arrRet[0]})
+			re, _ = json.Marshal(balacommon.ErrorResult{balacommon.Msg_success, string(tmp)})
+			return string(re)
+		} else {
+			return result
 		}
 	}
 

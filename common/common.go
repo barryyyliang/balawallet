@@ -225,6 +225,37 @@ func ToBig(unittag int, wei string) string {
 	return balance
 }
 
+func ToSmall(unittag int, num string) (string, error) {
+	// 要调用isnumber判断是否为正确数字格式
+	if IsNumber(num) {
+		strs := strings.Split(num, ".")
+		var balstr string
+		if len(strs) == 1 {
+			balstr = strs[0]
+			if balstr != "0" {
+				for i := 0; i < unittag; i++ {
+					balstr = balstr + "0"
+				}
+			}
+		} else {
+			lens := len(strs[1])
+
+			for i := 0; i < unittag-lens; i++ {
+				strs[1] = strs[1] + "0"
+			}
+
+			if strs[0] == "0" {
+				balstr = strings.TrimLeft(strs[1], "0")
+			} else {
+				balstr = strs[0] + strs[1]
+			}
+		}
+
+		return balstr, nil
+	}
+	return "", fmt.Errorf("bad number")
+}
+
 // 判断字符串是否为10进制数字，，每个字符必须为数字【1--9】，最多有一个小数点”.“
 func IsNumber(value string) bool {
 	//todo

@@ -22,6 +22,29 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
+type argument struct {
+	Name string
+	Type string
+}
+type localMethod struct {
+	Type    string
+	Name    string
+	Inputs  []argument
+	Outputs []argument
+
+	// Status indicator which can be: "pure", "view",
+	// "nonpayable" or "payable".
+	StateMutability string
+
+	// Deprecated Status indicators, but removed in v0.6.0.
+	Constant bool // True if function is either pure or view
+	Payable  bool // True if function is payable
+
+	// Event relevant indicator represents the event is
+	// declared as anonymous.
+	Anonymous bool
+}
+
 func newDynamicTx(nonce uint64, to common.Address, amount *big.Int, gasLimit uint64, gasPrice *big.Int, tipsPrice *big.Int, chain *big.Int) *types.Transaction {
 	return types.NewTx(&types.DynamicFeeTx{
 		Nonce:     nonce,
@@ -73,8 +96,10 @@ func etherTowei(ether string) (big.Int, error) {
 		strs := strings.Split(ether, ".")
 		var balstr string
 		if len(strs) == 1 {
-			if balstr != "0" {
+			if strs[0] != "0" {
 				balstr = strs[0] + "000000000000000000"
+			} else {
+				balstr = "0"
 			}
 		} else {
 			lens := len(strs[1])
@@ -83,7 +108,7 @@ func etherTowei(ether string) (big.Int, error) {
 				strs[1] = strs[1] + "0"
 			}
 
-			if "0" == strs[0] {
+			if strs[0] == "0" {
 				balstr = strings.TrimLeft(strs[1], "0")
 			} else {
 				balstr = strs[0] + strs[1]
