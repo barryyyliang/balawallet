@@ -523,14 +523,26 @@ func (c *SolChain) LoadABI(file string) string {
 	return string(re)
 }
 
-func (c *SolChain) ReadContract(from, conAdd, funcAbi, paremters string) string {
-	var re = balacommon.GetResult(balacommon.Msg_success, "")
-	contractAbi, err := abi.JSON(strings.NewReader(funcAbi))
-	if err != nil {
-		re = balacommon.GetResult(balacommon.Msg_parseabi_fail, err.Error())
-		return string(re)
+func (c *SolChain) ReadContract(from, conAdd, abiFile, funcName, paremters string) string {
+	var re = balacommon.GetResult(balacommon.Msg_fail, "")
+	sabi := c.LoadABI(abiFile)
+	var abiResult = new(balacommon.ErrorResult)
+	err := json.Unmarshal([]byte(sabi), abiResult)
+	var contractAbi abi.ABI
+	if err == nil && abiResult.Code == balacommon.Msg_success {
+		contractAbi, err = abi.JSON(strings.NewReader(abiResult.Msg))
+		if err != nil {
+			re = balacommon.GetResult(balacommon.Msg_parseabi_fail, err.Error())
+			return string(re)
+		}
+	} else {
+		re = balacommon.GetResult(balacommon.Msg_parseabi_fail, "")
 	}
+
 	for _, method := range contractAbi.Methods {
+		if method.RawName != funcName {
+			continue
+		}
 		var parStrings []string
 		json.Unmarshal([]byte(paremters), &parStrings)
 		if len(parStrings) != len(method.Inputs) {
@@ -557,14 +569,26 @@ func (c *SolChain) ReadContract(from, conAdd, funcAbi, paremters string) string 
 	return string(re)
 }
 
-func (c *SolChain) InvokeContract(from, conAdd, funcAbi, param, pass string) string {
-	var re = balacommon.GetResult(balacommon.Msg_success, "")
-	contractAbi, err := abi.JSON(strings.NewReader(funcAbi))
-	if err != nil {
-		re = balacommon.GetResult(balacommon.Msg_parseabi_fail, err.Error())
-		return string(re)
+func (c *SolChain) InvokeContract(from, conAdd, abiFile, funcName, param, pass string) string {
+	var re = balacommon.GetResult(balacommon.Msg_fail, "")
+	sabi := c.LoadABI(abiFile)
+	var abiResult = new(balacommon.ErrorResult)
+	err := json.Unmarshal([]byte(sabi), abiResult)
+	var contractAbi abi.ABI
+	if err == nil && abiResult.Code == balacommon.Msg_success {
+		contractAbi, err = abi.JSON(strings.NewReader(abiResult.Msg))
+		if err != nil {
+			re = balacommon.GetResult(balacommon.Msg_parseabi_fail, err.Error())
+			return string(re)
+		}
+	} else {
+		re = balacommon.GetResult(balacommon.Msg_parseabi_fail, "")
 	}
+
 	for _, method := range contractAbi.Methods {
+		if method.RawName != funcName {
+			continue
+		}
 		var parStrings []string
 		json.Unmarshal([]byte(param), &parStrings)
 		if len(parStrings) != len(method.Inputs) {

@@ -15,12 +15,12 @@ type Bchain interface {
 	DeployContract(from, file, pass, funcAbi, param string) string
 	CheckNode() string
 	LoadABI(file string) string
-	ReadContract(from, to, funcAbi, paremters string) string
+	ReadContract(from, to, abiFile, funcName, paremters string) string
 	QueryTx(hs string) string
 	Signature(info string) string
 	GetAbiFile() string
 	GetBinFile() string
-	InvokeContract(from, conAddr, funcAbi, param, pass string) string
+	InvokeContract(from, conAddr, abiFile, funcName, param, pass string) string
 	DeleteContract(address string) string
 	SignatureVerify(info string) string
 	ChangeAccountPass(atype, address, old, new string) string
@@ -90,8 +90,8 @@ func (in *ServerAPI) DoCheckNode() string {
 func (in *ServerAPI) DoLoadABI(file string) string {
 	return in.Chain.LoadABI(file)
 }
-func (in *ServerAPI) DoReadContract(from, to, funcAbi, paremters string) string {
-	return in.Chain.ReadContract(from, to, funcAbi, paremters)
+func (in *ServerAPI) DoReadContract(from, to, abiFile, funcName, paremters string) string {
+	return in.Chain.ReadContract(from, to, abiFile, funcName, paremters)
 }
 func (in *ServerAPI) DoQueryTx(hs string) string {
 	return in.Chain.QueryTx(hs)
@@ -105,8 +105,8 @@ func (in *ServerAPI) DoGetAbiFile() string {
 func (in *ServerAPI) DoGetBinFile() string {
 	return in.Chain.GetBinFile()
 }
-func (in *ServerAPI) DoInvokeContract(from, conAddr, funcAbi, param, pass string) string {
-	return in.Chain.InvokeContract(from, conAddr, funcAbi, param, pass)
+func (in *ServerAPI) DoInvokeContract(from, conAddr, abiFile, funcName, param, pass string) string {
+	return in.Chain.InvokeContract(from, conAddr, abiFile, funcName, param, pass)
 }
 func (in *ServerAPI) DoDeleteContract(address string) string {
 	return in.Chain.DeleteContract(address)

@@ -171,9 +171,10 @@
                 break               
             } 
         } 
-        var tmp = new Array()
-        tmp.push(abijson[i])
-        var func = JSON.stringify(tmp)
+        //var tmp = new Array()
+        //tmp.push(abijson[i])
+        //var func = JSON.stringify(tmp)
+        var abiFilePath = document.getElementById("abiFile").value
         var parems = new Array()
         var inputTable = document.getElementById("paramterTable")
 
@@ -184,7 +185,7 @@
         var paremsString = JSON.stringify(parems)       
 
         if (functype === "view") {  
-            var result = await window.doReadContract(from,caddress,func, paremsString)
+            var result = await window.doReadContract(from,caddress,abiFilePath,funcName, paremsString)
             var obj = JSON.parse(result)
             if (obj.Code === 0) {
                 var outsTable = document.getElementById("outTable")
@@ -205,7 +206,7 @@
                 showMsg("33","")
                 return
             }
-            var result = await window.doInvokeContract(from,caddress,func, paremsString,ass)
+            var result = await window.doInvokeContract(from,caddress,abiFilePath,funcName, paremsString,ass)
             var obj = JSON.parse(result)
             if(obj.Code === 0){
                 showMsg("34",obj.Msg)
