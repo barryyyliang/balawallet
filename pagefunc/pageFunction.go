@@ -189,9 +189,8 @@ func DoGetRes(com string) string {
 	return re
 }
 
-func DoChangeNet(nettype string) string {
-	var re []byte
-	tmpType := -1
+func getNetType(nettype string) string {
+	tmpType := "-1"
 	switch nettype {
 	case "Ethereum":
 		tmpType = common.Nettype_ethereum
@@ -202,6 +201,14 @@ func DoChangeNet(nettype string) string {
 	case "Pharos":
 		tmpType = common.Nettype_pharos
 	}
+
+	return tmpType
+}
+
+func DoChangeNet(nettype string) string {
+	var re []byte
+	tmpType := getNetType(nettype)
+
 	if common.G_NetType != tmpType {
 		if tmpType == common.Nettype_solana {
 			//re = GetResult(Msg_fail, "not support")

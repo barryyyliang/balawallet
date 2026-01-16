@@ -19,7 +19,7 @@ var g_Etherclient *ethclient.Client = nil
 var g_SolClient *solRPC.Client = nil
 var G_BlockchainConfig bool = true
 var G_DataDir string
-var G_NetType int
+var G_NetType string
 
 func InitGlobal(dir string) {
 	G_NetType = Nettype_ethereum
@@ -176,7 +176,7 @@ func GetEthConnection() *ethclient.Client {
 	return g_Etherclient
 }
 
-func NullConnect(ntye int) {
+func NullConnect(ntye string) {
 	switch ntye {
 	case Nettype_ethereum:
 		g_Etherclient = nil

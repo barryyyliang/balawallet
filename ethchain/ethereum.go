@@ -101,7 +101,7 @@ func (c *EthChain) NewAccount(pass string, walletName string) string {
 	}
 
 	//账户信息存库
-	db, err := leveldb.OpenFile(balacommon.G_DataDir+"db", nil)
+	db, err := leveldb.OpenFile(balacommon.G_DataDir+"account", nil)
 	if err == nil {
 		defer db.Close()
 		if balacommon.IsExist(db, walletName) == false {
@@ -135,7 +135,7 @@ func (c *EthChain) GetAccounts() string {
 
 	//账户信息
 	addressCache := make(map[string]string)
-	db, err := leveldb.OpenFile(balacommon.G_DataDir+"db", nil)
+	db, err := leveldb.OpenFile(balacommon.G_DataDir+"account", nil)
 	if err == nil {
 		defer db.Close()
 		it := db.NewIterator(nil, nil)
@@ -167,7 +167,7 @@ func (c *EthChain) GetAccounts() string {
 func (c *EthChain) ChangeAccountName(address string, name string) string {
 	re := balacommon.GetResult(balacommon.Msg_success, "")
 	//账户信息存库
-	db, err := leveldb.OpenFile(balacommon.G_DataDir+"db", nil)
+	db, err := leveldb.OpenFile(balacommon.G_DataDir+"account", nil)
 	if err == nil {
 		defer db.Close()
 		if balacommon.IsExist(db, name) == false {
@@ -186,7 +186,7 @@ func (c *EthChain) ChangeAccountName(address string, name string) string {
 }
 
 func (c *EthChain) GetAccountName(address string) string {
-	db, err := leveldb.OpenFile(balacommon.G_DataDir+"db", nil)
+	db, err := leveldb.OpenFile(balacommon.G_DataDir+"account", nil)
 	if err == nil {
 		defer db.Close()
 		name, err := db.Get([]byte(address), nil)
@@ -227,7 +227,7 @@ func (c *EthChain) ImportAccount(pa string, name string, kk string) string {
 
 	ks.ImportKey(akey, pa)
 	//账户信息存库
-	db, err := leveldb.OpenFile(balacommon.G_DataDir+"db", nil)
+	db, err := leveldb.OpenFile(balacommon.G_DataDir+"account", nil)
 	if err == nil {
 		defer db.Close()
 		if !balacommon.IsExist(db, name) {
@@ -494,15 +494,11 @@ func (c *EthChain) GetContract() string {
 		defer it.Release()
 		for it.Next() {
 			tmp := strings.Split(string(it.Key()), "_")
-			t, err := strconv.Atoi(tmp[0])
-			if err == nil {
-				if t == balacommon.G_NetType {
-					var aa balacommon.ComContract
-					json.Unmarshal(it.Value(), &aa)
-					res.Contracts = append(res.Contracts, aa)
-				}
+			if tmp[0] == balacommon.G_NetType {
+				var aa balacommon.ComContract
+				json.Unmarshal(it.Value(), &aa)
+				res.Contracts = append(res.Contracts, aa)
 			}
-
 		}
 	}
 
@@ -520,7 +516,7 @@ func (c *EthChain) DeleteContract(address string) string {
 	db, err := leveldb.OpenFile(balacommon.G_DataDir+"contract", nil)
 	if err == nil {
 		defer db.Close()
-		key := strconv.Itoa(balacommon.G_NetType) + "_" + address
+		key := balacommon.G_NetType + "_" + address
 		if db.Delete([]byte(key), nil) != nil {
 			re = balacommon.GetResult(balacommon.Msg_writedb_fail, "")
 		}
@@ -581,7 +577,7 @@ func (c *EthChain) ImportContract(cons string) string {
 		jvalue, _ := json.Marshal(co)
 		if err2 == nil {
 			defer db.Close()
-			key := strconv.Itoa(balacommon.G_NetType) + "_" + jcons.Address
+			key := balacommon.G_NetType + "_" + jcons.Address
 			if db.Put([]byte(key), jvalue, nil) != nil {
 				re = balacommon.GetResult(balacommon.Msg_writedb_fail, "")
 			}
