@@ -137,7 +137,7 @@ func InitRes() {
 	G_Res["zh-CN"]["/contractasset.html"]["contractasset_import"] = "导入"
 	G_Res["zh-CN"]["/contractasset.html"]["contractasset_delete"] = "删除"
 	G_Res["zh-CN"]["/contractasset.html"]["contractasset_invoke"] = "调用"
-                G_Res["zh-CN"]["/contractasset.html"]["contractasset_balance"] = "余额"
+	G_Res["zh-CN"]["/contractasset.html"]["contractasset_balance"] = "余额"
 
 	G_Res["en"]["/contractasset.html"] = make(map[string]string)
 	G_Res["en"]["/contractasset.html"]["contractasset_type"] = "Type"
@@ -147,7 +147,7 @@ func InitRes() {
 	G_Res["en"]["/contractasset.html"]["contractasset_import"] = "Import"
 	G_Res["en"]["/contractasset.html"]["contractasset_delete"] = "Delete"
 	G_Res["en"]["/contractasset.html"]["contractasset_invoke"] = "Inovke"
-                G_Res["en"]["/contractasset.html"]["contractasset_balance"] = "Balance"
+	G_Res["en"]["/contractasset.html"]["contractasset_balance"] = "Balance"
 
 	G_Res["zh-TW"]["/contractasset.html"] = make(map[string]string)
 	G_Res["zh-TW"]["/contractasset.html"]["contractasset_type"] = "合约類型"
@@ -157,7 +157,7 @@ func InitRes() {
 	G_Res["zh-TW"]["/contractasset.html"]["contractasset_import"] = "導入"
 	G_Res["zh-TW"]["/contractasset.html"]["contractasset_delete"] = "删除"
 	G_Res["zh-TW"]["/contractasset.html"]["contractasset_invoke"] = "調用"
-                G_Res["zh-TW"]["/contractasset.html"]["contractasset_balance"] = "餘額"
+	G_Res["zh-TW"]["/contractasset.html"]["contractasset_balance"] = "餘額"
 
 	//contractasset
 	G_Res["zh-CN"]["/transfer.html"] = make(map[string]string)
@@ -386,6 +386,12 @@ func InitRes() {
 	G_Res["zh-CN"]["/config.html"]["config_pol_address"] = "Polygon 地址"
 	G_Res["zh-CN"]["/config.html"]["config_sol_address"] = "Solana 地址"
 	G_Res["zh-CN"]["/config.html"]["config_phrs_address"] = "Pharos 地址"
+	G_Res["zh-CN"]["/config.html"]["add_network"] = "新增网络"
+	G_Res["zh-CN"]["/config.html"]["modal_title"] = "新增网络"
+	G_Res["zh-CN"]["/config.html"]["modal_network_name_label"] = "网络名称"
+	G_Res["zh-CN"]["/config.html"]["modal_node_address_label"] = "网络地址"
+	G_Res["zh-CN"]["/config.html"]["modal_confirm"] = "确认"
+	G_Res["zh-CN"]["/config.html"]["modal_cancel"] = "取消"
 
 	G_Res["en"]["/config.html"] = make(map[string]string)
 	G_Res["en"]["/config.html"]["config_eth_address"] = "Eth Address"
@@ -395,6 +401,12 @@ func InitRes() {
 	G_Res["en"]["/config.html"]["config_pol_address"] = "Polygon Address"
 	G_Res["en"]["/config.html"]["config_sol_address"] = "Solana Address"
 	G_Res["en"]["/config.html"]["config_phrs_address"] = "Pharos Address"
+	G_Res["en"]["/config.html"]["add_network"] = "Add Network"
+	G_Res["en"]["/config.html"]["modal_title"] = "Add Network"
+	G_Res["en"]["/config.html"]["modal_network_name_label"] = "Network Name"
+	G_Res["en"]["/config.html"]["modal_node_address_label"] = "Network Address"
+	G_Res["en"]["/config.html"]["modal_confirm"] = "Confirm"
+	G_Res["en"]["/config.html"]["modal_cancel"] = "Cancel"
 
 	G_Res["zh-TW"]["/config.html"] = make(map[string]string)
 	G_Res["zh-TW"]["/config.html"]["config_eth_address"] = "以太坊位址"
@@ -404,6 +416,12 @@ func InitRes() {
 	G_Res["zh-TW"]["/config.html"]["config_pol_address"] = "Polygon 位址"
 	G_Res["zh-TW"]["/config.html"]["config_sol_address"] = "Solana 位址"
 	G_Res["zh-TW"]["/config.html"]["config_phrs_address"] = "Pharos 位址"
+	G_Res["zh-TW"]["/config.html"]["add_network"] = "新增網路"
+	G_Res["zh-TW"]["/config.html"]["modal_title"] = "新增網路"
+	G_Res["zh-TW"]["/config.html"]["modal_network_name_label"] = "網路名稱"
+	G_Res["zh-TW"]["/config.html"]["modal_node_address_label"] = "網路位址"
+	G_Res["zh-TW"]["/config.html"]["modal_confirm"] = "確認"
+	G_Res["zh-TW"]["/config.html"]["modal_cancel"] = "取消"
 
 	//about
 	G_Res["zh-CN"]["/about.html"] = make(map[string]string)

@@ -133,7 +133,23 @@ func GetConfig(configs string) string {
 		tmp, _ := json.Marshal(result)
 		re = string(tmp)
 	} else {
-		tmp, _ := json.Marshal(G_Config)
+		// 创建一个新的map，用于处理customNetworks字段
+		resultMap := make(map[string]interface{})
+		for key, value := range G_Config {
+			if key == "customNetworks" {
+				// 尝试将customNetworks字段从字符串转换回数组
+				var customNetworks []interface{}
+				err := json.Unmarshal([]byte(value), &customNetworks)
+				if err == nil {
+					resultMap[key] = customNetworks
+				} else {
+					resultMap[key] = value
+				}
+			} else {
+				resultMap[key] = value
+			}
+		}
+		tmp, _ := json.Marshal(resultMap)
 		re = string(tmp)
 	}
 	return string(re)

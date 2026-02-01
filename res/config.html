@@ -1,35 +1,69 @@
 
-<table id="table1" style="margin: 0 auto;font-size: 16px;text-align: center;">
-    <tr>
-        <td id="config_eth_address">以太坊节点地址:</td>
-        <td><input type="text" id="config_input_eth_address" ></td>
-    </tr> 
-    <tr>
-        <td id="config_pol_address"> Polygon节点地址:</td>
-        <td><input type="text" id="config_input_pol_address" ></td>
-    </tr> 
-    <tr>
-        <td id="config_sol_address">Solana节点地址:</td>
-        <td><input type="text" id="config_input_sol_address" ></td>
-    </tr> 
-    <tr>
-        <td id="config_phrs_address">Pharos节点地址:</td>
-        <td><input type="text" id="config_input_phrs_address" ></td>
-    </tr> 
-    <tr>
-        <td id="config_contractdir">合约文件目录:</td>
-        <td><input type="text" id="config_input_contractDir" ></td>
-    </tr> 
-    <tr>
-        <td id="config_language">系统语言:</td>
-        <td><select id="config_select_language" style="font-size: 16px;height: 25px;width: 300px;border-radius: 0px;">
-            <option value="zh-CN">中文简体</option>
-            <option value="zh-TW">中文繁體</option>
-            <option value="en">English</option>
-        </select></td>
-    </tr> 
+<div style="display: flex; justify-content: center; gap: 50px;">
+    <div style="flex: 1; max-width: 500px;">
+        <h2 style="text-align: center;">网络配置</h2>
+        <table id="table1" style="margin: 0 auto;font-size: 16px;text-align: left;">
+            <tr>
+                <td id="config_eth_address" style="width: 150px;">以太坊节点地址:</td>
+                <td><input type="text" id="config_input_eth_address" style="width: 300px;padding: 5px;"></td>
+            </tr> 
+            <tr>
+                <td id="config_pol_address" style="width: 150px;">Polygon节点地址:</td>
+                <td><input type="text" id="config_input_pol_address" style="width: 300px;padding: 5px;"></td>
+            </tr> 
+            <tr>
+                <td id="config_sol_address" style="width: 150px;">Solana节点地址:</td>
+                <td><input type="text" id="config_input_sol_address" style="width: 300px;padding: 5px;"></td>
+            </tr> 
+            <tr>
+                <td id="config_phrs_address" style="width: 150px;">Pharos节点地址:</td>
+                <td><input type="text" id="config_input_phrs_address" style="width: 300px;padding: 5px;"></td>
+            </tr> 
+            <!-- 自定义网络会在这里动态添加 -->
+        </table>
+        <div style="margin: 10px auto;text-align: center;">
+            <button id="add_network" class="button1" onclick="addNetworkRow()" data-res="add_network">新增网络</button>
+        </div>
+    </div>
+    
+    <div style="flex: 1; max-width: 500px;">
+        <h2 style="text-align: center;">其他配置</h2>
+        <table style="margin: 0 auto;font-size: 16px;text-align: left;">
+            <tr>
+                <td id="config_contractdir" style="width: 150px;">合约文件目录:</td>
+                <td><input type="text" id="config_input_contractDir" style="width: 300px;padding: 5px;"></td>
+            </tr> 
+            <tr>
+                <td id="config_language" style="width: 150px;">系统语言:</td>
+                <td><select id="config_select_language" style="width: 300px;padding: 5px;">
+                    <option value="zh-CN">中文简体</option>
+                    <option value="zh-TW">中文繁體</option>
+                    <option value="en">English</option>
+                </select></td>
+            </tr> 
+        </table>
+    </div>
+</div>
 
-</table>
-<div style="margin: 0 auto;text-align: center;">
+<!-- 模态窗口 -->
+<div id="networkModal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
+    <div style="background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 400px; border-radius: 5px;">
+        <h3 id="modal_title" style="text-align: center; margin-top: 0;" data-res="modal_title">新增网络</h3>
+        <div style="margin-bottom: 15px; display: flex; justify-content: center; align-items: center;">
+            <label id="modal_network_name_label" for="modal_network_name" style="width: 120px; text-align: right; margin-right: 10px;" data-res="modal_network_name">网络名称:</label>
+            <input type="text" id="modal_network_name" style="width: 250px; padding: 5px;">
+        </div>
+        <div style="margin-bottom: 15px; display: flex; justify-content: center; align-items: center;">
+            <label id="modal_node_address_label" for="modal_node_address" style="width: 120px; text-align: right; margin-right: 10px;" data-res="modal_node_address">网络地址:</label>
+            <input type="text" id="modal_node_address" style="width: 250px; padding: 5px;">
+        </div>
+        <div style="text-align: center; margin-top: 20px; display: flex; justify-content: center; gap: 15px;">
+            <button id="modal_confirm" class="button1" onclick="confirmAddNetwork()" style="font-size: 14px; padding: 5px 15px;" data-res="modal_confirm">确认</button>
+            <button id="modal_cancel" class="button1" onclick="cancelAddNetwork()" style="font-size: 14px; padding: 5px 15px;" data-res="modal_cancel">取消</button>
+        </div>
+    </div>
+</div>
+
+<div style="position: fixed; bottom: 20px; right: 20px;">
     <button id="config_save" class="button1" onclick="onSaveConfig()">保存</button>
 </div>
