@@ -52,7 +52,18 @@ async function saveConfig() {
     window.doWebLog("保存的配置:" + json);
     var result = await window.doConfig(json)
     window.doWebLog("保存结果:" + result);
-    showResult(result)
+    showResult(result);
+    
+    // 尝试刷新main.html中的网络列表
+    try {
+        if (window.parent && window.parent.refreshMainNet) {
+            window.parent.refreshMainNet();
+        } else if (window.refreshMainNet) {
+            window.refreshMainNet();
+        }
+    } catch (e) {
+        window.doWebLog("刷新网络列表失败: " + e.message);
+    }
 }
 
 function confirmAddNetwork() {
