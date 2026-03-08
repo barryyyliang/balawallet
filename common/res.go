@@ -392,6 +392,8 @@ func InitRes() {
 	G_Res["zh-CN"]["/config.html"]["modal_node_address_label"] = "网络地址"
 	G_Res["zh-CN"]["/config.html"]["modal_confirm"] = "确认"
 	G_Res["zh-CN"]["/config.html"]["modal_cancel"] = "取消"
+	G_Res["zh-CN"]["/config.html"]["config_network_config"] = "网络配置"
+	G_Res["zh-CN"]["/config.html"]["config_other_config"] = "其他配置"
 
 	G_Res["en"]["/config.html"] = make(map[string]string)
 	G_Res["en"]["/config.html"]["config_eth_address"] = "Eth Address"
@@ -407,6 +409,8 @@ func InitRes() {
 	G_Res["en"]["/config.html"]["modal_node_address_label"] = "Network Address"
 	G_Res["en"]["/config.html"]["modal_confirm"] = "Confirm"
 	G_Res["en"]["/config.html"]["modal_cancel"] = "Cancel"
+	G_Res["en"]["/config.html"]["config_network_config"] = "Network Config"
+	G_Res["en"]["/config.html"]["config_other_config"] = "Other Config"
 
 	G_Res["zh-TW"]["/config.html"] = make(map[string]string)
 	G_Res["zh-TW"]["/config.html"]["config_eth_address"] = "以太坊位址"
@@ -422,6 +426,8 @@ func InitRes() {
 	G_Res["zh-TW"]["/config.html"]["modal_node_address_label"] = "網路位址"
 	G_Res["zh-TW"]["/config.html"]["modal_confirm"] = "確認"
 	G_Res["zh-TW"]["/config.html"]["modal_cancel"] = "取消"
+	G_Res["zh-TW"]["/config.html"]["config_network_config"] = "網路設定"
+	G_Res["zh-TW"]["/config.html"]["config_other_config"] = "其他設定"
 
 	//about
 	G_Res["zh-CN"]["/about.html"] = make(map[string]string)
