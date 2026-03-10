@@ -394,6 +394,7 @@ func InitRes() {
 	G_Res["zh-CN"]["/config.html"]["modal_cancel"] = "取消"
 	G_Res["zh-CN"]["/config.html"]["config_network_config"] = "网络配置"
 	G_Res["zh-CN"]["/config.html"]["config_other_config"] = "其他配置"
+	G_Res["zh-CN"]["/config.html"]["modal_network_tip"] = "只支持新增兼容以太坊的网络"
 
 	G_Res["en"]["/config.html"] = make(map[string]string)
 	G_Res["en"]["/config.html"]["config_eth_address"] = "Eth Address"
@@ -411,6 +412,7 @@ func InitRes() {
 	G_Res["en"]["/config.html"]["modal_cancel"] = "Cancel"
 	G_Res["en"]["/config.html"]["config_network_config"] = "Network Config"
 	G_Res["en"]["/config.html"]["config_other_config"] = "Other Config"
+	G_Res["en"]["/config.html"]["modal_network_tip"] = "Only Ethereum-compatible networks are supported"
 
 	G_Res["zh-TW"]["/config.html"] = make(map[string]string)
 	G_Res["zh-TW"]["/config.html"]["config_eth_address"] = "以太坊位址"
@@ -428,6 +430,7 @@ func InitRes() {
 	G_Res["zh-TW"]["/config.html"]["modal_cancel"] = "取消"
 	G_Res["zh-TW"]["/config.html"]["config_network_config"] = "網路設定"
 	G_Res["zh-TW"]["/config.html"]["config_other_config"] = "其他設定"
+	G_Res["zh-TW"]["/config.html"]["modal_network_tip"] = "只支援新增相容以太坊的網路"
 
 	//about
 	G_Res["zh-CN"]["/about.html"] = make(map[string]string)

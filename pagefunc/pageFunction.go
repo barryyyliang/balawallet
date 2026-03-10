@@ -134,7 +134,7 @@ func DoGetComponent(com string) string {
 
 func DoConfig(configs string) string {
 	re := common.GetResult(common.Msg_success, "")
-	
+
 	// 首先解析整个配置为map[string]interface{}
 	var configMap map[string]interface{}
 	err := json.Unmarshal([]byte(configs), &configMap)
@@ -142,7 +142,7 @@ func DoConfig(configs string) string {
 		fmt.Println("解析配置失败:", err)
 		return string(re)
 	}
-	
+
 	// 处理字符串类型的配置
 	for key, value := range configMap {
 		if strValue, ok := value.(string); ok {
@@ -203,6 +203,9 @@ func getNetType(nettype string) string {
 		tmpType = common.Nettype_solana
 	case "Pharos":
 		tmpType = common.Nettype_pharos
+	}
+	if tmpType == "-1" {
+		tmpType = nettype
 	}
 
 	return tmpType

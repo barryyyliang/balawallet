@@ -173,12 +173,34 @@ func GetEthConnection() *ethclient.Client {
 	if g_Etherclient == nil {
 		var connect *ethclient.Client
 		var err error
+		var nodeAddress string
+
 		if Nettype_ethereum == G_NetType {
-			connect, err = ethclient.Dial(G_Config["ethAddress"])
+			nodeAddress = G_Config["ethAddress"]
 		} else if Nettype_polygon == G_NetType {
-			connect, err = ethclient.Dial(G_Config["polAddress"])
+			nodeAddress = G_Config["polAddress"]
 		} else if Nettype_pharos == G_NetType {
-			connect, err = ethclient.Dial(G_Config["phrsAddress"])
+			nodeAddress = G_Config["phrsAddress"]
+		} else {
+			// 对于自定义网络，从配置文件中获取网络地址
+			if customNetworksStr, ok := G_Config["customNetworks"]; ok {
+				var customNetworks []map[string]string
+				if err := json.Unmarshal([]byte(customNetworksStr), &customNetworks); err == nil {
+					for _, network := range customNetworks {
+						if network["name"] == G_NetType {
+							nodeAddress = network["nodeAddress"]
+							break
+						}
+					}
+				}
+			}
+		}
+
+		if nodeAddress != "" {
+			connect, err = ethclient.Dial(nodeAddress)
+		} else {
+			fmt.Println("no node address configured")
+			err = fmt.Errorf("no node address configured")
 		}
 
 		if err != nil {

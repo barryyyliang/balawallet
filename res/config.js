@@ -94,8 +94,6 @@ function confirmAddNetwork() {
     nodeAddressInput.type = "text";
     nodeAddressInput.placeholder = "网络地址";
     nodeAddressInput.className = "node-address-input";
-    nodeAddressInput.style.width = "300px";
-    nodeAddressInput.style.padding = "5px";
     nodeAddressInput.value = nodeAddress;
     
     var deleteButton = document.createElement("button");
@@ -180,8 +178,6 @@ function initPage() {
                 nodeAddressInput.type = "text";
                 nodeAddressInput.placeholder = "网络地址";
                 nodeAddressInput.className = "node-address-input";
-                nodeAddressInput.style.width = "300px";
-                nodeAddressInput.style.padding = "5px";
                 nodeAddressInput.value = network.nodeAddress;
                 
                 var deleteButton = document.createElement("button");
@@ -196,6 +192,7 @@ function initPage() {
                 deleteButton.title = "删除";
                 deleteButton.onclick = function() {
                     row.remove();
+                    saveConfig(); // 删除网络后保存配置
                 };
                 
                 // 存储网络名称，用于保存配置

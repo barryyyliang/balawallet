@@ -5,19 +5,19 @@
         <table id="table1" style="margin: 0 auto;font-size: 16px;text-align: left;">
             <tr>
                 <td id="config_eth_address" style="width: 150px;">以太坊节点地址:</td>
-                <td><input type="text" id="config_input_eth_address" style="width: 300px;padding: 5px;"></td>
+                <td><input type="text" id="config_input_eth_address"></td>
             </tr> 
             <tr>
                 <td id="config_pol_address" style="width: 150px;">Polygon节点地址:</td>
-                <td><input type="text" id="config_input_pol_address" style="width: 300px;padding: 5px;"></td>
+                <td><input type="text" id="config_input_pol_address" ></td>
             </tr> 
             <tr>
                 <td id="config_sol_address" style="width: 150px;">Solana节点地址:</td>
-                <td><input type="text" id="config_input_sol_address" style="width: 300px;padding: 5px;"></td>
+                <td><input type="text" id="config_input_sol_address" ></td>
             </tr> 
             <tr>
                 <td id="config_phrs_address" style="width: 150px;">Pharos节点地址:</td>
-                <td><input type="text" id="config_input_phrs_address" style="width: 300px;padding: 5px;"></td>
+                <td><input type="text" id="config_input_phrs_address" ></td>
             </tr> 
             <!-- 自定义网络会在这里动态添加 -->
         </table>
@@ -31,11 +31,11 @@
         <table style="margin: 0 auto;font-size: 16px;text-align: left;">
             <tr>
                 <td id="config_contractdir" style="width: 150px;">合约文件目录:</td>
-                <td><input type="text" id="config_input_contractDir" style="width: 300px;padding: 5px;"></td>
+                <td><input type="text" id="config_input_contractDir" style="width:300px;font-size: 16px;height:25px;" ></td>
             </tr> 
             <tr>
                 <td id="config_language" style="width: 150px;">系统语言:</td>
-                <td><select id="config_select_language" style="width: 300px;padding: 5px;">
+                <td><select id="config_select_language" style="width:320px;font-size: 16px;height:40px;">
                     <option value="zh-CN">中文简体</option>
                     <option value="zh-TW">中文繁體</option>
                     <option value="en">English</option>
@@ -57,6 +57,7 @@
             <label id="modal_node_address_label" for="modal_node_address" style="width: 120px; text-align: right; margin-right: 10px;" data-res="modal_node_address">网络地址:</label>
             <input type="text" id="modal_node_address" style="width: 250px; padding: 5px;">
         </div>
+        <div style="margin-bottom: 15px; text-align: center; color: #f40000; font-size: 14px;" id="modal_network_tip" data-res="modal_network_tip">只支持新增兼容以太坊的网络</div>
         <div style="text-align: center; margin-top: 20px; display: flex; justify-content: center; gap: 15px;">
             <button id="modal_confirm" class="button1" onclick="confirmAddNetwork()" style="font-size: 14px; padding: 5px 15px;" data-res="modal_confirm">确认</button>
             <button id="modal_cancel" class="button1" onclick="cancelAddNetwork()" style="font-size: 14px; padding: 5px 15px;" data-res="modal_cancel">取消</button>

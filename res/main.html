@@ -180,7 +180,7 @@
                 config.customNetworks.forEach(function(network) {
                     var option = document.createElement("option")
                     option.text = network.name
-                    option.value = network.nodeAddress
+                    option.value = network.name
                     mainNetSelect.add(option)
                 })
             }
@@ -359,7 +359,7 @@
                 config.customNetworks.forEach(function(network) {
                     var option = document.createElement("option")
                     option.text = network.name
-                    option.value = network.nodeAddress
+                    option.value = network.name
                     mainNetSelect.add(option)
                 })
                 // 恢复之前选中的值
