@@ -221,7 +221,7 @@ func DoChangeNet(nettype string) string {
 			serverapi.SetServer(tmp)
 		} else {
 			common.G_NetType = tmpType
-			common.NullConnect(common.Nettype_ethereum)
+			common.NullConnect()
 			tmp := ethchain.GetEthChain()
 			serverapi.SetServer(tmp)
 			re = common.GetResult(common.Msg_success, "")
