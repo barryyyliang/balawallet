@@ -214,17 +214,9 @@ func GetEthConnection() *ethclient.Client {
 	return g_Etherclient
 }
 
-func NullConnect(ntye string) {
-	switch ntye {
-	case Nettype_ethereum:
-		g_Etherclient = nil
-	case Nettype_polygon:
-		g_Etherclient = nil
-	case Nettype_solana:
-		g_SolClient = nil
-	case Nettype_pharos:
-		g_Etherclient = nil
-	}
+func NullConnect() {
+	g_Etherclient = nil
+	g_SolClient = nil
 }
 
 /*
