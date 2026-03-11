@@ -162,10 +162,7 @@ func DoConfig(configs string) string {
 	db.Put([]byte("config"), tmp, nil)
 
 	// 配置更新后刷新链接
-	common.NullConnect(common.Nettype_ethereum)
-	common.NullConnect(common.Nettype_polygon)
-	common.NullConnect(common.Nettype_solana)
-	common.NullConnect(common.Nettype_pharos)
+	common.NullConnect()
 	return string(re)
 }
 
