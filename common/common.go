@@ -19,7 +19,7 @@ var g_Etherclient *ethclient.Client = nil
 var g_SolClient *solRPC.Client = nil
 var G_BlockchainConfig bool = true
 var G_DataDir string
-var G_NetType int
+var G_NetType string
 
 func InitGlobal(dir string) {
 	G_NetType = Nettype_ethereum
@@ -133,7 +133,23 @@ func GetConfig(configs string) string {
 		tmp, _ := json.Marshal(result)
 		re = string(tmp)
 	} else {
-		tmp, _ := json.Marshal(G_Config)
+		// 创建一个新的map，用于处理customNetworks字段
+		resultMap := make(map[string]interface{})
+		for key, value := range G_Config {
+			if key == "customNetworks" {
+				// 尝试将customNetworks字段从字符串转换回数组
+				var customNetworks []interface{}
+				err := json.Unmarshal([]byte(value), &customNetworks)
+				if err == nil {
+					resultMap[key] = customNetworks
+				} else {
+					resultMap[key] = value
+				}
+			} else {
+				resultMap[key] = value
+			}
+		}
+		tmp, _ := json.Marshal(resultMap)
 		re = string(tmp)
 	}
 	return string(re)
@@ -157,12 +173,34 @@ func GetEthConnection() *ethclient.Client {
 	if g_Etherclient == nil {
 		var connect *ethclient.Client
 		var err error
+		var nodeAddress string
+
 		if Nettype_ethereum == G_NetType {
-			connect, err = ethclient.Dial(G_Config["ethAddress"])
+			nodeAddress = G_Config["ethAddress"]
 		} else if Nettype_polygon == G_NetType {
-			connect, err = ethclient.Dial(G_Config["polAddress"])
+			nodeAddress = G_Config["polAddress"]
 		} else if Nettype_pharos == G_NetType {
-			connect, err = ethclient.Dial(G_Config["phrsAddress"])
+			nodeAddress = G_Config["phrsAddress"]
+		} else {
+			// 对于自定义网络，从配置文件中获取网络地址
+			if customNetworksStr, ok := G_Config["customNetworks"]; ok {
+				var customNetworks []map[string]string
+				if err := json.Unmarshal([]byte(customNetworksStr), &customNetworks); err == nil {
+					for _, network := range customNetworks {
+						if network["name"] == G_NetType {
+							nodeAddress = network["nodeAddress"]
+							break
+						}
+					}
+				}
+			}
+		}
+
+		if nodeAddress != "" {
+			connect, err = ethclient.Dial(nodeAddress)
+		} else {
+			fmt.Println("no node address configured")
+			err = fmt.Errorf("no node address configured")
 		}
 
 		if err != nil {
@@ -176,17 +214,9 @@ func GetEthConnection() *ethclient.Client {
 	return g_Etherclient
 }
 
-func NullConnect(ntye int) {
-	switch ntye {
-	case Nettype_ethereum:
-		g_Etherclient = nil
-	case Nettype_polygon:
-		g_Etherclient = nil
-	case Nettype_solana:
-		g_SolClient = nil
-	case Nettype_pharos:
-		g_Etherclient = nil
-	}
+func NullConnect() {
+	g_Etherclient = nil
+	g_SolClient = nil
 }
 
 /*

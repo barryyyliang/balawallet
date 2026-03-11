@@ -170,6 +170,22 @@
             }
         }
 
+        // 获取配置并添加自定义网络到main_net select
+        var configResult = await window.doGetConfig("")
+        if (configResult != ""){
+            var config = JSON.parse(configResult)
+            if (config.customNetworks && Array.isArray(config.customNetworks)){
+                var mainNetSelect = document.getElementById("main_net")
+                // 为每个自定义网络添加选项
+                config.customNetworks.forEach(function(network) {
+                    var option = document.createElement("option")
+                    option.text = network.name
+                    option.value = network.name
+                    mainNetSelect.add(option)
+                })
+            }
+        }
+
         var res = await window.doGetRes("main")
         if (res != "") {
             gMainRes = JSON.parse(res)         
@@ -310,6 +326,46 @@
 
     function getMainNet(){
         return  document.getElementById("main_net").value
+    }
+
+    // 刷新网络列表
+    async function refreshMainNet() {
+        var configResult = await window.doGetConfig("")
+        if (configResult != ""){
+            var config = JSON.parse(configResult)
+            if (config.customNetworks && Array.isArray(config.customNetworks)){
+                var mainNetSelect = document.getElementById("main_net")
+                // 保存当前选中的值
+                var currentValue = mainNetSelect.value
+                // 清空除了默认网络外的所有选项
+                var defaultOptions = []
+                for (var i = 0; i < mainNetSelect.options.length; i++) {
+                    var option = mainNetSelect.options[i]
+                    // 保留默认网络选项（Ethereum, Polygon, Solana, Pharos）
+                    if (option.value === "Ethereum" || option.value === "Polygon" || option.value === "Solana" || option.value === "Pharos") {
+                        defaultOptions.push({text: option.text, value: option.value})
+                    }
+                }
+                // 清空所有选项
+                mainNetSelect.options.length = 0
+                // 添加默认网络选项
+                defaultOptions.forEach(function(option) {
+                    var opt = document.createElement("option")
+                    opt.text = option.text
+                    opt.value = option.value
+                    mainNetSelect.add(opt)
+                })
+                // 添加自定义网络选项
+                config.customNetworks.forEach(function(network) {
+                    var option = document.createElement("option")
+                    option.text = network.name
+                    option.value = network.name
+                    mainNetSelect.add(option)
+                })
+                // 恢复之前选中的值
+                mainNetSelect.value = currentValue
+            }
+        }
     }
 </script>
 </head> 

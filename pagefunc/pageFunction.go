@@ -134,12 +134,26 @@ func DoGetComponent(com string) string {
 
 func DoConfig(configs string) string {
 	re := common.GetResult(common.Msg_success, "")
-	var config = make(map[string]string)
 
-	json.Unmarshal([]byte(configs), &config)
+	// 首先解析整个配置为map[string]interface{}
+	var configMap map[string]interface{}
+	err := json.Unmarshal([]byte(configs), &configMap)
+	if err != nil {
+		fmt.Println("解析配置失败:", err)
+		return string(re)
+	}
 
-	for key, value := range config {
-		common.G_Config[key] = value
+	// 处理字符串类型的配置
+	for key, value := range configMap {
+		if strValue, ok := value.(string); ok {
+			common.G_Config[key] = strValue
+		} else if key == "customNetworks" {
+			// 处理customNetworks字段，将其转换为JSON字符串后保存
+			customNetworksJSON, err := json.Marshal(value)
+			if err == nil {
+				common.G_Config[key] = string(customNetworksJSON)
+			}
+		}
 	}
 
 	db, _ := leveldb.OpenFile(common.G_DataDir+"db", nil)
@@ -147,22 +161,8 @@ func DoConfig(configs string) string {
 	tmp, _ := json.Marshal(common.G_Config)
 	db.Put([]byte("config"), tmp, nil)
 
-	/*
-		for key, value := range G_Config {
-			err = db.Put([]byte(key), []byte(value), nil)
-			if err != nil {
-				fmt.Println("put config error")
-				re = getResult(Msg_writedb_fail, err.Error())
-			} else {
-				fmt.Println("put config:" + key + ":" + value)
-			}
-		}
-	*/
 	// 配置更新后刷新链接
-	common.NullConnect(common.Nettype_ethereum)
-	common.NullConnect(common.Nettype_polygon)
-	common.NullConnect(common.Nettype_solana)
-	common.NullConnect(common.Nettype_pharos)
+	common.NullConnect()
 	return string(re)
 }
 
@@ -189,9 +189,8 @@ func DoGetRes(com string) string {
 	return re
 }
 
-func DoChangeNet(nettype string) string {
-	var re []byte
-	tmpType := -1
+func getNetType(nettype string) string {
+	tmpType := "-1"
 	switch nettype {
 	case "Ethereum":
 		tmpType = common.Nettype_ethereum
@@ -202,6 +201,17 @@ func DoChangeNet(nettype string) string {
 	case "Pharos":
 		tmpType = common.Nettype_pharos
 	}
+	if tmpType == "-1" {
+		tmpType = nettype
+	}
+
+	return tmpType
+}
+
+func DoChangeNet(nettype string) string {
+	var re []byte
+	tmpType := getNetType(nettype)
+
 	if common.G_NetType != tmpType {
 		if tmpType == common.Nettype_solana {
 			//re = GetResult(Msg_fail, "not support")
