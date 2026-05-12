@@ -14,6 +14,9 @@ async function saveConfig() {
     obj["solAddress"] = document.getElementById("config_input_sol_address").value 
     obj["phrsAddress"] = document.getElementById("config_input_phrs_address").value 
     obj["contractDir"] = document.getElementById("config_input_contractDir").value
+    obj["wcProjectId"] = document.getElementById("config_input_wcProjectId").value
+    var proxyEle = document.getElementById("config_input_proxy");
+    obj["proxyAddress"] = proxyEle ? proxyEle.value : ""
     obj["language"] = document.getElementById("config_select_language").value
     
     // 保存新增的网络配置
@@ -144,6 +147,7 @@ function initPage() {
         obj["solAddress"] = "config_input_sol_address" 
         obj["phrsAddress"] = "config_input_phrs_address" 
         obj["contractDir"] = "config_input_contractDir"
+        obj["wcProjectId"] = "config_input_wcProjectId"
         obj["language"] = "config_select_language"
         var acc = JSON.parse(result)
         window.doWebLog("解析后的配置:" + JSON.stringify(acc));

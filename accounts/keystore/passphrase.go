@@ -68,6 +68,8 @@ const (
 	scryptDKLen = 32
 )
 
+var _ IkeyStore = (*keyStorePassphrase)(nil)
+
 type keyStorePassphrase struct {
 	keysDirPath string
 	scryptN     int

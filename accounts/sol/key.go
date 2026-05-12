@@ -50,6 +50,10 @@ const (
 	// MaxBase58Length = 44
 )
 
+var _ accounts.IChainAdapter = (*SolChainAdapter)(nil)
+var _ accounts.Key = (*SolKey)(nil)
+var _ accounts.Account = (*SolAccount)(nil)
+
 type SolChainAdapter struct {
 }
 

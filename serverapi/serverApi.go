@@ -27,6 +27,11 @@ type Bchain interface {
 	InvokeEstimate(from, conAddr, funcAbi, param string) string
 	GetContractBalance(assetType, conAddr, ownerAddr string) string
 	DeployEstimate(from, conFile, funcAbi, param string) string
+	// Dapp 连接相关
+	PersonalSign(account, password, data string) string
+	SignTypedData(account, password, data string) string
+	SignTransaction(account, password, data string) string
+	GetChainId() string
 }
 
 var server = new(ServerAPI)
@@ -37,6 +42,9 @@ func GetServer(in Bchain) *ServerAPI {
 }
 func SetServer(in Bchain) {
 	server.setServer(in)
+}
+func GetCurrentServer() *ServerAPI {
+	return server
 }
 
 type ServerAPI struct {
@@ -125,4 +133,16 @@ func (in *ServerAPI) DoGetContractBalance(assetType, conAddr, ownerAddr string) 
 }
 func (in *ServerAPI) DoDeployEstimate(from, conFile, funcAbi, param string) string {
 	return in.Chain.DeployEstimate(from, conFile, funcAbi, param)
+}
+func (in *ServerAPI) DoPersonalSign(account, password, data string) string {
+	return in.Chain.PersonalSign(account, password, data)
+}
+func (in *ServerAPI) DoSignTypedData(account, password, data string) string {
+	return in.Chain.SignTypedData(account, password, data)
+}
+func (in *ServerAPI) DoSignTransaction(account, password, data string) string {
+	return in.Chain.SignTransaction(account, password, data)
+}
+func (in *ServerAPI) DoGetChainId() string {
+	return in.Chain.GetChainId()
 }

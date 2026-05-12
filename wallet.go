@@ -48,6 +48,7 @@ func main() {
 	common.InitGlobal(dir)
 	ethchain.Init(dir)
 	solchain.Init(dir)
+
 	tmp := ethchain.GetEthChain()
 	server := serverapi.GetServer(tmp)
 
@@ -100,6 +101,14 @@ func main() {
 	win.Bind("doInvokeEstimate", server.DoInvokeEstimate)
 	win.Bind("doGetContractBalance", server.DoGetContractBalance)
 	win.Bind("doDeployEstimate", server.DoDeployEstimate)
+
+	//Dapp 连接相关函数
+	win.Bind("doDappConnect", pagefunc.DoDappConnect)
+	win.Bind("doDappDisconnect", pagefunc.DoDappDisconnect)
+	win.Bind("doDappStatus", pagefunc.DoDappStatus)
+	win.Bind("doDappPollRequest", pagefunc.DoDappPollRequest)
+	win.Bind("doDappApprove", pagefunc.DoDappApprove)
+	win.Bind("doDappReject", pagefunc.DoDappReject)
 
 	content := common.G_Files["/main.html"]
 	if len(content) == 0 {

@@ -33,6 +33,10 @@ import (
 	"github.com/google/uuid"
 )
 
+var _ accounts.IChainAdapter = (*EthChainAdapter)(nil)
+var _ accounts.Key = (*EthKey)(nil)
+var _ accounts.Account = (*EthAccount)(nil)
+
 type EthChainAdapter struct {
 }
 
