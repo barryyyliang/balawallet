@@ -1,0 +1,36 @@
+
+th {    
+    background-color:#656865d8;
+    color: white;
+    height:30px;
+}
+
+.cdiv {
+    text-align: center;
+    margin: 20px;
+}
+.contractTable{
+    margin-bottom: 10px;
+    font-size: 16px;
+    text-align: center;
+    margin:auto;
+    width: 500px;
+    border: 1px solid black;
+}
+
+.invokeTable{
+    margin-bottom: 10px;
+    font-size: 16px;
+    text-align: center;
+    border: 1px solid black;
+    margin:auto;
+    width: 500px;
+}
+
+.trth{
+    height:30px;
+}
+
+.firstTd{
+    width: 150px;
+}

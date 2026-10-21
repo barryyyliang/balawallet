@@ -1,0 +1,169 @@
+[
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "mintInfo",
+        "outputs": [
+            {
+                "name": "_owner",
+                "type": "address"
+            },
+            {
+                "name": "_mintAuthority",
+                "type": "address"
+            },
+            {
+                "name": "_totalSupply",
+                "type": "uint64"
+            },
+            {
+                "name": "_decimals",
+                "type": "uint64"
+            },
+            {
+                "name": "_isInitialized",
+                "type": "string"
+            },
+            {
+                "name": "_freezeAuthority",
+                "type": "address"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [
+            {
+                "name": "_owner",
+                "type": "address"
+            }
+        ],
+        "name": "balanceOf",
+        "outputs": [
+            {
+                "name": "_balance",
+                "type": "uint64"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [
+            {
+                "name": "_account",
+                "type": "address"
+            }
+        ],
+        "name": "balanceOfAccount",
+        "outputs": [
+            {
+                "name": "_account",
+                "type": "address"
+            },
+            {
+                "name": "_mint",
+                "type": "address"
+            },
+            {
+                "name": "_owner",
+                "type": "address"
+            },
+            {
+                "name": "_balance",
+                "type": "uint64"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": false,
+        "inputs": [
+            {
+                "name": "_toOwner",
+                "type": "address"
+            },
+            {
+                "name": "_value",
+                "type": "uint64"
+            }
+        ],
+        "name": "transfer",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [
+            {
+                "name": "_owner",
+                "type": "address"
+            }
+        ],
+        "name": "getTokenAccount",
+        "outputs": [
+            {
+                "name": "_account",
+                "type": "address"
+            },
+            {
+                "name": "_mint",
+                "type": "address"
+            },
+            {
+                "name": "_owner",
+                "type": "address"
+            },
+            {
+                "name": "_balance",
+                "type": "uint64"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [
+            {
+                "name": "_owner",
+                "type": "address"
+            }
+        ],
+        "name": "createTokenAccount",
+        "outputs": [
+        ],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [
+            {
+                "name": "_toOwner",
+                "type": "address"
+            },
+            {
+                "name": "_amount",
+                "type": "uint64"
+            }
+        ],
+        "name": "mintTo",
+        "outputs": [
+        ],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    }
+]

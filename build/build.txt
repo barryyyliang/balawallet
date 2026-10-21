@@ -1,0 +1,24 @@
+
+sudo security add-trusted-cert -d -r trustAsRoot -p codeSign -k /Library/Keychains/System.keychain ./cert.cer
+sudo security add-trusted-cert -d -r trustRoot -p codeSign -k /Library/Keychains/System.keychain ./cert.cer
+
+security find-identity -p codesigning
+
+
+codesign -f -s "Developer ID Application: Yongfu Liang (H9WT49L44K)" -v "/Users/barry/code/app/app/BalaWallet.app" 
+
+hdiutil create -srcFolder /Users/barry/code/app/app -o BalaWallet
+
+codesign -f -s "Developer ID Application: Yongfu Liang (H9WT49L44K)" -v "/Users/barry/code/app/BalaWallet.dmg" 
+
+
+codesign -f -s "Developer ID Application: Yongfu Liang (H9WT49L44K)" -v "/Users/barry/code/app/BalaWallet.dmg" --deep
+
+
+
+xattr -r -d com.apple.FinderInfo w3wallet.dmg 
+
+
+
+
+

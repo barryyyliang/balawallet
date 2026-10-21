@@ -1,0 +1,19 @@
+<div id="export_hint" style="margin: 10px auto;text-align: center;font-size: 16px">
+    提示：将导出明文私钥，请妥善保管，秘钥丢失，会导致秘钥管理的数字资产丢失，如果想要备份加密的钱包文件，请在钱包的account目录下直接获取
+</div>
+<table id="table1" style="margin: 0 auto;font-size: 16px;text-align: center;">
+    <tr>        
+        <td id="export_account">账户:</td>
+        <td>
+            <select id="export_select_acc" style="font-size: 16px;height: 25px;width: 300px;border-radius: 0px;">
+            </select>
+        </td>
+    </tr>  
+    <tr>
+        <td id="export_acc">账户密码:</td>
+        <td><input type="password" id="export_input_pass" ></td>
+    </tr> 
+</table>
+<div style="margin: 0 auto;text-align: center;">
+    <button id="export_export" class="button1" onclick="exportAct()">导出</button>
+</div>

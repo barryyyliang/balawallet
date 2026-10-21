@@ -1,0 +1,46 @@
+
+<!--弹出层时背景层DIV-->
+<div id="fade" class= "black_overlay"></div>     
+<div id="MyDiv" class="white_content_small">
+    <div style="text-align: right; cursor: default;">
+        <div style="display: flex;height:35px;;align-items:center ;justify-content: right; background: rgb(131, 174, 230);width:100%;">
+            <span id="main_close" style="font-size: 16px;" onclick="MYDIALOG.CloseDiv('MyDiv','fade')">关闭</span>
+        </div>
+    </div>
+    <div id="dialogcontent" style="font-size: 16px;display: flex;flex-direction: column;text-align: left; word-wrap:break-word;flex-grow: 1;">
+    </div>
+</div>   
+
+<!-- menu-->            
+<div id="menu" class="topmenu">
+    <div id="main_copy" class="menu" onclick="MYMENU.copy()">拷贝</div>
+    <div id="main_paste" class="menu" onclick="MYMENU.paste()">粘贴</div>
+    <div id="main_cut" class="menu">剪切</div>
+    <div id="main_clear" class="menu">清除</div>
+    <textarea id="copyarea" style="position:fixed; clip:rect(0 0 0 0);height: 0px;width: 0px;"></textarea>
+</div> 
+
+<!-- tool menu-->            
+<div id="toolMenu" class="topmenu">
+    <div id="main_deploy" class="menu" onclick="changePage('tools','deploycontract')">部署合约</div>
+    <div id="main_invoke" class="menu" onclick="changePage('tools','invokecontract')">调用合约</div>
+    <div id="main_query" class="menu" onclick="changePage('tools','querytx')">查询交易</div>
+    <div id="main_sign" class="menu" onclick="changePage('tools','signature')">数字签名</div>
+    <div id="main_dapp" class="menu" onclick="changePage('tools','dappconnect')">连接 Dapp</div>
+    <!--div id="main_dataspace" class="menu" onclick="changePage('tools','dataspace')">个人数据空间</div-->
+</div> 
+
+<!-- system menu-->            
+<div id="systemMenu" class="topmenu">
+    <div id="main_newaccount" class="menu" onclick="changePage('system','newaccount')">新增账户</div>
+    <div id="main_importaccount" class="menu" onclick="changePage('system','import')">导入账号</div>
+    <div id="main_exportaccount" class="menu" onclick="changePage('system','export')">导出账号</div>
+    <div id="main_changespacepass" class="menu" onclick="changePage('system','spacepass')">数据空间密码</div>
+    <div id="main_config" class="menu" onclick="changePage('system','config')">系统设置</div>
+    <div id="main_about" class="menu" onclick="changePage('system','about')">关于</div>
+</div> 
+
+<!-- function menu-->            
+<div id="funcMenu" class="topmenu" onmouseout="onFuncOut(event)">
+    <div id="main_newaccount" class="menu">新增账户</div>
+</div> 

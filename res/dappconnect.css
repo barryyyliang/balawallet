@@ -1,0 +1,32 @@
+
+#dapp_connect_area textarea:focus {
+    outline: 2px solid #4a90d9;
+}
+
+#dapp_status_area table tr {
+    height: 35px;
+}
+
+#dapp_request_area {
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+#dapp_approve_btn:hover {
+    background-color: #45a049 !important;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+#dapp_reject_btn:hover {
+    background-color: #da190b !important;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+#dapp_log {
+    color: #333;
+    line-height: 1.5;
+}

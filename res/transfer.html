@@ -1,0 +1,37 @@
+<div style="margin: 0 auto;text-align: center;">
+    <table id="table1" style="margin: 0 auto;font-size: 16px;text-align: center;">
+        <tr>
+            <td id="transfer_from">转出账户:</td>
+            <td>
+                <input type="text" id="transfer_input_selectedAdd"  style="width:300px;background-color: rgb(230, 230, 230);" readonly="readonly">
+            </td>
+        </tr> 
+        <tr>
+            <td id="transfer_name">别名:</td>
+            <td><input type="text" id="transfer_input_name" style="width:300px;background-color: rgb(230, 230, 230);" readonly="readonly"></td>
+        </tr> 
+        <tr>
+            <td id="transfer_balance">账户余额:</td>
+            <td><input type="text" id="transfer_input_balance" style="width:300px;background-color: rgb(230, 230, 230);" readonly="readonly"></td>
+        </tr> 
+        <tr>
+            <td id="transfer_fee">预估费用:</td>
+            <td><input type="text" id="transfer_input_fee" style="width:300px;background-color: rgb(230, 230, 230);" readonly="readonly"></td>
+        </tr> 
+        <tr>
+            <td id="transfer_to">接收地址:</td>
+            <td><input type="text" id="transfer_input_toAddress" style="width:300px"></td>
+        </tr> 
+        <tr>
+            <td id="transfer_amount">转账金额:</td>
+            <td><input type="text" id="transfer_input_amount" style="width:300px"></td>
+        </tr> 
+        <tr>
+            <td id="transfer_acc">密码:</td>
+            <td><input type="password" id="transfer_pass" style="width:300px"></td>
+        </tr> 
+    </table>
+</div>
+<div style="margin: 0 auto;text-align: center;">
+    <button id="transfer_transfer" class="button1" onclick="ontransfer()">转账</button>
+</div>

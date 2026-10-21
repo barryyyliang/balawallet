@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html>
+<head> 
+<meta charset="utf-8"> 
+<title>数字货币钱包</title> 
+<style>
+    div1{
+        margin: 0 auto;
+        font-size: 16px;
+        text-align: center;
+    }
+    table, th, td {
+        frame: void;
+    }
+    tr {
+        height:50px;
+    }
+    input {
+        font-size: 16px;
+        height: 25px;
+        width: 300px;
+        vertical-align: bottom;
+    }
+    /*主菜单*/
+   
+    ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #333;
+    }
+
+    li {
+        float: left;
+    }
+
+    li a {
+        display: block;
+        color: white;
+        text-align: center;
+        padding: 14px 16px;
+        text-decoration: none;
+    }
+
+    li a:hover {
+        background-color: #111;
+    } 
+    li a.active {
+        background-color: rgb(100, 145, 100);
+    }
+    .button1 {
+        background-color: #656865d8; /* Green */
+        border: none;
+        color: white;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+        -webkit-transition-duration: 0.4s; /* Safari */
+        transition-duration: 0.4s;
+        width: 200px;
+        height: 30px;
+    }
+    .button1:hover {
+        box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+    }
+    .highlight {
+        background-color:lightgoldenrodyellow;
+    }
+
+</style>
+<style id="stylerightmenu"></style>
+<style id="pageStyle"></style>
+<script id="menuscript"></script>
+<script id="pageScript"></script>
+<script>
+    var currentMenu
+    var currentPage
+    var gResJson
+    var gMainRes
+    var gParam
+
+    window.onload=async function() {
+        //async  init page
+        var result = await  window.doGetComponent("rightmenu")
+        var obj = JSON.parse(result)
+        document.getElementById('stylerightmenu').innerHTML = obj.css   
+        document.getElementById('rightmenudiv').innerHTML = obj.html
+        document.getElementById('menuscript').innerHTML = obj.js  
+
+        // window.doGetComponent("rightmenu").then( (result) => {
+        //         var obj = JSON.parse(result)
+        //         document.getElementById('stylerightmenu').innerHTML = obj.css   
+        //         document.getElementById('rightmenudiv').innerHTML = obj.html
+        //         document.getElementById('menuscript').innerHTML = obj.js            
+        //     }
+        // )
+
+        initMenu()
+        changePage("qianbao","qianbao")          
+        checkConfig()
+    }
+
+    function checkConfig(){
+        window.doCheckNode().then ( (result) => {
+            var obj = JSON.parse(result)
+            if ( 0 != obj.Code) {
+                MYDIALOG.ShowDiv(obj.Msg)
+            }
+        })    
+    }
+
+    async function gReloadRes() {
+        var res = await window.doGetRes(currentPage)
+        if (res != "") {
+            gResJson = JSON.parse(res)
+        }
+    }
+
+    async function gLoadRes() {
+        var res = await window.doGetRes(currentPage)
+        if (res != "") {
+            gResJson = JSON.parse(res)
+            for (var ele in gResJson) {
+                var obj = document.getElementById(ele)
+                if (obj != null) {
+                    obj.innerText = gResJson[ele]
+                }
+            }
+        }
+    }
+
+    function gGetRes(res) {
+        if (gResJson != null) {
+            return gResJson[res]
+        } else {
+            return ""
+        }
+    }
+
+    async function gGetMainRes(res) {
+        if (gMainRes == null) {
+            var res = await window.doGetRes("main")
+            if (res != "") {
+                gMainRes = JSON.parse(res)         
+            }            
+        }
+
+        return gMainRes[res]
+    }
+    
+
+    async function initMenu() {
+        var result = await window.doGetAccounts()
+        if (result != ""){
+            var acc = JSON.parse(result)
+            if (acc != ""){
+                window.doWebLog(acc)
+                var se = document.getElementById("add")
+                se.options.length = 0
+                for (i=0; i<acc.accounts.length; i++){
+                    var option = document.createElement("option")
+                    option.text = acc.accounts[i].address
+                    option.value = acc.accounts[i].address
+                    se.add(option)
+                }
+            }
+        }
+
+        // 获取配置并添加自定义网络到main_net select
+        var configResult = await window.doGetConfig("")
+        if (configResult != ""){
+            var config = JSON.parse(configResult)
+            if (config.customNetworks && Array.isArray(config.customNetworks)){
+                var mainNetSelect = document.getElementById("main_net")
+                // 为每个自定义网络添加选项
+                config.customNetworks.forEach(function(network) {
+                    var option = document.createElement("option")
+                    option.text = network.name
+                    option.value = network.name
+                    mainNetSelect.add(option)
+                })
+            }
+        }
+
+        var res = await window.doGetRes("main")
+        if (res != "") {
+            gMainRes = JSON.parse(res)         
+            for (var ele in gMainRes) {
+                var obj = document.getElementById(ele)
+                if (obj != null) {
+                    obj.innerText = gMainRes[ele]
+                }
+            }
+        }
+    } 
+
+    function setCurrentMenu(menuName){
+        currentMenu = menuName
+    }
+    function getCurrentMenu(){
+        return currentMenu
+    }
+    function setCurrentPage(pageName){
+        currentPage = pageName
+    }
+    function getCurrentPage(){
+        return currentPage
+    }
+
+
+    async function changePage(menuname,pagename){    
+        //if(pagename === currentPage){
+        //    return
+        //}
+        MYDIALOG.CloseDiv("MyDiv","fade")
+        var menu = document.querySelector('#toolMenu')
+        if (menu != null) {
+            menu.style.height=0;
+        }        
+
+        try{
+            if (currentPage != ""  && currentPage != null && currentPage != "invokecontract" && currentPage != "querytx"){
+            document.getElementById("page_" + currentPage).remove()
+            }
+        } catch (e) {
+            MYDIALOG.ShowDiv(e.message);
+        }
+
+        currentMenu = menuname
+        currentPage = pagename
+
+        var li = document.getElementsByClassName("active")
+        for (var i=0; i<li.length;i++){
+            li[i].setAttribute("class","hover")
+        }
+        document.getElementById(menuname).setAttribute("class","active")       
+
+        var result = await window.doGetComponent(pagename)
+        var obj
+        try{
+                obj = JSON.parse(result)
+                document.getElementById('pageStyle').remove() 
+                //document.getElementById('pageContent').innerHTML = ""
+                document.getElementById('pageScript').remove()
+
+                var cs = document.createElement("style")
+                cs.setAttribute("id","pageStyle")
+                cs.innerHTML = obj.css
+                document.head.appendChild(cs)
+
+                var js = document.createElement("script")
+                js.setAttribute("id","pageScript")
+                js.innerHTML = obj.js
+                document.head.appendChild(js)
+                //document.getElementById('pageScript').innerHTML = obj.js   
+
+                var content = document.getElementById('pageContent')
+                var hasHistory = false
+                var i = 0
+                for(i = 0;i<content.children.length;i++){                
+                    if (content.children[i].id === "page_" + pagename){
+                        //content.childNodes[i].style.width = "100%"
+                        content.children[i].style.height = "100%"
+                        content.children[i].style.display = "block"
+                        hasHistory = true
+                    } else {
+                        //content.childNodes[i].style.width = "0px"
+                        content.children[i].style.display = "none"
+                        content.childNodes[i].style.height = "0px"
+                    }
+                }
+
+                if (hasHistory === false){
+                    var page = document.createElement("div")
+                    page.setAttribute("id","page_" + pagename)  
+                    page.setAttribute("style","width:100%;height:100%")  
+                    page.innerHTML = obj.html
+                    content.appendChild(page)
+                    initPage() 
+                } else {
+                    gReloadRes()
+                    try{
+                        reInit()
+                    } catch (e) {
+                    }
+                }
+                //document.getElementById('pageContent').innerHTML = obj.html                
+                //initPage() 
+            }
+        catch(err){
+            MYDIALOG.ShowDiv(err.message);
+        }        
+    }
+
+    function showResult(resutl) {
+        var objJson = JSON.parse(resutl)
+        MYDIALOG.ShowDiv(objJson.Msg)
+    }
+
+    async function showMsg(code,addmsg) {
+        var msg = await window.doGetMsg(code)
+        if (addmsg != ""){
+            addmsg = " : " + addmsg
+        }
+        MYDIALOG.ShowDiv(msg+addmsg)
+    } 
+
+    function getCurrentAccount(){
+        return  document.getElementById("add").value
+    }
+
+    async function onNetChange(){
+        var nettype = document.getElementById("main_net").value
+        var result = await window.doChangeNet(nettype)
+        var obj = JSON.parse(result)
+        if (obj.Code === 0){
+            document.getElementById('pageContent').innerHTML = ""
+            changePage('qianbao','qianbao')            
+        }
+        MYDIALOG.ShowDiv(obj.Msg)
+    }
+
+    function getMainNet(){
+        return  document.getElementById("main_net").value
+    }
+
+    // 刷新网络列表
+    async function refreshMainNet() {
+        var configResult = await window.doGetConfig("")
+        if (configResult != ""){
+            var config = JSON.parse(configResult)
+            if (config.customNetworks && Array.isArray(config.customNetworks)){
+                var mainNetSelect = document.getElementById("main_net")
+                // 保存当前选中的值
+                var currentValue = mainNetSelect.value
+                // 清空除了默认网络外的所有选项
+                var defaultOptions = []
+                for (var i = 0; i < mainNetSelect.options.length; i++) {
+                    var option = mainNetSelect.options[i]
+                    // 保留默认网络选项（Ethereum, Polygon, Solana, Pharos）
+                    if (option.value === "Ethereum" || option.value === "Polygon" || option.value === "Solana" || option.value === "Pharos") {
+                        defaultOptions.push({text: option.text, value: option.value})
+                    }
+                }
+                // 清空所有选项
+                mainNetSelect.options.length = 0
+                // 添加默认网络选项
+                defaultOptions.forEach(function(option) {
+                    var opt = document.createElement("option")
+                    opt.text = option.text
+                    opt.value = option.value
+                    mainNetSelect.add(opt)
+                })
+                // 添加自定义网络选项
+                config.customNetworks.forEach(function(network) {
+                    var option = document.createElement("option")
+                    option.text = network.name
+                    option.value = network.name
+                    mainNetSelect.add(option)
+                })
+                // 恢复之前选中的值
+                mainNetSelect.value = currentValue
+            }
+        }
+    }
+</script>
+</head> 
+<!--body oncontextmenu="return false" onselectstart="return false"-->
+<body style="background: rgb(245, 245, 245);"></body>
+    <div id = "menudiv" style="z-index: 100;display: flex;background-color: #333;position: fixed;top: 0%;left: 0%;width: 100%;">
+        <div style="margin-right: auto;">
+            <ul>
+                <li><a id="qianbao" class="active" onmouseover="onMenuOver('qianbao')" onclick="changePage('qianbao','qianbao')">钱包</a></li>                    
+                <li><a id="contractasset" onmouseover="onMenuOver('contractasset')" onclick="changePage('contractasset','contractasset')">合约资产</a></li>
+                <li><a id="transfer" onmouseover="onMenuOver('transfer')" onclick="changePage('transfer','transfer')">转账</a></li>
+                <li><a id="dataspace" onmouseover="onMenuOver('dataspace')" onclick="changePage('dataspace','dataspace')">数据空间</a></li>
+                <li><a id="tools" onmouseover="onMenuOver('tools')" onclick="onToolsMenu()">工具</a></li>
+                <!--li><a id="system" onclick="changePage('system','system')">系统</a></li-->
+                <li><a id="system" onmouseover="onMenuOver('system')" onclick="onSystemMenu()">系统</a></li>
+            </ul>   
+        </div>  
+        <div style="display: flex;align-items: center;">
+            <select id="add" name="add" onchange="accountChange()" style="font-size: 14px;height: 25px;width: 300px;border-radius: 0px;"></select>
+        </div>    
+        <div style="display: flex;align-items: center;">
+            <select id="main_net" onchange="onNetChange()" style="font-size: 14px;height: 25px;width: 100px;border-radius: 0px;">
+                <option id="main_eth" value="Ethereum">Ethereum</option>
+                <option id="main_pol" value="Polygon">Polygon</option>
+                <option id="main_sol" value="Solana">Solana</option>
+                <option id="main_sol" value="Pharos">Pharos</option>
+            </select>
+        </div>   
+    </div>   
+    <div style="width: 98%;top: 60px;position: absolute;display: flex;flex-direction: column;text-align: center;"> 
+        <div style="margin: 0 auto;text-align: center;">
+            <div id="pageContent" style="margin: 0 auto;text-align: center;"></div>   
+        </div>        
+    </div>
+    <div id = 'rightmenudiv' style="margin: 0 auto;text-align: center;"> </div>      
+</body>
+   
+</html>
